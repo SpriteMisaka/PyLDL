@@ -2,7 +2,7 @@
 
 LDL(Label Distribution Learning) toolkit implemented in python, including:
 
-+ 6 LDL algorithms: SA_BFGS, SA_IIS, AA_KNN, AA_BP, PT_Bayes, PT_SVM;
++ 6 LDL algorithms proposed by [Geng](https://github.com/SpriteMisaka/PyLDL/blob/main/LDL.pdf): SA_BFGS, SA_IIS, AA_KNN, AA_BP, PT_Bayes, PT_SVM;
 + 10 LDL metrics: chebyshev, clark, canberra, kl_divergence, cosine, intersection, euclidean, sorensen, squared_chi2, fidelity;
 + 15 LDL datasets: Human_Gene, Movie, Natural_Scene, SBU_3DFE, SJAFFE, Yeast_alpha, Yeast_cdc, Yeast_cold, Yeast_diau, Yeast_dtt, Yeast_elu, Yeast_heat, Yeast_spo, Yeast_spo5, Yeast_spoem.
 
