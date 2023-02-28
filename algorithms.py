@@ -1,6 +1,9 @@
-import numpy as np
+import os
 
-from scipy.optimize import minimize, fsolve
+import numpy as np
+import numba
+
+from scipy.optimize import minimize
 from scipy.special import softmax
 from sklearn.base import BaseEstimator
 from sklearn.neighbors import NearestNeighbors
@@ -62,6 +65,9 @@ class BaseLDL(_BaseLDL, BaseEstimator):
 class BaseDeepLDL(_BaseLDL, keras.Model):
     
     def __init__(self, random_state=None):
+
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
         super(_BaseLDL, self).__init__(random_state)
         super(keras.Model, self).__init__()
         if random_state != None:
@@ -128,6 +134,21 @@ class SA_BFGS(_SA):
         return optimize_result.x.reshape(self._n_outputs, self._n_features).transpose()
 
 
+@numba.jit(nopython=True, fastmath=True)
+def _solve(_X, _y, y_pred):
+
+    delta = np.empty(shape=(_X.shape[1], _y.shape[1]), dtype=np.float32)
+    for k in range(_X.shape[1]):
+        for j in range(_y.shape[1]):
+            
+            temp1 = np.sum(_y[:, j] * _X[:, k])
+            temp2 = np.sum(y_pred[:, j] * _X[:, k] * \
+                           np.exp(np.sign(_X[:, k]) * np.sum(np.abs(_X), axis=1)))
+            delta[k][j] = np.log(temp1 / (temp2 + 1e-8))
+
+    return delta
+
+
 class SA_IIS(_SA):
 
     def _specialized_alg(self, weights):
@@ -136,27 +157,18 @@ class SA_IIS(_SA):
         counter = 1
         W = weights.reshape(self._n_outputs, self._n_features).transpose()
         y_pred = softmax(np.dot(self._X, W), axis=1)
+
         while flag:
-            
-            delta = np.zeros(shape=(self._n_features, self._n_outputs), dtype=np.float32)
-            
-            for k in range(self._n_features):
-                for j in range(self._n_outputs):
-                    
-                    def func(x):
-                        s1 = np.sum(y_pred[:, j] * self._X[:, k] * np.exp(x * np.sign(self._X[:, k])) * \
-                                    np.sum(np.abs(self._X), axis=1))
-                        s2 = np.sum(self._y[:, j] * self._X[:, k])
-                        return s1 - s2
-                    delta[k][j] = fsolve(func, 0)
+            delta = _solve(self._X, self._y, y_pred)
 
             l2 = self._loss(y_pred)
             weights += delta.transpose().ravel()
             y_pred = softmax(np.dot(self._X, W), axis=1)
             l1 = self._loss(y_pred)
+
             if l2 - l1 < self.convergence_criterion or counter >= self.maxiter:
                 flag = False
-
+            
             W = weights.reshape(self._n_outputs, self._n_features).transpose()
             counter += 1
 
@@ -188,14 +200,18 @@ class AA_BP(BaseDeepLDL):
     def __init__(self, random_state=None):
         super().__init__(random_state)
 
-    def fit(self, X, y):
+    def fit(self, X, y, latent=None, epochs=600, **fit_params):
         super().fit(X, y)
 
+        if latent == None:
+            latent = self._n_features * 3 // 2
+
         self._model = keras.Sequential([keras.layers.InputLayer(input_shape=(self._n_features,)),
-                                       keras.layers.Dense(self._n_outputs, activation='softmax')])
+                                        keras.layers.Dense(latent, activation='sigmoid'),
+                                        keras.layers.Dense(self._n_outputs, activation='softmax')])
         self._model.compile(loss="mean_squared_error")
 
-        self._model.fit(self._X, self._y, verbose=0)
+        self._model.fit(self._X, self._y, verbose=0, epochs=epochs, **fit_params)
 
     def predict(self, X):
         return self._model(X)
@@ -243,3 +259,30 @@ class PT_SVM(_PT):
 
 
 __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM"]
+
+
+if __name__ == '__main__':
+
+    from sklearn.model_selection import KFold
+    import pandas as pd
+    from utils import load_dataset
+    from tqdm import *
+
+    seed = 114514
+    X, y = load_dataset('SJAFFE')
+
+    columns = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]
+    
+    for method in __all__:
+        df = pd.DataFrame(columns=columns)
+        print(method)
+        for i in tqdm(range(10)):
+
+            kfold = KFold(n_splits=10, shuffle=True, random_state=seed+i)
+            for train_index, test_index in tqdm(kfold.split(X), leave=False):
+
+                model = eval(f'{method}()')
+                model.fit(X[train_index], y[train_index])
+
+                df.loc[len(df.index)] = model.score(X[test_index], y[test_index], metrics=columns)
+                df.to_excel(f'{method}.xlsx', index=False)
