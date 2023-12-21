@@ -1,88 +1,66 @@
 import numpy as np
 from scipy import stats
-from sklearn.metrics import *
-from sklearn.metrics.pairwise import *
+from sklearn.metrics.pairwise import paired_cosine_distances
 
 
 eps = np.finfo(np.float64).eps
 
 
+def _clip(func):
+    def _wrapper(y, y_pred):
+        y = np.clip(y, eps, 1)
+        y_pred = np.clip(y_pred, eps, 1)
+        return func(y, y_pred)
+    return _wrapper
+
+
 def chebyshev(y, y_pred):
-    diff_abs = np.abs(y - y_pred)
-    cheby = np.max(diff_abs, 1)
-
-    return cheby.mean()
+    return np.max(np.abs(y - y_pred), 1).mean()
 
 
+@_clip
 def clark(y, y_pred):
-    y = np.clip(y, eps, 1)
-    y_pred = np.clip(y_pred, eps, 1)
-    sum_2 = np.power(y + y_pred, 2)
-    diff_2 = np.power(y - y_pred, 2)
-    clark = np.sqrt(np.sum(diff_2 / sum_2, 1))
-    
-    return clark.mean()
+    return np.sqrt(np.sum(np.power(y - y_pred, 2) / np.power(y + y_pred, 2), 1)).mean()
 
 
+@_clip
 def canberra(y, y_pred):
-    y = np.clip(y, eps, 1)
-    y_pred = np.clip(y_pred, eps, 1)
-    sum_2 = y + y_pred
-    diff_abs = np.abs(y - y_pred)
-    can = np.sum(diff_abs / sum_2, 1)
-    
-    return can.mean()
+    return np.sum(np.abs(y - y_pred) / (y + y_pred), 1).mean()
 
 
+@_clip
 def kl_divergence(y, y_pred):
-    y = np.clip(y, eps, 1)
-    y_pred = np.clip(y_pred, eps, 1)   
-    kl = np.sum(y * (np.log(y) - np.log(y_pred)), 1)
-
-    return kl.mean()
+    return np.sum(y * (np.log(y) - np.log(y_pred)), 1).mean()
 
 
 def cosine(y, y_pred):
-
     return 1 - paired_cosine_distances(y, y_pred).mean()
 
 
 def intersection(y, y_pred):
-
     return 1 - 0.5 * np.sum(np.abs(y - y_pred), 1).mean()
 
 
 def euclidean(y, y_pred):
-    height = y.shape[0]
-
-    return np.sum(np.sqrt(np.sum((y - y_pred) ** 2, 1))) / height
+    return np.sqrt(np.sum((y - y_pred) ** 2, 1)).mean()
 
 
+@_clip
 def sorensen(y, y_pred):
-    height = y.shape[0]
-    numerator = np.sum(np.abs(y - y_pred), 1)
-    denominator = np.sum(y + y_pred, 1)
-
-    return np.sum(numerator / denominator) / height
+    return (np.sum(np.abs(y - y_pred), 1) / np.sum(y + y_pred, 1)).mean()
 
 
+@_clip
 def squared_chi2(y, y_pred):
-    height = y.shape[0]
-    numerator = (y - y_pred) ** 2
-    denominator = y + y_pred
-
-    return np.sum(numerator / denominator) / height
+    return np.sum((y - y_pred) ** 2 / (y + y_pred), 1).mean()
 
 
 def fidelity(y, y_pred):
-    height = y.shape[0]
-
-    return np.sum(np.sqrt(y * y_pred)) / height
+    return np.sum(np.sqrt(y * y_pred), 1).mean()
 
 
-def mean_absolute_error(y, y_pred, x=None):
-    if x is None:
-        x = np.arange(1, y.shape[1] + 1)
+def mean_absolute_error(y, y_pred):
+    x = np.arange(1, y.shape[1] + 1)
     yt = np.sum(y * x, axis=1)
     yp = np.sum(y_pred * x, axis=1)
     return np.average(np.abs(yt - yp))
@@ -100,25 +78,22 @@ def sort_loss(y, y_pred, reduction=np.average):
 
 
 def spearman(y, y_pred):
-    sum = 0.
-    for i in range(y.shape[0]):
-        s, _ = stats.spearmanr(y[i], y_pred[i])
-        sum += s
-    sum /= y.shape[0]
-    return sum
+    return np.array([stats.spearmanr(y[i], y_pred[i])[0] for i in range(y.shape[0])]).mean()
 
 
 def kendall(y, y_pred):
-    sum = 0.
-    for i in range(y.shape[0]):
-        s, _ = stats.kendalltau(y[i], y_pred[i])
-        sum += s
-    sum /= y.shape[0]
-    return sum
+    return np.array([stats.kendalltau(y[i], y_pred[i], variant='c')[0] for i in range(y.shape[0])]).mean()
+
+
+def zero_one_loss(y, y_pred):
+    return 1 - (np.argmax(y, 1) == np.argmax(y_pred, 1)).mean()
+
+
+def error_probability(y, y_pred):
+    return 1 - y[np.arange(y.shape[0]), np.argmax(y_pred, 1)].mean()
 
 
 def score(y, y_pred,
           metrics=["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]):
-
     return tuple((eval(i)(y, y_pred) for i in metrics))
     

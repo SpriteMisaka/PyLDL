@@ -3,17 +3,19 @@
 Label distribution learning (LDL) and label enhancement (LE) toolkit implemented in python, including:
 
 + LDL algorithms:
-  + ([Geng, Yin, and Zhou 2013](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2013.pdf))[*TPAMI*]: `CPNN`\*.
+  + ([Geng, Yin, and Zhou 2013](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2013.pdf))[*TPAMI*]: `CPNN`$^1$.
   + ([Geng and Hou 2015](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2015.pdf))[*IJCAI*]: `LDSVR`.
   + ⭐([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf))[*TKDE*]: `SA_BFGS`, `SA_IIS`, `AA_KNN`, `AA_BP`, `PT_Bayes`, and `PT_SVM`.
   + ([Yang, Sun, and Sun 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/yang2017.pdf))[*AAAI*]: `BCPNN` and `ACPNN`.
   + ([Shen et al. 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2017.pdf))[*NeurIPS*]: `LDLF`.
+  + ([Wang and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2019.pdf))[*IJCAI*]: `LDL4C`$^2$.
   + ([Shen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2020.pdf))[*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
-  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Information Sciences*]: `SSG_LDL`.
+  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Information Sciences*]: `SSG_LDL`$^3$.
   + ([González et al. 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021b.pdf))[*Information Fusion*]: `DF_LDL`.
+  + ([Wang and Geng 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021.pdf))[*IJCAI*]: `LDL_HR`$^2$.
   + ([Jia et al. 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2021.pdf))[*TKDE*]: `LDL_SCL`.
   + ([Jia et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023.pdf))[*TKDE*]: `LDL_LRR`.
-  + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`\*, `QFD2`\*, and `CJS`\*.
+  + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, and `ML`.
   + ([Xu et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2020.pdf))[*ICML*]: `LEVI`.
@@ -21,7 +23,11 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
 + LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 
-> \* Technically, these methods are only suitable for totally ordered labels.
+> $^1$ Technically, these methods are only suitable for totally ordered labels.
+>
+> $^2$ These are LDL classifiers, so you should use `predict_proba` to get label distributions and `predict` to get predicted labels.
+>
+> $^3$ These are oversampling algorithms for LDL, therefore you should use `fit_transform` to generate synthetic samples.
 
 ## Usage
 
@@ -44,8 +50,6 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print(score(y_test, y_pred))
 ```
-
-Note that `SSG_LDL` is an oversampling algorithm, therefore you should use `fit_transform` to generate synthetic samples.
 
 For those who would like to use the original implementation:
 

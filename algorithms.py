@@ -115,6 +115,12 @@ class _BaseDeep(keras.Model):
         self._n_latent = n_latent
         self._n_hidden = n_hidden
 
+    def _l2_reg(self, model):
+        reg = 0.
+        for i in model.trainable_variables:
+            reg += tf.reduce_sum(tf.square(i))
+        return reg / 2.
+
 
 class BaseDeepLDL(_BaseLDL, _BaseDeep):
 
@@ -562,28 +568,11 @@ class LDL_SCL(BaseDeepLDL):
         return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))
 
 
-class LDL_LRR(BaseDeepLDL):
+class DeepBFGS():
 
-    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+    def _get_obj_func(self, model, loss_function, X, y):
 
-    @tf.function
-    def _ranking_loss(self, y_pred, P, W):
-        Phat = tf.math.sigmoid((tf.expand_dims(y_pred, -1) - tf.expand_dims(y_pred, 1)) * 100)
-        l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - Phat, 1e-9, 1.0)) + \
-              P * tf.math.log(tf.clip_by_value(Phat, 1e-9, 1.0))) * W
-        return -tf.reduce_sum(l)
-
-    @tf.function
-    def _loss(self, X, y):
-        y_pred = self._model(X)
-        kl = tf.math.reduce_mean(keras.losses.kl_divergence(y, y_pred))
-        rank = self._ranking_loss(y_pred, self._P, self._W)
-        return kl + self._alpha / (2 * X.shape[0]) * rank
-
-    def _get_obj_func(self):
-
-        shapes = tf.shape_n(self._model.trainable_variables)
+        shapes = tf.shape_n(model.trainable_variables)
         n_tensors = len(shapes)
 
         count = 0
@@ -602,17 +591,20 @@ class LDL_LRR(BaseDeepLDL):
         def _assign_new_model_parameters(params_1d):
             params = tf.dynamic_partition(params_1d, part, n_tensors)
             for i, (shape, param) in enumerate(zip(shapes, params)):
-                self._model.trainable_variables[i].assign(tf.reshape(param, shape))
+                model.trainable_variables[i].assign(tf.reshape(param, shape))
 
         @tf.function
         def _f(params_1d):
 
             with tf.GradientTape() as tape:
                 _assign_new_model_parameters(params_1d)
-                loss = self._loss(self._X, self._y)
+                loss = loss_function(X, y)
 
-            grads = tape.gradient(loss, self._model.trainable_variables)
+            grads = tape.gradient(loss, model.trainable_variables)
             grads = tf.dynamic_stitch(idx, grads)
+
+            _f.iter.assign_add(1)
+            tf.py_function(_f.history.append, inp=[loss], Tout=[])
 
             return loss, grads
 
@@ -623,8 +615,39 @@ class LDL_LRR(BaseDeepLDL):
         _f.assign_new_model_parameters = _assign_new_model_parameters
         _f.history = []
         return _f
+    
+    def _optimize_bfgs(self, model, loss_function, X, y, max_iterations=500):
+        
+        func = self._get_obj_func(model, loss_function, X, y)
+        init_params = tf.dynamic_stitch(func.idx, model.trainable_variables)
 
-    def fit(self, X, y, alpha=1e-2, beta=1.):
+        results = tfp.optimizer.lbfgs_minimize(
+            value_and_gradients_function=func, initial_position=tf.zeros_like(init_params), max_iterations=max_iterations
+        )
+
+        func.assign_new_model_parameters(results.position)
+
+
+class LDL_LRR(BaseDeepLDL, DeepBFGS):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    @tf.function
+    def _ranking_loss(self, y_pred, P, W):
+        Phat = tf.math.sigmoid((tf.expand_dims(y_pred, -1) - tf.expand_dims(y_pred, 1)) * 100)
+        l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - Phat, 1e-9, 1.0)) + \
+              P * tf.math.log(tf.clip_by_value(Phat, 1e-9, 1.0))) * W
+        return -tf.reduce_sum(l)
+
+    @tf.function
+    def _loss(self, X, y):
+        y_pred = self._model(X)
+        kl = tf.math.reduce_mean(keras.losses.kl_divergence(y, y_pred))
+        rank = self._ranking_loss(y_pred, self._P, self._W) / (2 * X.shape[0])
+        return kl + self._alpha * rank + self._beta * self._l2_reg(self._model)
+
+    def fit(self, X, y, alpha=1e-2, beta=1e-2):
         super().fit(X, y)
 
         self._alpha = alpha
@@ -637,23 +660,100 @@ class LDL_LRR(BaseDeepLDL):
 
         self._model = keras.Sequential(
             [keras.layers.InputLayer(input_shape=self._n_features),
-             keras.layers.Dense(self._n_outputs,
-                                activation="softmax",
-                                kernel_regularizer=keras.regularizers.L2(self._beta))]
-        )
+             keras.layers.Dense(self._n_outputs, activation="softmax")])
 
-        func = self._get_obj_func()
-        init_params = tf.dynamic_stitch(func.idx, self._model.trainable_variables)
-
-        results = tfp.optimizer.lbfgs_minimize(
-            value_and_gradients_function=func, initial_position=init_params,
-            max_iterations=500, tolerance=1.4901161193847656e-08
-        )
-
-        func.assign_new_model_parameters(results.position)
+        self._optimize_bfgs(self._model, self._loss, self._X, self._y)
 
     def predict(self, X):
-        return self._model(X)
+        return self._model(X).numpy()
+
+
+class BaseLDLClassifier(BaseDeepLDL):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    def predict_proba(self, X):
+        return self._model(X).numpy()
+    
+    def predict(self, X):
+        return np.argmax(self.predict_proba(X), axis=1)
+    
+    def score(self, X, y, metrics=None):
+        if metrics is None:
+            metrics = ["zero_one_loss", "error_probability"]
+        return score(y, self.predict_proba(X), metrics=metrics)
+
+
+class LDL4C(BaseLDLClassifier, DeepBFGS):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    @tf.function
+    def _loss(self, X, y):
+        y_pred = self._model(X)
+        top2 = tf.gather(y_pred, self._top2, axis=1, batch_dims=1)
+        margin = tf.reduce_sum(tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho))
+        mae = keras.losses.mean_absolute_error(y, y_pred)
+        return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(self._model)
+    
+    def fit(self, X, y, alpha=1e-2, beta=1e-6, rho=1e-2):
+        super().fit(X, y)
+
+        self._alpha = alpha
+        self._beta = beta
+        self._rho = rho
+
+        self._top2 = tf.math.top_k(self._y, k=2)[1]
+        self._entropy = tf.cast(-tf.reduce_sum(self._y * tf.math.log(self._y) + 1e-7, axis=1), dtype=tf.float32)
+
+        self._model = keras.Sequential(
+            [keras.layers.InputLayer(input_shape=self._n_features),
+             keras.layers.Dense(self._n_outputs, activation="softmax")])
+
+        self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations=50)
+
+
+class LDL_HR(BaseLDLClassifier, DeepBFGS):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    @tf.function
+    def _loss(self, X, y):
+        y_pred = self._model(X)
+        
+        highest = tf.gather(y_pred, self._highest, axis=1, batch_dims=1)
+        rest = tf.gather(y_pred, self._rest, axis=1, batch_dims=1)
+        margin = tf.reduce_sum(tf.maximum(0., 1. - (highest - rest) / self._rho))
+
+        real_rest = tf.gather(y, self._rest, axis=1, batch_dims=1)
+        rest_mae = tf.reduce_sum(keras.losses.mean_absolute_error(real_rest, rest))
+
+        mae = tf.reduce_sum(keras.losses.mean_absolute_error(self._l, y_pred))
+
+        return mae + self._alpha * margin + self._beta * rest_mae + self._gamma * self._l2_reg(self._model)
+    
+    def fit(self, X, y, alpha=1e-2, beta=1e-2, gamma=1e-6, rho=1e-2):
+        super().fit(X, y)
+
+        self._alpha = alpha
+        self._beta = beta
+        self._gamma = gamma
+        self._rho = rho
+
+        temp = tf.math.top_k(self._y, k=6)[1]
+        self._highest = temp[:, 0:1]
+        self._rest = temp[:, 1:]
+
+        self._l = tf.one_hot(tf.reshape(self._highest, -1), self._n_outputs)
+
+        self._model = keras.Sequential(
+            [keras.layers.InputLayer(input_shape=self._n_features),
+             keras.layers.Dense(self._n_outputs, activation="softmax")])
+
+        self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations=50)
 
 
 class _PT(BaseLDL):
@@ -1034,5 +1134,6 @@ __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "CPNN", "BCPNN", "ACPNN", "LDSVR",
            "LDLF", "LDL_SCL", "LDL_LRR", "CAD", "QFD2", "CJS",
            "DF_LDL", "AdaBoostLDL",
+           "LDL4C", "LDL_HR",
            "SSG_LDL",
            "FCM", "KM", "LP", "ML", "LEVI"]
