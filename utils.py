@@ -12,12 +12,21 @@ def load_dataset(name):
     return data['features'], data['labels']
 
 
+def random_missing(y, w=.1):
+    missing_y = y.copy()
+    np.put(missing_y,
+           np.random.choice(y.size, int(y.size * w), replace=False),
+           np.nan)
+    missing_mask = np.isnan(missing_y)
+    missing_y[missing_mask] = 0.
+    return missing_y, missing_mask
+
+
 def binaryzation(y, t=.5):
     b = np.sort(y.T, axis=0)[::-1]
     cs = np.cumsum(b, axis=0)
     m = np.argmax(cs > t, axis=0)
     r = np.argsort(np.argsort(y))
-    r >= y.shape[1] - m.reshape(-1, 1) - 1
     return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
 
 

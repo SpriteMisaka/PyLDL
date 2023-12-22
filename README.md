@@ -7,12 +7,13 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Geng and Hou 2015](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2015.pdf))[*IJCAI*]: `LDSVR`.
   + ⭐([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf))[*TKDE*]: `SA_BFGS`, `SA_IIS`, `AA_KNN`, `AA_BP`, `PT_Bayes`, and `PT_SVM`.
   + ([Yang, Sun, and Sun 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/yang2017.pdf))[*AAAI*]: `BCPNN` and `ACPNN`.
+  + ([Xu and Zhou 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2017.pdf))[*IJCAI*]: `IncomLDL`$^2$.
   + ([Shen et al. 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2017.pdf))[*NeurIPS*]: `LDLF`.
-  + ([Wang and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2019.pdf))[*IJCAI*]: `LDL4C`$^2$.
+  + ([Wang and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2019.pdf))[*IJCAI*]: `LDL4C`$^3$.
   + ([Shen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2020.pdf))[*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
-  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Information Sciences*]: `SSG_LDL`$^3$.
+  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Information Sciences*]: `SSG_LDL`$^4$.
   + ([González et al. 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021b.pdf))[*Information Fusion*]: `DF_LDL`.
-  + ([Wang and Geng 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021.pdf))[*IJCAI*]: `LDL_HR`$^2$.
+  + ([Wang and Geng 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021.pdf))[*IJCAI*]: `LDL_HR`$^3$.
   + ([Jia et al. 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2021.pdf))[*TKDE*]: `LDL_SCL`.
   + ([Jia et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023.pdf))[*TKDE*]: `LDL_LRR`.
   + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
@@ -25,9 +26,11 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 
 > $^1$ Technically, these methods are only suitable for totally ordered labels.
 >
-> $^2$ These are LDL classifiers, so you should use `predict_proba` to get label distributions and `predict` to get predicted labels.
+> $^2$ These are algorithms for incomplete LDL, so you should use `utils.random_missing` to generate the missing label distribution matrix and the corresponding mask matrix in the experiments.
 >
-> $^3$ These are oversampling algorithms for LDL, therefore you should use `fit_transform` to generate synthetic samples.
+> $^3$ These are LDL classifiers, so you should use `predict_proba` to get label distributions and `predict` to get predicted labels.
+>
+> $^4$ These are oversampling algorithms for LDL, therefore you should use `fit_transform` to generate synthetic samples.
 
 ## Usage
 
@@ -64,7 +67,7 @@ Now, you can load the original implementation of the method, e.g.:
 from matlab_algorithms import SA_IIS
 ```
 
-You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `plot_artificial` function, e.g.:
+You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `utils.plot_artificial` function, e.g.:
 
 ```python
 from algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes
@@ -107,7 +110,7 @@ Results of ours are as follows.
 |  LDL-SCL  |   .087 ± .008   |   .336 ± .024   |   .688 ± .051   |   .044 ± .006   |   .959 ± .006   |   .885 ± .009   |
 |   LDLF    |   .092 ± .011   |   .353 ± .035   |   .721 ± .076   |   .049 ± .010   |   .954 ± .009   |   .879 ± .013   |
 
-(LDL Algorithms using `SA_BFGS` as the base estimator)
+(LDL Algorithms using `SA_BFGS` as the Base Estimator)
 
 | Algorithm  |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     K-L(↓)      |     Cos.(↑)     |     Int.(↑)     |
 | :--------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
@@ -115,6 +118,18 @@ Results of ours are as follows.
 |  SSG-BFGS  |   .090 ± .090   |   .343 ± .343   |   .699 ± .699   |   .047 ± .047   |   .957 ± .957   |   .883 ± .883   |
 | BFGS-AdaB. |   .087 ± .009   |   .327 ± .025   |   .666 ± .050   |   .042 ± .007   |   .961 ± .007   |   .888 ± .009   |
 | (Baseline) |   .092 ± .010   |   .361 ± .029   |   .735 ± .060   |   .051 ± .009   |   .954 ± .009   |   .878 ± .011   |
+
+(Incomplete LDL)
+
+|       Algorithm        |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     Cos.(↑)     |     Int.(↑)     |
+| :--------------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
+| SA-BFGS (10% Missing)  |   .101 ± .010   |   .396 ± .031   |   .815 ± .065   |   .943 ± .010   |   .863 ± .011   |
+| IncomLDL (10% Missing) | **.095 ± .009** | **.354 ± .022** | **.735 ± .046** | **.956 ± .006** | **.876 ± .008** |
+
+|       Algorithm        |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     Cos.(↑)     |     Int.(↑)     |
+| :--------------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
+| SA-BFGS (40% Missing)  |   .108 ± .012   |   .404 ± .029   |   .831 ± .063   |   .938 ± .011   |   .858 ± .012   |
+| IncomLDL (40% Missing) | **.104 ± .010** | **.371 ± .021** | **.773 ± .046** | **.950 ± .006** | **.869 ± .009** |
 
 (Classical LDL Algorithms)
 
@@ -149,7 +164,8 @@ quadprog==0.1.11
 scikit-fuzzy==0.4.2
 scikit-learn==1.0.2
 scipy==1.8.0
-tensorflow-gpu==2.8.0
+tensorflow==2.8.0
+tensorflow-addons==0.22.0
 tensorflow-probability==0.16.0
 ```
 
