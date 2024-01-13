@@ -150,46 +150,14 @@ class BaseDeepLE(_BaseLE, _BaseDeep):
 
 class _SA(BaseLDL):
 
-    def __init__(self,
-                 maxiter=600,
-                 convergence_criterion=1e-6,
-                 random_state=None):
-
+    def __init__(self, random_state=None):
         super().__init__(random_state)
-
-        self.maxiter = maxiter
-        self.convergence_criterion = convergence_criterion
-
         self._W = None
 
-        warnings.filterwarnings('ignore', "The iteration is not making good progress,")
-
-    def _object_fun(self, weights):
-        W = weights.reshape(self._n_outputs, self._n_features).transpose()
-        y_pred = softmax(np.dot(self._X, W), axis=1)
-
-        func_loss = self._loss(y_pred)
-        func_grad = self._gradient(y_pred)
-
-        return func_loss, func_grad
-
-    def _gradient(self, y_pred):
-        grad = np.dot(self._X.T, y_pred - self._y)
-        return grad.transpose().reshape(-1, )
-
-    def _loss(self, y_pred):
-        y_true = np.clip(self._y, 1e-7, 1)
+    def _loss(self, y, y_pred):
+        y_true = np.clip(y, 1e-7, 1)
         y_pred = np.clip(y_pred, 1e-7, 1)
         return -1 * np.sum(y_true * np.log(y_pred))
-
-    def _specialized_alg(self, _):
-        pass
-
-    def fit(self, X, y):
-        super().fit(X, y)
-
-        weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
-        self._W = self._specialized_alg(weights)
 
     def predict(self, X):
         return softmax(np.dot(X, self._W), axis=1)
@@ -203,16 +171,34 @@ class _SA(BaseLDL):
 
 class SA_BFGS(_SA):
 
-    def _specialized_alg(self, weights):
-        optimize_result = minimize(self._object_fun, weights, method='L-BFGS-B', jac=True,
-                                   options={'gtol': self.convergence_criterion,
-                                            'disp': False, 'maxiter': self.maxiter})
-        return optimize_result.x.reshape(self._n_outputs, self._n_features).transpose()
+    def _obj_func(self, weights):
+        W = weights.reshape(self._n_outputs, self._n_features).T
+        y_pred = softmax(np.dot(self._X, W), axis=1)
+
+        func_loss = self._loss(self._y, y_pred)
+        func_grad = np.dot(self._X.T, y_pred - self._y).T.reshape(-1, )
+
+        return func_loss, func_grad
+
+    def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
+        super().fit(X, y)
+
+        weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
+
+        warnings.filterwarnings('ignore', "The iteration is not making good progress,")
+        optimize_result = minimize(self._obj_func, weights, method='L-BFGS-B', jac=True,
+                                   options={'gtol': convergence_criterion,
+                                            'disp': False, 'maxiter': max_iterations})
+        
+        self._W = optimize_result.x.reshape(self._n_outputs, self._n_features).T
 
 
 class SA_IIS(_SA):
 
-    def _specialized_alg(self, weights):
+    def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
+        super().fit(X, y)
+
+        weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
 
         flag = True
         counter = 1
@@ -231,18 +217,18 @@ class SA_IIS(_SA):
                         return temp1 - temp2
                     delta[k][j] = fsolve(func, .0, xtol=1e-10)
 
-            l2 = self._loss(y_pred)
+            l2 = self._loss(self._y, y_pred)
             weights += delta.transpose().ravel()
             y_pred = softmax(np.dot(self._X, W), axis=1)
-            l1 = self._loss(y_pred)
+            l1 = self._loss(self._y, y_pred)
 
-            if l2 - l1 < self.convergence_criterion or counter >= self.maxiter:
+            if l2 - l1 < convergence_criterion or counter >= max_iterations:
                 flag = False
 
             W = weights.reshape(self._n_outputs, self._n_features).transpose()
             counter += 1
 
-        return W
+        self._W = W
 
 
 class AA_KNN(BaseLDL):
@@ -590,7 +576,7 @@ class IncomLDL(BaseDeepLDL):
         self._mask = tf.where(mask, 0., 1.)
 
         self._model = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
-                                        keras.layers.Dense(self._n_outputs, activation=None, use_bias=False)])
+                                        keras.layers.Dense(self._n_outputs, activation='softmax', use_bias=False)])
         self._optimizer = tfa.optimizers.ProximalAdagrad(learning_rate)
 
         for _ in range(epochs):
@@ -611,62 +597,53 @@ class IncomLDL(BaseDeepLDL):
 
 class DeepBFGS():
 
+    @tf.function
+    def _assign_new_model_parameters(self, params_1d, model):
+        params = tf.dynamic_partition(params_1d, self._part, self._n_tensors)
+        for i, (shape, param) in enumerate(zip(self._model_shapes, params)):
+            model.trainable_variables[i].assign(tf.reshape(param, shape))
+
     def _get_obj_func(self, model, loss_function, X, y):
-
-        shapes = tf.shape_n(model.trainable_variables)
-        n_tensors = len(shapes)
-
-        count = 0
-        idx = []
-        part = []
-
-        for i, shape in enumerate(shapes):
-            n = np.product(shape)
-            idx.append(tf.reshape(tf.range(count, count+n, dtype=tf.int32), shape))
-            part.extend([i]*n)
-            count += n
-
-        part = tf.constant(part)
-
-        @tf.function
-        def _assign_new_model_parameters(params_1d):
-            params = tf.dynamic_partition(params_1d, part, n_tensors)
-            for i, (shape, param) in enumerate(zip(shapes, params)):
-                model.trainable_variables[i].assign(tf.reshape(param, shape))
 
         @tf.function
         def _f(params_1d):
 
             with tf.GradientTape() as tape:
-                _assign_new_model_parameters(params_1d)
+                self._assign_new_model_parameters(params_1d, model)
                 loss = loss_function(X, y)
 
             grads = tape.gradient(loss, model.trainable_variables)
-            grads = tf.dynamic_stitch(idx, grads)
-
-            _f.iter.assign_add(1)
-            tf.py_function(_f.history.append, inp=[loss], Tout=[])
+            grads = tf.dynamic_stitch(self._idx, grads)
 
             return loss, grads
 
-        _f.iter = tf.Variable(0)
-        _f.idx = idx
-        _f.part = part
-        _f.shapes = shapes
-        _f.assign_new_model_parameters = _assign_new_model_parameters
-        _f.history = []
         return _f
     
-    def _optimize_bfgs(self, model, loss_function, X, y, max_iterations=500):
+    def _optimize_bfgs(self, model, loss_function, X, y, max_iterations=50):
+
+        self._model_shapes = tf.shape_n(model.trainable_variables)
+        self._n_tensors = len(self._model_shapes)
+
+        count = 0
+        self._idx = []
+        self._part = []
+
+        for i, shape in enumerate(self._model_shapes):
+            n = np.product(shape)
+            self._idx.append(tf.reshape(tf.range(count, count+n, dtype=tf.int32), shape))
+            self._part.extend([i]*n)
+            count += n
+
+        self._part = tf.constant(self._part)
         
         func = self._get_obj_func(model, loss_function, X, y)
-        init_params = tf.dynamic_stitch(func.idx, model.trainable_variables)
+        init_params = tf.dynamic_stitch(self._idx, model.trainable_variables)
 
         results = tfp.optimizer.lbfgs_minimize(
-            value_and_gradients_function=func, initial_position=tf.zeros_like(init_params), max_iterations=max_iterations
+            value_and_gradients_function=func, initial_position=init_params, max_iterations=max_iterations
         )
 
-        func.assign_new_model_parameters(results.position)
+        self._assign_new_model_parameters(results.position, model)
 
 
 class LDL_LRR(BaseDeepLDL, DeepBFGS):
@@ -688,7 +665,7 @@ class LDL_LRR(BaseDeepLDL, DeepBFGS):
         rank = self._ranking_loss(y_pred, self._P, self._W) / (2 * X.shape[0])
         return kl + self._alpha * rank + self._beta * self._l2_reg(self._model)
 
-    def fit(self, X, y, alpha=1e-2, beta=1e-2):
+    def fit(self, X, y, alpha=1e-2, beta=1e-8, max_iterations=50):
         super().fit(X, y)
 
         self._alpha = alpha
@@ -703,13 +680,13 @@ class LDL_LRR(BaseDeepLDL, DeepBFGS):
             [keras.layers.InputLayer(input_shape=self._n_features),
              keras.layers.Dense(self._n_outputs, activation="softmax")])
 
-        self._optimize_bfgs(self._model, self._loss, self._X, self._y)
+        self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations)
 
     def predict(self, X):
         return self._model(X).numpy()
 
 
-class BaseLDLClassifier(BaseDeepLDL):
+class BaseDeepLDLClassifier(BaseDeepLDL):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
@@ -726,7 +703,7 @@ class BaseLDLClassifier(BaseDeepLDL):
         return score(y, self.predict_proba(X), metrics=metrics)
 
 
-class LDL4C(BaseLDLClassifier, DeepBFGS):
+class LDL4C(BaseDeepLDLClassifier, DeepBFGS):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
@@ -756,7 +733,7 @@ class LDL4C(BaseLDLClassifier, DeepBFGS):
         self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations=max_iterations)
 
 
-class LDL_HR(BaseLDLClassifier, DeepBFGS):
+class LDL_HR(BaseDeepLDLClassifier, DeepBFGS):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
@@ -797,7 +774,7 @@ class LDL_HR(BaseLDLClassifier, DeepBFGS):
         self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations=max_iterations)
 
 
-class LDLM(BaseLDLClassifier, DeepBFGS):
+class LDLM(BaseDeepLDLClassifier):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
