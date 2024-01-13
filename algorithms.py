@@ -185,7 +185,6 @@ class SA_BFGS(_SA):
 
         weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
 
-        warnings.filterwarnings('ignore', "The iteration is not making good progress,")
         optimize_result = minimize(self._obj_func, weights, method='L-BFGS-B', jac=True,
                                    options={'gtol': convergence_criterion,
                                             'disp': False, 'maxiter': max_iterations})
@@ -197,6 +196,7 @@ class SA_IIS(_SA):
 
     def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
         super().fit(X, y)
+        warnings.filterwarnings('ignore', "The iteration is not making good progress,")
 
         weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
 
