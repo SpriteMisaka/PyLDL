@@ -8,7 +8,7 @@ from qpsolvers import solve_qp
 
 from scipy.optimize import minimize, fsolve
 from scipy.special import softmax
-from scipy.spatial.distance import pdist
+from scipy.spatial.distance import pdist, cdist
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.neighbors import NearestNeighbors
@@ -1148,6 +1148,94 @@ class ML(BaseLE):
         return softmax(mu, axis=1)
 
 
+class GLLE(BaseDeepLE, DeepBFGS):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    def _get_obj_func(self, model, loss_function, P, l):
+
+        def _f(params_1d):
+
+            with tf.GradientTape() as tape:
+                y = model(P)
+                E_loss = self._E_loss(y)
+
+            E_gradients = tape.gradient(E_loss, self._E)
+            self._E_optimizer.apply_gradients(zip(E_gradients, self._E))
+
+            for i in range(self._n_clusters):
+                Ei_norm = tf.linalg.norm(self._E[i], axis=1, keepdims=True)
+                self._E[i].assign(self._E[i] / Ei_norm)
+
+            with tf.GradientTape() as tape:
+                self._assign_new_model_parameters(params_1d, model)
+                y = model(P)
+                loss = loss_function(l, y)
+
+            gradients = tape.gradient(loss, model.trainable_variables)
+            gradients = tf.dynamic_stitch(self._idx, gradients)
+
+            return loss, gradients
+
+        return _f
+    
+    @tf.function
+    def _E_loss(self, y):
+        E_loss = 0.
+        groups = tf.dynamic_partition(y, tf.constant(self._cluster_results), self._n_clusters)
+        for i in range(self._n_clusters):
+            E_loss += tf.linalg.trace(
+                tf.transpose(groups[i]) @ self._E[i] @ tf.transpose(self._E[i]) @ groups[i]
+            )
+        return E_loss
+
+    @tf.function
+    def _loss(self, l, y):
+        mse = tf.reduce_sum((l - y)**2)
+        lap = tf.linalg.trace(tf.transpose(y) @ self._G @ y)
+        return mse + self._alpha * lap + self._beta * self._E_loss(y)
+
+    def fit_transform(self, X, l, max_iterations=500, corr_learning_rate=1e-2,
+                      alpha=1e-2, beta=1e-4, sigma=10.):
+        super().fit_transform(X, l)
+
+        self._alpha = alpha
+        self._beta = beta
+
+        self._sigma = sigma
+
+        gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
+        self._P = tf.cast(rbf_kernel(self._X, gamma=gamma), dtype=tf.float32)
+        
+        self._nn = NearestNeighbors(n_neighbors=self._n_outputs+1)
+        self._nn.fit(self._X)
+        graph = self._nn.kneighbors_graph()
+
+        A = tf.exp(-(cdist(self._X, self._X) ** 2) / (2 * self._sigma ** 2))
+        A = tf.cast(A * graph.toarray(), dtype=tf.float32)
+        A_hat = tf.linalg.diag(tf.reduce_sum(A, axis=1))
+
+        self._G = tf.cast(A_hat - A, dtype=tf.float32)
+
+        k_means = KMeans()
+        self._cluster_results = k_means.fit_predict(self._X)
+        self._n_clusters = k_means.n_clusters
+        cluster_counts = tf.math.bincount(self._cluster_results)
+
+        self._E = [tf.Variable(tf.random.normal((cluster_counts[i], cluster_counts[i])),
+                               trainable=True) for i in range(self._n_clusters)]
+        self._E_optimizer = keras.optimizers.SGD(learning_rate=corr_learning_rate)
+
+        self._model = keras.Sequential(
+            [keras.layers.InputLayer(input_shape=self._P.shape[1]),
+             keras.layers.Dense(self._n_outputs, activation=None)])
+        
+        self._optimize_bfgs(self._model, self._loss, self._P, self._l, max_iterations)
+
+        return keras.activations.softmax(self._model(self._P))
+
+
 class LEVI(BaseDeepLE):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
@@ -1212,4 +1300,4 @@ __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "LDL4C", "LDL_HR", "LDLM",
            "IncomLDL",
            "SSG_LDL",
-           "FCM", "KM", "LP", "ML", "LEVI"]
+           "FCM", "KM", "LP", "ML", "GLLE", "LEVI"]
