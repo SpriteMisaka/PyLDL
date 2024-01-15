@@ -1253,18 +1253,19 @@ class LEVI(BaseDeepLE):
                                          scale=np.ones(self._n_outputs, dtype=np.float32))
 
         samples = d.sample()
-
-        y_hat = keras.activations.softmax(samples)
-        outputs = self._decoder(samples)
+        X_hat = self._decoder_X(samples)
+        l_hat = self._decoder_l(samples)
 
         kl = tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1)
-        rec_X = keras.losses.mean_squared_error(X, outputs)
-        rec_y = keras.losses.binary_crossentropy(l, y_hat)
+        rec_X = keras.losses.mean_squared_error(X, X_hat)
+        rec_y = keras.losses.binary_crossentropy(l, l_hat)
 
-        return tf.math.reduce_sum(kl + rec_X + rec_y)
+        return tf.reduce_sum((l - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_y)
 
-    def fit_transform(self, X, l, learning_rate=1e-5, epochs=3000):
+    def fit_transform(self, X, l, learning_rate=1e-4, epochs=1000, alpha=1.):
         super().fit_transform(X, l)
+
+        self._alpha = alpha
 
         input_shape = self._n_features + self._n_outputs
 
@@ -1272,12 +1273,16 @@ class LEVI(BaseDeepLE):
             self._n_hidden = self._n_features * 3 // 2
 
         self._encoder = keras.Sequential([keras.layers.InputLayer(input_shape=input_shape),
-                                          keras.layers.Dense(self._n_hidden, activation='sigmoid'),
+                                          keras.layers.Dense(self._n_hidden, activation='softplus'),
                                           keras.layers.Dense(self._n_outputs*2, activation=None)])
 
-        self._decoder = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
-                                          keras.layers.Dense(self._n_hidden, activation='sigmoid'),
-                                          keras.layers.Dense(self._n_features, activation=None)])
+        self._decoder_X = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
+                                            keras.layers.Dense(self._n_hidden, activation='softplus'),
+                                            keras.layers.Dense(self._n_features, activation=None)])
+        
+        self._decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
+                                            keras.layers.Dense(self._n_hidden, activation='softplus'),
+                                            keras.layers.Dense(self._n_outputs, activation=None)])
 
         self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
 

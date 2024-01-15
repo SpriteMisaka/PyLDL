@@ -19,7 +19,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Jia et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023.pdf))[*TKDE*]: `LDL_LRR`.
   + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
 + LE algorithms:
-  + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML` and `GLLE`.
+  + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2020.pdf))[*ICML*]: `LEVI`.
 
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
@@ -71,10 +71,10 @@ from matlab_algorithms import SA_IIS
 You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `utils.plot_artificial` function, e.g.:
 
 ```python
-from algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes
+from algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes, KM, GLLE
 from utils import plot_artificial
 
-methods = ['LDSVR', 'SA_BFGS', 'SA_IIS', 'AA_KNN', 'PT_Bayes']
+methods = ['LDSVR', 'SA_BFGS', 'SA_IIS', 'AA_KNN', 'PT_Bayes', 'KM', 'GLLE']
 
 plot_artificial(model=None, figname='GT')
 for i in methods:
@@ -94,6 +94,8 @@ The output images are as follows.
 | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/AA_KNN.jpg?raw=true" width=300> | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/PT_Bayes.jpg?raw=true" width=300> |
 | :----------------------------------------------------------: | :----------------------------------------------------------: |
 |                           `AA_KNN`                           |                          `PT_Bayes`                          |
+| <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/KM.jpg?raw=true" width=300> | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/GLLE.jpg?raw=true" width=300> |
+|                             `KM`                             |                            `GLLE`                            |
 
 Enjoy! :)
 
