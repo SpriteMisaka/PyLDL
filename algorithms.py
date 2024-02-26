@@ -1298,6 +1298,70 @@ class LEVI(BaseDeepLE):
         return softmax(mean, axis=1)
 
 
+class LIBLE(BaseDeepLE):
+
+    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+
+    def _loss(self, X, l):
+        latent = self._encoder(X)
+        mean = latent[:, :self._n_latent]
+        var = tf.math.softplus(latent[:, self._n_latent:])
+
+        d = tfp.distributions.Normal(loc=mean, scale=var)
+        std_d = tfp.distributions.Normal(loc=np.zeros(self._n_latent, dtype=np.float32),
+                                         scale=np.ones(self._n_latent, dtype=np.float32))
+
+        h = d.sample()
+        l_hat = self._decoder_l(h)
+        y_hat = self._decoder_y(h)
+        g = self._decoder_g(h)
+
+        kl = tf.reduce_sum(tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1))
+        rec_l = tf.reduce_sum((l - l_hat)**2)
+        rec_y = tf.reduce_sum(g**(-2) * (l - y_hat)**2 + tf.math.log(tf.abs(g**2)))
+
+        return rec_l + self._alpha * kl + self._beta * rec_y
+
+    def fit_transform(self, X, l, learning_rate=1e-3, epochs=1500, alpha=1e-3, beta=1.):
+        super().fit_transform(X, l)
+
+        self._alpha = alpha
+        self._beta = beta
+
+        if self._n_latent is None:
+            self._n_latent = self._n_features
+        if self._n_hidden is None:
+            self._n_hidden = self._n_features * 3 // 2
+
+        self._encoder = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
+                                          keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                          keras.layers.Dense(self._n_latent*2, activation=None)])
+
+        self._decoder_g = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                            keras.layers.Dense(1, activation='sigmoid')])
+        
+        self._decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                            keras.layers.Dense(self._n_outputs, activation=None)])
+        
+        self._decoder_y = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                            keras.layers.Dense(self._n_outputs, activation=None)])
+
+        self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
+
+        for _ in range(epochs):
+            with tf.GradientTape() as tape:
+                loss = self._loss(self._X, self._l)
+            gradients = tape.gradient(loss, self.trainable_variables)
+            self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+
+        latent = self._encoder(X)
+        mean = latent[:, :self._n_latent].numpy()
+        return softmax(self._decoder_y(mean), axis=1)
+
 __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "CPNN", "BCPNN", "ACPNN", "LDSVR",
            "LDLF", "LDL_SCL", "LDL_LRR", "CAD", "QFD2", "CJS",
@@ -1305,4 +1369,5 @@ __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "LDL4C", "LDL_HR", "LDLM",
            "IncomLDL",
            "SSG_LDL",
-           "FCM", "KM", "LP", "ML", "GLLE", "LEVI"]
+           "FCM", "KM", "LP", "ML", "GLLE",
+           "LEVI", 'LIBLE']

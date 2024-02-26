@@ -21,7 +21,8 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2020.pdf))[*ICML*]: `LEVI`.
-
+  + ([Zheng, Zhu, and Tang 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/zheng2023.pdf))[*CVPR*]: `LIBLE`.
+  
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
 + LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 
@@ -94,8 +95,10 @@ The output images are as follows.
 | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/AA_KNN.jpg?raw=true" width=300> | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/PT_Bayes.jpg?raw=true" width=300> |
 | :----------------------------------------------------------: | :----------------------------------------------------------: |
 |                           `AA_KNN`                           |                          `PT_Bayes`                          |
-| <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/KM.jpg?raw=true" width=300> | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/GLLE.jpg?raw=true" width=300> |
-|                             `KM`                             |                            `GLLE`                            |
+
+| <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/GLLE.jpg?raw=true" width=300> | <img src="https://github.com/SpriteMisaka/PyLDL/blob/main/visualization/LIBLE.jpg?raw=true" width=300> |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+|                            `GLLE`                            |                           `LIBLE`                            |
 
 Enjoy! :)
 
