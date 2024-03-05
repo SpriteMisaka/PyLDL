@@ -39,9 +39,9 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 Here is an example of using PyLDL.
 
 ```python
-from utils import load_dataset
-from algorithms import SA_BFGS
-from metrics import score
+from pyldl.utils import load_dataset
+from pyldl.algorithms import SA_BFGS
+from pyldl.metrics import score
 
 from sklearn.model_selection import train_test_split
 
@@ -61,21 +61,22 @@ For those who would like to use the original implementation:
 1. Install MATLAB.
 2. Install MATLAB engine for python.
 3. Download LDL Package from [here](http://palm.seu.edu.cn/xgeng/LDL/download.htm).
+3. Get the package directory of PyLDL (...\\Lib\\site-packages\\pyldl).
 4. Place the *LDLPackage_v1.2* folder into the *matlab_algorithms* folder.
 
 Now, you can load the original implementation of the method, e.g.:
 
 ```python
-from matlab_algorithms import SA_IIS
+from pyldl.matlab_algorithms import SA_IIS
 ```
 
-You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `utils.plot_artificial` function, e.g.:
+You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `pyldl.utils.plot_artificial` function, e.g.:
 
 ```python
-from algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes, KM, GLLE
-from utils import plot_artificial
+from pyldl.algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes, GLLE, LIBLE
+from pyldl.utils import plot_artificial
 
-methods = ['LDSVR', 'SA_BFGS', 'SA_IIS', 'AA_KNN', 'PT_Bayes', 'KM', 'GLLE']
+methods = ['LDSVR', 'SA_BFGS', 'SA_IIS', 'AA_KNN', 'PT_Bayes', 'GLLE', 'LIBLE']
 
 plot_artificial(model=None, figname='GT')
 for i in methods:
@@ -108,37 +109,6 @@ For each algorithm, a ten-fold cross validation is performed, repeated 10 times 
 
 Results of ours are as follows.
 
-(Novel LDL Algorithms)
-
-| Algorithm |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     K-L(↓)      |     Cos.(↑)     |     Int.(↑)     |
-| :-------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-|  LDL-LRR  | **.085 ± .010** | **.323 ± .027** | **.656 ± .055** | **.041 ± .008** | **.962 ± .008** | **.891 ± .010** |
-|  LDL-SCL  |   .087 ± .008   |   .336 ± .024   |   .688 ± .051   |   .044 ± .006   |   .959 ± .006   |   .885 ± .009   |
-|   LDLF    |   .092 ± .011   |   .353 ± .035   |   .721 ± .076   |   .049 ± .010   |   .954 ± .009   |   .879 ± .013   |
-
-(LDL Algorithms using `SA_BFGS` as the Base Estimator)
-
-| Algorithm  |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     K-L(↓)      |     Cos.(↑)     |     Int.(↑)     |
-| :--------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-|  DF-BFGS   | **.083 ± .009** | **.306 ± .025** | **.624 ± .052** | **.039 ± .007** | **.963 ± .007** | **.894 ± .009** |
-|  SSG-BFGS  |   .090 ± .090   |   .343 ± .343   |   .699 ± .699   |   .047 ± .047   |   .957 ± .957   |   .883 ± .883   |
-| BFGS-AdaB. |   .087 ± .009   |   .327 ± .025   |   .666 ± .050   |   .042 ± .007   |   .961 ± .007   |   .888 ± .009   |
-| (Baseline) |   .092 ± .010   |   .361 ± .029   |   .735 ± .060   |   .051 ± .009   |   .954 ± .009   |   .878 ± .011   |
-
-(Incomplete LDL)
-
-|       Algorithm        |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     Cos.(↑)     |     Int.(↑)     |
-| :--------------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-| SA-BFGS (10% Missing)  |   .101 ± .010   |   .396 ± .031   |   .815 ± .065   |   .943 ± .010   |   .863 ± .011   |
-| IncomLDL (10% Missing) | **.095 ± .009** | **.354 ± .022** | **.735 ± .046** | **.956 ± .006** | **.876 ± .008** |
-
-|       Algorithm        |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     Cos.(↑)     |     Int.(↑)     |
-| :--------------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-| SA-BFGS (40% Missing)  |   .108 ± .012   |   .404 ± .029   |   .831 ± .063   |   .938 ± .011   |   .858 ± .012   |
-| IncomLDL (40% Missing) | **.104 ± .010** | **.371 ± .021** | **.773 ± .046** | **.950 ± .006** | **.869 ± .009** |
-
-(Classical LDL Algorithms)
-
 | Algorithm |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     K-L(↓)      |     Cos.(↑)     |     Int.(↑)     |
 | :-------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
 |  SA-BFGS  | **.092 ± .010** |   .361 ± .029   |   .735 ± .060   | **.051 ± .009** | **.954 ± .009** | **.878 ± .011** |
@@ -162,16 +132,15 @@ Results of the original MATLAB implementation ([Geng 2016](https://github.com/Sp
 ## Requirements
 
 ```
-keras==2.8.0
-matplotlib==3.6.1
-numpy==1.22.3
-qpsolvers==4.0.0
-quadprog==0.1.11
-scikit-fuzzy==0.4.2
-scikit-learn==1.0.2
-scipy==1.8.0
-tensorflow==2.8.0
-tensorflow-addons==0.22.0
-tensorflow-probability==0.16.0
+matplotlib>=3.6.1
+numpy>=1.22.3
+qpsolvers>=4.0.0
+quadprog>=0.1.11
+scikit-fuzzy>=0.4.2
+scikit-learn>=1.0.2
+scipy>=1.8.0
+tensorflow>=2.8.0
+tensorflow-addons>=0.22.0
+tensorflow-probability>=0.16.0
 ```
 

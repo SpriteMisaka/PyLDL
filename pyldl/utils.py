@@ -4,7 +4,7 @@ import scipy.io as sio
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
-from algorithms import _BaseLDL, _BaseLE
+from pyldl.algorithms import _BaseLDL, _BaseLE
 
 
 def load_dataset(name):

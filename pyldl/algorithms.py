@@ -1,4 +1,7 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import logging
+
 import copy
 import warnings
 
@@ -24,14 +27,15 @@ from sklearn.manifold._locally_linear import barycenter_kneighbors_graph
 import skfuzzy as fuzz
 
 import tensorflow as tf
+tf.get_logger().setLevel(logging.ERROR)
 from tensorflow import keras
 
-warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore")
 import tensorflow_addons as tfa
 import tensorflow_probability as tfp
 
-from metrics import score, sort_loss
-from rprop import RProp
+from pyldl.metrics import score, sort_loss
+from pyldl.rprop import RProp
 
 
 class _Base():
@@ -108,9 +112,6 @@ class BaseLE(_BaseLE, TransformerMixin, BaseEstimator):
 class _BaseDeep(keras.Model):
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
-
-        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
         keras.Model.__init__(self)
         if not random_state is None:
             tf.random.set_seed(random_state)
@@ -196,7 +197,6 @@ class SA_IIS(_SA):
 
     def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
         super().fit(X, y)
-        warnings.filterwarnings('ignore', "The iteration is not making good progress,")
 
         weights = np.random.uniform(-0.1, 0.1, self._n_features * self._n_outputs)
 

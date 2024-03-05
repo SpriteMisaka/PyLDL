@@ -1,11 +1,11 @@
 import io
+import os
 import numpy as np
 import matlab.engine
 
-from algorithms import BaseLDL
+from pyldl.algorithms import BaseLDL
 
 eng = matlab.engine.start_matlab()
-
 
 def _set_arr(name, arr):
     eng.eval(f'global {name}', nargout=0)
@@ -23,7 +23,7 @@ class BaseMatlabLDL(BaseLDL):
     class MatlabLDLExec:
 
         def __enter__(self):
-            eng.cd(r'matlab_algorithms', nargout=0)
+            eng.cd(f'{os.path.dirname(os.path.abspath(__file__))}', nargout=0)
             eng.eval(r'addpath("./LDLPackage_v1.2")', nargout=0)
 
         def __exit__(self, exc_type, exc_val, exc_tb):
