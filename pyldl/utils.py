@@ -1,3 +1,7 @@
+import os
+import logging
+import requests
+
 import numpy as np
 import scipy.io as sio
 
@@ -7,25 +11,59 @@ from sklearn.preprocessing import MinMaxScaler
 from pyldl.algorithms import _BaseLDL, _BaseLE
 
 
-def load_dataset(name):
-    data = sio.loadmat('dataset/' + name)
+def load_dataset(name, dir='dataset'):
+    if not os.path.exists(dir):
+        logging.info(f'Directory {dir} does not exist, creating it.')
+        os.makedirs(dir)
+    dataset_path = os.path.join(dir, name+'.mat')
+    if not os.path.exists(dataset_path):
+        logging.info(f'Dataset {name}.mat does not exist, downloading it now, please wait...')
+        url = f'https://raw.githubusercontent.com/SpriteMisaka/PyLDL/main/dataset/{name}.mat'
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open(dataset_path, 'wb') as f:
+                f.write(response.content)
+            logging.info(f'Dataset {name}.mat downloaded successfully.')
+        else:
+            raise ValueError(f'Failed to download {name}.mat')
+    data = sio.loadmat(dataset_path)
     return data['features'], data['labels']
 
 
-def random_missing(y, w=0.1):
-    missing_mask = np.random.rand(*y.shape) < w
+def random_missing(y, missing_rate=0.2):
+    if missing_rate <= 0. or missing_rate >= 1.:
+        raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
+    missing_mask = np.random.rand(*y.shape) < missing_rate
     missing_y = y.copy()
     missing_y[missing_mask] = np.nan
     missing_y[np.isnan(missing_y)] = 0.
     return missing_y, missing_mask
 
 
-def binaryzation(y, t=.5):
-    b = np.sort(y.T, axis=0)[::-1]
-    cs = np.cumsum(b, axis=0)
-    m = np.argmax(cs > t, axis=0)
+def binaryzation(y, method='threshold', param=None):
     r = np.argsort(np.argsort(y))
-    return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
+
+    if method == 'threshold':
+        if param is None:
+            param = .5
+        elif not isinstance(param, float) or param < 0. or param >= 1.:
+            raise ValueError("Invalid param, when method is 'threshold', "
+                             "param should be a float in the range [0, 1).")
+        b = np.sort(y.T, axis=0)[::-1]
+        cs = np.cumsum(b, axis=0)
+        m = np.argmax(cs >= param, axis=0)
+        return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
+
+    elif method == 'topk':
+        if param is None:
+            param = y.shape[1] // 2
+        elif not isinstance(param, int) or param < 1 or param >= y.shape[1]:
+            raise ValueError("Invalid param, when method is 'topk', "
+                             "param should be an integer in the range [1, number_of_labels).")
+        return np.where(r >= y.shape[1] - param, 1, 0)
+
+    else:
+        raise ValueError("Invalid method, which should be 'threshold' or 'topk'.")
 
 
 def artificial(X, a=1., b=.5, c=.2, d=1.,
@@ -41,13 +79,13 @@ def artificial(X, a=1., b=.5, c=.2, d=1.,
     return y / np.sum(y, axis=1).reshape(-1, 1)
 
 
-def make_ldl(n_samples=200):
+def make_ldl(n_samples=200, **kwargs):
     X = np.random.uniform(-1, 1, (n_samples, 3))
-    y = artificial(X)
+    y = artificial(X, **kwargs)
     return X, y
 
 
-def plot_artificial(n_samples=50, model=None, figname='output'):
+def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
 
     x1 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
     x2 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
@@ -66,7 +104,7 @@ def plot_artificial(n_samples=50, model=None, figname='output'):
         model.fit(X_train, y_train)
         y = model.predict(X)
     else:
-        y = artificial(X)
+        y = artificial(X, **kwargs)
         if isinstance(model, _BaseLE):
             l = binaryzation(y)
             y = model.fit_transform(X, l)
@@ -88,4 +126,10 @@ def plot_artificial(n_samples=50, model=None, figname='output'):
     ax.zaxis.set_pane_color((1., 1., 1., 1.))
     ax.plot_surface(a1, a2, a3, facecolors=colors)
     
-    fig.savefig(f'{figname}.pdf', bbox_inches='tight')
+    if file_name is not None:
+        if isinstance(file_name, str):
+            fig.savefig(f'{file_name}.pdf', bbox_inches='tight')
+        else:
+            raise ValueError("Invalid file name, which should be a string.")
+    else:
+        plt.show()

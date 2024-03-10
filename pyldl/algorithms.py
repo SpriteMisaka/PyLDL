@@ -4,6 +4,7 @@ import logging
 
 import copy
 import warnings
+from abc import abstractmethod, ABC
 
 import numpy as np
 
@@ -26,19 +27,20 @@ from sklearn.manifold._locally_linear import barycenter_kneighbors_graph
 
 import skfuzzy as fuzz
 
+import keras
+from keras import backend as K
+
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
-from tensorflow import keras
 
 warnings.filterwarnings("ignore")
 import tensorflow_addons as tfa
 import tensorflow_probability as tfp
 
 from pyldl.metrics import score, sort_loss
-from pyldl.rprop import RProp
 
 
-class _Base():
+class _Base(ABC):
 
     def __init__(self, random_state=None):
         if not random_state is None:
@@ -47,6 +49,7 @@ class _Base():
         self._n_features = None
         self._n_outputs = None
 
+    @abstractmethod
     def fit(self, X, y=None):
         self._X = X
         self._y = y
@@ -70,10 +73,14 @@ class _Base():
             self._not_been_fit()
         return self._n_outputs
 
+    def __str__(self):
+        return self.__class__.__name__
+
 
 class _BaseLDL(_Base):
 
-    def predict(self, _):
+    @abstractmethod
+    def predict(self, X):
         pass
 
     def score(self, X, y, metrics=None):
@@ -85,6 +92,7 @@ class _BaseLDL(_Base):
 
 class _BaseLE(_Base):
 
+    @abstractmethod
     def fit_transform(self, X, l):
         super().fit(X, None)
         self._l = l
@@ -118,7 +126,9 @@ class _BaseDeep(keras.Model):
         self._n_latent = n_latent
         self._n_hidden = n_hidden
 
-    def _l2_reg(self, model):
+    @staticmethod
+    @tf.function
+    def _l2_reg(model):
         reg = 0.
         for i in model.trainable_variables:
             reg += tf.reduce_sum(tf.square(i))
@@ -338,6 +348,65 @@ class CJS(AA_BP):
     def fit(self, X, y, learning_rate=1e-4, epochs=500,
             activation='relu', optimizer='Adam'):
         return super().fit(X, y, learning_rate, epochs, activation, optimizer)
+
+
+class RProp(keras.optimizers.Optimizer):
+    
+    def __init__(self, init_alpha=1e-3, scale_up=1.2, scale_down=0.5, min_alpha=1e-6, max_alpha=50., **kwargs):
+        super(RProp, self).__init__(name='rprop', **kwargs)
+        self.init_alpha = K.variable(init_alpha, name='init_alpha')
+        self.scale_up = K.variable(scale_up, name='scale_up')
+        self.scale_down = K.variable(scale_down, name='scale_down')
+        self.min_alpha = K.variable(min_alpha, name='min_alpha')
+        self.max_alpha = K.variable(max_alpha, name='max_alpha')
+
+    def get_updates(self, params, gradients):
+        grads = gradients
+        shapes = [K.int_shape(p) for p in params]
+        alphas = [K.variable(np.ones(shape) * self.init_alpha) for shape in shapes]
+        old_grads = [K.zeros(shape) for shape in shapes]
+        prev_weight_deltas = [K.zeros(shape) for shape in shapes]
+        self.updates = []
+
+        for param, grad, old_grad, prev_weight_delta, alpha in zip(params, grads,
+                                                                   old_grads, prev_weight_deltas,
+                                                                   alphas):
+
+            new_alpha = K.switch(
+                K.greater(grad * old_grad, 0),
+                K.minimum(alpha * self.scale_up, self.max_alpha),
+                K.switch(K.less(grad * old_grad, 0), K.maximum(alpha * self.scale_down, self.min_alpha), alpha)
+            )
+
+            new_delta = K.switch(K.greater(grad, 0),
+                                 -new_alpha,
+                                 K.switch(K.less(grad, 0),
+                                          new_alpha,
+                                          K.zeros_like(new_alpha)))
+
+            weight_delta = K.switch(K.less(grad*old_grad, 0), -prev_weight_delta, new_delta)
+
+            new_param = param + weight_delta
+
+            grad = K.switch(K.less(grad*old_grad, 0), K.zeros_like(grad), grad)
+
+            self.updates.append(K.update(param, new_param))
+            self.updates.append(K.update(alpha, new_alpha))
+            self.updates.append(K.update(old_grad, grad))
+            self.updates.append(K.update(prev_weight_delta, weight_delta))
+
+        return self.updates
+
+    def get_config(self):
+        config = {
+            'init_alpha': float(K.get_value(self.init_alpha)),
+            'scale_up': float(K.get_value(self.scale_up)),
+            'scale_down': float(K.get_value(self.scale_down)),
+            'min_alpha': float(K.get_value(self.min_alpha)),
+            'max_alpha': float(K.get_value(self.max_alpha)),
+        }
+        base_config = super(RProp, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 
 class CPNN(BaseDeepLDL):
@@ -651,8 +720,9 @@ class LDL_LRR(BaseDeepLDL, DeepBFGS):
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
 
+    @staticmethod
     @tf.function
-    def _ranking_loss(self, y_pred, P, W):
+    def _ranking_loss(y_pred, P, W):
         Phat = tf.math.sigmoid((tf.expand_dims(y_pred, -1) - tf.expand_dims(y_pred, 1)) * 100)
         l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - Phat, 1e-9, 1.0)) + \
               P * tf.math.log(tf.clip_by_value(Phat, 1e-9, 1.0))) * W
@@ -662,8 +732,8 @@ class LDL_LRR(BaseDeepLDL, DeepBFGS):
     def _loss(self, X, y):
         y_pred = self._model(X)
         kl = tf.math.reduce_mean(keras.losses.kl_divergence(y, y_pred))
-        rank = self._ranking_loss(y_pred, self._P, self._W) / (2 * X.shape[0])
-        return kl + self._alpha * rank + self._beta * self._l2_reg(self._model)
+        rank = LDL_LRR._ranking_loss(y_pred, self._P, self._W) / (2 * X.shape[0])
+        return kl + self._alpha * rank + self._beta * _BaseDeep._l2_reg(self._model)
 
     def fit(self, X, y, alpha=1e-2, beta=1e-8, max_iterations=50):
         super().fit(X, y)
@@ -714,7 +784,7 @@ class LDL4C(BaseDeepLDLClassifier, DeepBFGS):
         top2 = tf.gather(y_pred, self._top2, axis=1, batch_dims=1)
         margin = tf.reduce_sum(tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho))
         mae = keras.losses.mean_absolute_error(y, y_pred)
-        return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(self._model)
+        return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * _BaseDeep._l2_reg(self._model)
     
     def fit(self, X, y, max_iterations=50, alpha=1e-2, beta=1e-6, rho=1e-2):
         super().fit(X, y)
@@ -751,7 +821,7 @@ class LDL_HR(BaseDeepLDLClassifier, DeepBFGS):
 
         mae = tf.reduce_sum(keras.losses.mean_absolute_error(self._l, y_pred))
 
-        return mae + self._alpha * margin + self._beta * rest_mae + self._gamma * self._l2_reg(self._model)
+        return mae + self._alpha * margin + self._beta * rest_mae + self._gamma * _BaseDeep._l2_reg(self._model)
     
     def fit(self, X, y, max_iterations=50, alpha=1e-2, beta=1e-2, gamma=1e-6, rho=1e-2):
         super().fit(X, y)
@@ -796,7 +866,7 @@ class LDLM(BaseDeepLDLClassifier):
             0., float('inf')))
 
         return pred_margin + self._alpha * label_margin + \
-            self._beta * second_margin + self._gamma * self._l2_reg(self._model)
+            self._beta * second_margin + self._gamma * _BaseDeep._l2_reg(self._model)
 
     def fit(self, X, y, learning_rate=5e-4, epochs=1000,
             alpha=1e-2, beta=1e-2, gamma=1e-6, rho=1e-2):

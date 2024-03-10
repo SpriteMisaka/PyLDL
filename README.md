@@ -22,9 +22,10 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2020.pdf))[*ICML*]: `LEVI`.
   + ([Zheng, Zhu, and Tang 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/zheng2023.pdf))[*CVPR*]: `LIBLE`.
-  
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
-+ LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
++ Structured LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
++ LDL applications:
+  + ([Shirani et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shirani2019.pdf))[*ACL*]: Emphasis selection (supported datasets: [SemEval2020](https://github.com/RiTUAL-UH/SemEval2020_Task10_Emphasis_Selection); pre-trained GloVe embeddings can be downloaded [here](https://nlp.stanford.edu/projects/glove/)).
 
 > $^1$ Technically, these methods are only suitable for totally ordered labels.
 >
@@ -33,6 +34,20 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 > $^3$ These are LDL classifiers, so you should use `predict_proba` to get label distributions and `predict` to get predicted labels.
 >
 > $^4$ These are oversampling algorithms for LDL, therefore you should use `fit_transform` to generate synthetic samples.
+
+## Installation
+
+PyLDL is now available on [PyPI](https://pypi.org/project/python-ldl/). Use the following command to install.
+
+```shell
+pip install python-ldl
+```
+
+To install the newest version, you can clone this repo and run the `setup.py` file.
+
+```shell
+python setup.py install
+```
 
 ## Usage
 
@@ -60,7 +75,7 @@ For those who would like to use the original implementation:
 
 1. Install MATLAB.
 2. Install MATLAB engine for python.
-3. Download LDL Package from [here](http://palm.seu.edu.cn/xgeng/LDL/download.htm).
+3. Download LDL Package [here](http://palm.seu.edu.cn/xgeng/LDL/download.htm).
 3. Get the package directory of PyLDL (...\\Lib\\site-packages\\pyldl).
 4. Place the *LDLPackage_v1.2* folder into the *matlab_algorithms* folder.
 
