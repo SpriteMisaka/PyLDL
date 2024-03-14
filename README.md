@@ -26,6 +26,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 + Structured LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 + LDL applications:
   + ([Shirani et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shirani2019.pdf))[*ACL*]: Emphasis selection (supported datasets: [SemEval2020](https://github.com/RiTUAL-UH/SemEval2020_Task10_Emphasis_Selection); pre-trained GloVe embeddings can be downloaded [here](https://nlp.stanford.edu/projects/glove/)).
+  + ([Wu et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wu2019.pdf))[*ICCV*]: Lesion counting (supported datasets: [ACNE04](https://drive.google.com/drive/folders/18yJcHXhzOv7H89t-Lda6phheAicLqMuZ)).
 
 > $^1$ Technically, these methods are only suitable for totally ordered labels.
 >

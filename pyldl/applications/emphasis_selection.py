@@ -94,9 +94,8 @@ def load_glove(path, tokenizer, embedding_dim=100):
 
 class DL_BiLSTM(BaseDeepLDL):
 
-    def __init__(self, tokenizer, embeddings_matrix,
-                 n_hidden=256, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+    def __init__(self, tokenizer, embeddings_matrix, n_hidden=256, random_state=None):
+        super().__init__(n_hidden, None, random_state)
         self._embeddings_matrix = embeddings_matrix
         self._tokenizer = tokenizer
 
