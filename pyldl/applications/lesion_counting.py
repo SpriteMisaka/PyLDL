@@ -12,7 +12,7 @@ import keras
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
-from pyldl.algorithms import BaseDeepLDL
+from pyldl.algorithms.base import BaseDeepLDL
 
 
 n_grades = 4
@@ -76,13 +76,13 @@ class LDL_ACNE(BaseDeepLDL):
     def __init__(self, random_state=None):
         super().__init__(None, None, random_state)
 
-    havashi = [0] + [0 for _ in range(5)] + [1 for _ in range(15)] + \
+    hayashi = [0] + [0 for _ in range(5)] + [1 for _ in range(15)] + \
         [2 for _ in range(30)] + [3 for _ in range(15)]
 
     @staticmethod
     @tf.function
     def counts2grades(counts):
-        return tf.transpose(tf.math.segment_sum(tf.transpose(counts), LDL_ACNE.havashi))
+        return tf.transpose(tf.math.segment_sum(tf.transpose(counts), LDL_ACNE.hayashi))
 
     @tf.function
     def _loss(self, X, counts, counts2grades):

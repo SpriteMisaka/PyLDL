@@ -4,11 +4,11 @@ import requests
 
 import numpy as np
 import scipy.io as sio
-
 import matplotlib.pyplot as plt
+
 from sklearn.preprocessing import MinMaxScaler
 
-from pyldl.algorithms import _BaseLDL, _BaseLE
+from pyldl.algorithms.base import BaseLDL, BaseLE
 
 
 def load_dataset(name, dir='dataset'):
@@ -99,13 +99,13 @@ def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
 
     X = np.concatenate([bb, cc], axis=1)
 
-    if isinstance(model, _BaseLDL):
+    if isinstance(model, BaseLDL):
         X_train, y_train = make_ldl()
         model.fit(X_train, y_train)
         y = model.predict(X)
     else:
         y = artificial(X, **kwargs)
-        if isinstance(model, _BaseLE):
+        if isinstance(model, BaseLE):
             l = binaryzation(y)
             y = model.fit_transform(X, l)
 

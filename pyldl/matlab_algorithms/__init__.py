@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matlab.engine
 
-from pyldl.algorithms import BaseLDL
+from pyldl.algorithms.base import BaseLDL
 
 eng = matlab.engine.start_matlab()
 

@@ -12,7 +12,7 @@ tf.get_logger().setLevel(logging.ERROR)
 
 from IPython.display import HTML, display
 
-from pyldl.algorithms import BaseDeepLDL
+from pyldl.algorithms.base import BaseDeepLDL
 
 
 def load_semeval2020(path):
