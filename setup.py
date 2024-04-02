@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-ldl",
-    version="0.0.1",
+    version="0.0.2",
     author="SpriteMisaka",
     author_email="SpriteMisaka@gmail.com",
     description="Label distribution learning (LDL) and label enhancement (LE) toolkit implemented in python.",

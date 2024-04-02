@@ -63,7 +63,7 @@ def visualization(X, grade, count, grade_real=None, count_real=None,
     count_number_real = int(np.sum(count_real * (count_range + 1)))
     ax[1].set_xlim((0, n_counts))
     ax[1].scatter(count_range, count, c=colors[grade_label], s=12,
-               label=f'Predection:\n  {grade_desc[grade_label]} ({count_number})')
+               label=f'Prediction:\n  {grade_desc[grade_label]} ({count_number})')
     ax[1].plot(x, y_real, c=colors[grade_label_real],
                label=f'Ground Truth:\n  {grade_desc[grade_label_real]} ({count_number_real})')
     ax[1].legend()

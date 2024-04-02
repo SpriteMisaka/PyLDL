@@ -38,9 +38,11 @@ class AA_BP(BaseDeepLDL):
     def _loss_function(self, y, y_pred):
         return tf.math.reduce_mean(keras.losses.mean_squared_error(y, y_pred))
 
-    def fit(self, X, y, learning_rate=5e-3, epochs=3000, model=None,
-            activation='sigmoid', optimizer='SGD'):
+    def fit(self, X, y, learning_rate=5e-3, epochs=3000, batch_size=32,
+            model=None, activation='sigmoid', optimizer='SGD', X_test=None, y_test=None):
         super().fit(X, y)
+
+        self._batch_size = batch_size
 
         if self._n_hidden is None:
             self._n_hidden = self._n_features * 3 // 2
@@ -51,14 +53,17 @@ class AA_BP(BaseDeepLDL):
                                         keras.layers.Dense(self._n_hidden, activation=activation),
                                         keras.layers.Dense(self._n_outputs, activation='softmax')])
         self._optimizer = eval(f'keras.optimizers.{optimizer}({learning_rate})')
+        data = tf.data.Dataset.from_tensor_slices((self._X, self._y)).batch(self._batch_size)
 
         for _ in range(epochs):
-            with tf.GradientTape() as tape:
-                y_pred = self._model(self._X)
-                loss = self._loss_function(self._y, y_pred)
-
-            gradients = tape.gradient(loss, self.trainable_variables)
-            self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+            total_loss = 0.
+            for batch in data:
+                with tf.GradientTape() as tape:
+                    y_pred = self._model(batch[0])
+                    loss = self._loss_function(batch[1], y_pred)
+                gradients = tape.gradient(loss, self.trainable_variables)
+                self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+                total_loss += loss
 
     def predict(self, X):
         return self._model(X)
