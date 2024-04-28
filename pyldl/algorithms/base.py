@@ -5,7 +5,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import logging
-from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -19,7 +18,7 @@ import tensorflow_probability as tfp
 from pyldl.metrics import score
 
 
-class _Base(ABC):
+class _Base():
 
     def __init__(self, random_state=None):
         if not random_state is None:
@@ -28,7 +27,6 @@ class _Base(ABC):
         self._n_features = None
         self._n_outputs = None
 
-    @abstractmethod
     def fit(self, X, y=None):
         self._X = X
         self._y = y
@@ -58,7 +56,6 @@ class _Base(ABC):
 
 class _BaseLDL(_Base):
 
-    @abstractmethod
     def predict(self, X):
         pass
 
@@ -71,7 +68,6 @@ class _BaseLDL(_Base):
 
 class _BaseLE(_Base):
 
-    @abstractmethod
     def fit_transform(self, X, l):
         super().fit(X, None)
         self._l = l
