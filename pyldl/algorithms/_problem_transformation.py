@@ -55,7 +55,7 @@ class LDSVR(_PT):
         self._model = None
 
     def _preprocessing(self, X, y):
-        y = -np.log(1. / (y + 1e-7) - 1.)
+        y = -np.log(1. / np.clip(y, 1e-7, 1. - 1e-7) - 1.)
         return X, y
 
     def fit(self, X, y):
