@@ -15,33 +15,26 @@ import keras
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from pyldl.algorithms.base import BaseLE, BaseDeepLE, DeepBFGS
+from pyldl.algorithms.base import BaseLE, BaseDeep, BaseDeepLE, BaseAdam, BaseBFGS
 
 
 class FCM(BaseLE):
 
-    def __init__(self, random_state=None):
-        super().__init__(random_state)
-
-    def fit_transform(self, X, l, n_clusters=50, beta=2):
-        super().fit_transform(X, l)
-
+    def fit(self, X, l, n_clusters=50, beta=2):
+        super().fit(X, l)
         _, u, _, _, _, _, _ = fuzz.cluster.cmeans(
             self._X.T, n_clusters, beta,
             error=1e-7, maxiter=10000, init=None
         )
         A = np.matmul(l.T, u.T)
         y = fuzz.maxprod_composition(u.T, A.T)
-        return softmax(y, axis=1)
+        self._y = softmax(y, axis=1)
 
 
 class KM(BaseLE):
 
-    def __init__(self, random_state=None):
-        super().__init__(random_state)
-
-    def fit_transform(self, X, l):
-        super().fit_transform(X, l)
+    def fit(self, X, l):
+        super().fit(X, l)
 
         l = l > 0
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
@@ -55,16 +48,13 @@ class KM(BaseLE):
         r2 = np.max(s2, axis=0).reshape(1, -1)
         y = 1 - np.sqrt(s2 / (r2 + 1e-7))
         y *= self._l
-        return softmax(y, axis=1)
+        self._y = softmax(y, axis=1)
 
 
 class LP(BaseLE):
 
-    def __init__(self, random_state=None):
-        super().__init__(random_state)
-
-    def fit_transform(self, X, l, epochs=3000, alpha=.5):
-        super().fit_transform(X, l)
+    def fit(self, X, l, epochs=3000, alpha=.5):
+        super().fit(X, l)
 
         dis = np.linalg.norm(self._X[:, None] - self._X, axis=-1)
         A = np.exp(- dis ** 2 / 2)
@@ -74,18 +64,13 @@ class LP(BaseLE):
         y = self._l
         for _ in range(epochs):
             y = alpha * np.matmul(P, y) + (1 - alpha) * self._l
-        y = softmax(y, axis=1)
-
-        return y
+        self._y = softmax(y, axis=1)
 
 
 class ML(BaseLE):
 
-    def __init__(self, random_state=None):
-        super().__init__(random_state)
-
-    def fit_transform(self, X, l, beta=1):
-        super().fit_transform(X, l)
+    def fit(self, X, l, beta=1):
+        super().fit(X, l)
         l[l == 0] = -1
         knn = NearestNeighbors(n_neighbors=self.n_outputs+1)
         knn.fit(self._X)
@@ -110,13 +95,10 @@ class ML(BaseLE):
                                 h=b,
                                 solver='quadprog')
 
-        return softmax(mu, axis=1)
+        self._y = softmax(mu, axis=1)
 
 
-class GLLE(BaseDeepLE, DeepBFGS):
-
-    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+class GLLE(BaseBFGS, BaseDeepLE):
 
     def _get_obj_func(self, model, loss_function, P, l):
 
@@ -144,7 +126,7 @@ class GLLE(BaseDeepLE, DeepBFGS):
             return loss, gradients
 
         return _f
-    
+
     @tf.function
     def _E_loss(self, y):
         E_loss = 0.
@@ -156,20 +138,12 @@ class GLLE(BaseDeepLE, DeepBFGS):
         return E_loss
 
     @tf.function
-    def _loss(self, l, y):
+    def _loss_function(self, l, y):
         mse = tf.reduce_sum((l - y)**2)
         lap = tf.linalg.trace(tf.transpose(y) @ self._G @ y)
         return mse + self._alpha * lap + self._beta * self._E_loss(y)
 
-    def fit_transform(self, X, l, max_iterations=500, corr_learning_rate=1e-2,
-                      alpha=1e-2, beta=1e-4, sigma=10.):
-        super().fit_transform(X, l)
-
-        self._alpha = alpha
-        self._beta = beta
-
-        self._sigma = sigma
-
+    def _before_train(self):
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
         self._P = tf.cast(rbf_kernel(self._X, gamma=gamma), dtype=tf.float32)
         
@@ -190,27 +164,34 @@ class GLLE(BaseDeepLE, DeepBFGS):
 
         self._E = [tf.Variable(tf.random.normal((cluster_counts[i], cluster_counts[i])),
                                trainable=True) for i in range(self._n_clusters)]
-        self._E_optimizer = keras.optimizers.SGD(learning_rate=corr_learning_rate)
+        self._E_optimizer = keras.optimizers.SGD()
 
-        self._model = keras.Sequential(
-            [keras.layers.InputLayer(input_shape=self._P.shape[1]),
-             keras.layers.Dense(self._n_outputs, activation=None)])
-        
-        self._optimize_bfgs(self._model, self._loss, self._P, self._l, max_iterations)
+    def _get_default_model(self):
+        return self.get_2layer_model(self._P.shape[1], self._n_outputs, softmax=False)
 
-        return keras.activations.softmax(self._model(self._P))
+    def fit(self, X, l,
+            alpha=1e-2, beta=1e-4, sigma=10., max_iterations=50, **kwargs):
+        self._alpha = alpha
+        self._beta = beta
+        self._sigma = sigma
+        BaseDeep.fit(self, X, l, **kwargs)
+        self._optimize_bfgs(self._model, self._loss_function, self._P, self._l, max_iterations)
+        return self
+
+    def transform(self):
+        return keras.activations.softmax(self._call(self._P)).numpy()
 
 
-class LEVI(BaseDeepLE):
+class LEVI(BaseAdam, BaseDeepLE):
 
-    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
-
-    def _loss(self, X, l):
+    def _call(self, X, l, transform=False):
         inputs = tf.concat((X, l), axis=1)
 
-        latent = self._encoder(inputs)
+        latent = self._model["encoder"](inputs)
         mean = latent[:, :self._n_outputs]
+        if transform:
+            return mean
+
         var = tf.math.softplus(latent[:, self._n_outputs:])
 
         d = tfp.distributions.Normal(loc=mean, scale=var)
@@ -218,59 +199,58 @@ class LEVI(BaseDeepLE):
                                          scale=np.ones(self._n_outputs, dtype=np.float32))
 
         samples = d.sample()
-        X_hat = self._decoder_X(samples)
-        l_hat = self._decoder_l(samples)
+        X_hat = self._model["decoder_X"](samples)
+        l_hat = self._model["decoder_l"](samples)
 
+        return d, std_d, samples, X_hat, l_hat
+
+    def _loss(self, X, l, start, end):
+        d, std_d, samples, X_hat, l_hat = self._call(X, l)
         kl = tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1)
         rec_X = keras.losses.mean_squared_error(X, X_hat)
         rec_y = keras.losses.binary_crossentropy(l, l_hat)
 
         return tf.reduce_sum((l - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_y)
 
-    def fit_transform(self, X, l, learning_rate=1e-4, epochs=1000, alpha=1.):
-        super().fit_transform(X, l)
-
-        self._alpha = alpha
+    def _get_default_model(self):
 
         input_shape = self._n_features + self._n_outputs
 
-        if self._n_hidden is None:
-            self._n_hidden = self._n_features * 3 // 2
+        encoder = keras.Sequential([keras.layers.InputLayer(input_shape=input_shape),
+                                    keras.layers.Dense(self._n_hidden, activation='softplus'),
+                                    keras.layers.Dense(self._n_outputs*2, activation=None)])
 
-        self._encoder = keras.Sequential([keras.layers.InputLayer(input_shape=input_shape),
-                                          keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                          keras.layers.Dense(self._n_outputs*2, activation=None)])
+        decoder_X = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
+                                      keras.layers.Dense(self._n_hidden, activation='softplus'),
+                                      keras.layers.Dense(self._n_features, activation=None)])
 
-        self._decoder_X = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
-                                            keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                            keras.layers.Dense(self._n_features, activation=None)])
-        
-        self._decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
-                                            keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                            keras.layers.Dense(self._n_outputs, activation=None)])
+        decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
+                                      keras.layers.Dense(self._n_hidden, activation='softplus'),
+                                      keras.layers.Dense(self._n_outputs, activation=None)])
 
-        self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
+        return {"encoder": encoder, "decoder_X": decoder_X, "decoder_l": decoder_l}
 
-        for _ in range(epochs):
-            with tf.GradientTape() as tape:
-                loss = self._loss(self._X, self._l)
-            gradients = tape.gradient(loss, self.trainable_variables)
-            self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+    def fit(self, X, l, alpha=1., **kwargs):
+        self._alpha = alpha
+        return super().fit(X, l, **kwargs)
 
-        inputs = tf.concat((self._X, self._l), axis=1)
-        latent = self._encoder(inputs)
-        mean = latent[:, :self._n_outputs].numpy()
-        return softmax(mean, axis=1)
+    def transform(self):
+        return keras.activations.softmax(
+            self._call(self._X, self._l, transform=True)
+        ).numpy()
 
 
-class LIBLE(BaseDeepLE):
+class LIBLE(BaseAdam, BaseDeepLE):
 
-    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
+    def __init__(self, n_hidden=64, n_latent=64, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
 
-    def _loss(self, X, l):
-        latent = self._encoder(X)
+    def _call(self, X, transform=False):
+        latent = self._model["encoder"](X)
         mean = latent[:, :self._n_latent]
+        if transform:
+            return self._model["decoder_y"](mean)
+
         var = tf.math.softplus(latent[:, self._n_latent:])
 
         d = tfp.distributions.Normal(loc=mean, scale=var)
@@ -278,51 +258,44 @@ class LIBLE(BaseDeepLE):
                                          scale=np.ones(self._n_latent, dtype=np.float32))
 
         h = d.sample()
-        l_hat = self._decoder_l(h)
-        y_hat = self._decoder_y(h)
-        g = self._decoder_g(h)
+        l_hat = self._model["decoder_l"](h)
+        y_hat = self._model["decoder_y"](h)
+        g = self._model["decoder_g"](h)
 
+        return d, std_d, l_hat, y_hat, g
+
+    def _loss(self, X, l, start, end):
+        d, std_d, l_hat, y_hat, g = self._call(X)
         kl = tf.reduce_sum(tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1))
         rec_l = tf.reduce_sum((l - l_hat)**2)
         rec_y = tf.reduce_sum(g**(-2) * (l - y_hat)**2 + tf.math.log(tf.abs(g**2)))
 
         return rec_l + self._alpha * kl + self._beta * rec_y
 
-    def fit_transform(self, X, l, learning_rate=1e-3, epochs=1500, alpha=1e-3, beta=1.):
-        super().fit_transform(X, l)
+    def _get_default_model(self):
 
+        encoder = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
+                                    keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                    keras.layers.Dense(self._n_latent*2, activation=None)])
+
+        decoder_g = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                      keras.layers.Dense(1, activation='sigmoid')])
+        
+        decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                      keras.layers.Dense(self._n_outputs, activation=None)])
+        
+        decoder_y = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
+                                      keras.layers.Dense(self._n_outputs, activation=None)])
+
+        return {"encoder": encoder, "decoder_g": decoder_g, "decoder_l": decoder_l, "decoder_y": decoder_y}
+
+    def fit(self, X, l, alpha=1e-3, beta=1e-3, **kwargs):
         self._alpha = alpha
         self._beta = beta
+        return super().fit(X, l, **kwargs)
 
-        if self._n_latent is None:
-            self._n_latent = self._n_features
-        if self._n_hidden is None:
-            self._n_hidden = self._n_features * 3 // 2
-
-        self._encoder = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
-                                          keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                          keras.layers.Dense(self._n_latent*2, activation=None)])
-
-        self._decoder_g = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                            keras.layers.Dense(1, activation='sigmoid')])
-        
-        self._decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                            keras.layers.Dense(self._n_outputs, activation=None)])
-        
-        self._decoder_y = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                            keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                            keras.layers.Dense(self._n_outputs, activation=None)])
-
-        self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
-
-        for _ in range(epochs):
-            with tf.GradientTape() as tape:
-                loss = self._loss(self._X, self._l)
-            gradients = tape.gradient(loss, self.trainable_variables)
-            self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-
-        latent = self._encoder(X)
-        mean = latent[:, :self._n_latent].numpy()
-        return softmax(self._decoder_y(mean), axis=1)
+    def transform(self):
+        return keras.activations.softmax(self._call(self._X, transform=True)).numpy()

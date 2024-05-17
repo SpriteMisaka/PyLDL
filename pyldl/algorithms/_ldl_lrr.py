@@ -1,13 +1,10 @@
 import keras
 import tensorflow as tf
 
-from pyldl.algorithms.base import BaseDeepLDL, DeepBFGS
+from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
-class LDL_LRR(BaseDeepLDL, DeepBFGS):
-
-    def __init__(self, n_hidden=None, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+class LDL_LRR(BaseBFGS, BaseDeepLDL):
 
     @staticmethod
     @tf.function
@@ -31,19 +28,13 @@ class LDL_LRR(BaseDeepLDL, DeepBFGS):
         rank = LDL_LRR.ranking_loss(y_pred, self._P, self._W) / (2 * X.shape[0])
         return kl + self._alpha * rank + self._beta * BaseDeepLDL._l2_reg(self._model)
 
-    def fit(self, X, y, alpha=1e-2, beta=1e-8, max_iterations=50):
-        super().fit(X, y)
+    def _get_default_model(self):
+        return self.get_2layer_model(self._n_features, self._n_outputs)
 
-        self._alpha = alpha
-        self._beta = beta
-
+    def _before_train(self):
         self._P, self._W = LDL_LRR.preprocessing(self._y)
 
-        self._model = keras.Sequential(
-            [keras.layers.InputLayer(input_shape=self._n_features),
-            keras.layers.Dense(self._n_outputs, activation="softmax")])
-
-        self._optimize_bfgs(self._model, self._loss, self._X, self._y, max_iterations)
-
-    def predict(self, X):
-        return self._model(X).numpy()
+    def fit(self, X, y, alpha=1e-2, beta=1e-8, max_iterations=50):
+        self._alpha = alpha
+        self._beta = beta
+        return super().fit(X, y, max_iterations=max_iterations)

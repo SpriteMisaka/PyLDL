@@ -94,6 +94,18 @@ def error_probability(y, y_pred):
 
 
 def score(y, y_pred,
-          metrics=["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]):
-    return tuple((eval(i)(y, y_pred) for i in metrics))
-    
+          metrics=["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"],
+          return_dict=False):
+    scores = tuple((eval(i)(y, y_pred) for i in metrics))
+    return dict(zip(metrics, scores)) if return_dict else scores
+
+
+THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
+                          "euclidean", "sorensen", "squared_chi2",
+                          "mean_absolute_error",
+                          "sort_loss",
+                          "zero_one_loss", "error_probability"]
+
+THE_LAGER_THE_BETTER = ["cosine", "intersection",
+                        "fidelity",
+                        "spearman", "kendall"]

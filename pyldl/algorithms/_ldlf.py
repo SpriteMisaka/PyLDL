@@ -3,12 +3,12 @@ import numpy as np
 import keras
 import tensorflow as tf
 
-from pyldl.algorithms.base import BaseDeepLDL
+from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
-class LDLF(BaseDeepLDL):
+class LDLF(BaseAdam, BaseDeepLDL):
 
-    def __init__(self, n_estimators=5, n_depth=6, n_hidden=None, n_latent=64, random_state=None):
+    def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
         self._n_estimators = n_estimators
         self._n_depth = n_depth
@@ -36,9 +36,10 @@ class LDLF(BaseDeepLDL):
 
         return mu
 
-    def fit(self, X, y, learning_rate=5e-2, epochs=3000):
-        super().fit(X, y)
+    def _get_default_model(self):
+        return self.get_3layer_model(self._n_features, self._n_hidden, self._n_outputs)
 
+    def _before_train(self):
         self._phi = [np.random.choice(
             np.arange(self._n_latent), size=self._n_leaves, replace=False
         ) for _ in range(self._n_estimators)]
@@ -50,37 +51,27 @@ class LDLF(BaseDeepLDL):
             dtype="float32", trainable=True,
         ) for _ in range(self._n_estimators)]
 
-        if self._n_hidden is None:
-            self._n_hidden = self._n_features * 3 // 2
+    @tf.function
+    def _loss(self, X, y, start=None, end=None):
+        loss = 0.
+        for i in range(self._n_estimators):
+            _mu = self._call(X, i)
+            _prob = tf.matmul(_mu, self._pi[i])
 
-        self._model = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
-                                        keras.layers.Dense(self._n_hidden, activation='sigmoid'),
-                                        keras.layers.Dense(self._n_latent, activation="sigmoid")])
-        self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
+            loss += tf.math.reduce_mean(keras.losses.kl_divergence(y, _prob))
 
-        for _ in range(epochs):
-            with tf.GradientTape() as model_tape:
-                loss = 0.
-                for i in range(self._n_estimators):
-                    _mu = self._call(X, i)
-                    _prob = tf.matmul(_mu, self._pi[i])
+            _y = tf.expand_dims(y, axis=1)
+            _pi = tf.expand_dims(self._pi[i], axis=0)
+            _mu = tf.expand_dims(_mu, axis=2)
+            _prob = tf.clip_by_value(
+                tf.expand_dims(_prob, axis=1), clip_value_min=1e-6, clip_value_max=1.0)
+            _new_pi = tf.multiply(tf.multiply(_y, _pi), _mu) / _prob
+            _new_pi = tf.reduce_sum(_new_pi, axis=0)
+            _new_pi = keras.activations.softmax(_new_pi)
+            self._pi[i].assign(_new_pi)
 
-                    loss += tf.math.reduce_mean(keras.losses.kl_divergence(self._y, _prob))
-
-                    _y = tf.expand_dims(self._y, axis=1)
-                    _pi = tf.expand_dims(self._pi[i], axis=0)
-                    _mu = tf.expand_dims(_mu, axis=2)
-                    _prob = tf.clip_by_value(
-                        tf.expand_dims(_prob, axis=1), clip_value_min=1e-6, clip_value_max=1.0)
-                    _new_pi = tf.multiply(tf.multiply(_y, _pi), _mu) / _prob
-                    _new_pi = tf.reduce_sum(_new_pi, axis=0)
-                    _new_pi = keras.activations.softmax(_new_pi)
-                    self._pi[i].assign(_new_pi)
-
-                loss /= self._n_estimators
-
-            gradients = model_tape.gradient(loss, self._model.trainable_variables)
-            self._optimizer.apply_gradients(zip(gradients, self._model.trainable_variables))
+        loss /= self._n_estimators
+        return loss
 
     def predict(self, X):
         res = np.zeros([X.shape[0], self._n_outputs], dtype=np.float32)
