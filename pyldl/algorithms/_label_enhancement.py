@@ -4,7 +4,7 @@ import skfuzzy as fuzz
 from qpsolvers import solve_qp
 
 from scipy.special import softmax
-from scipy.spatial.distance import pdist, cdist
+from scipy.spatial.distance import pdist, cdist, squareform
 
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
@@ -29,6 +29,7 @@ class FCM(BaseLE):
         A = np.matmul(l.T, u.T)
         y = fuzz.maxprod_composition(u.T, A.T)
         self._y = softmax(y, axis=1)
+        return self
 
 
 class KM(BaseLE):
@@ -49,14 +50,15 @@ class KM(BaseLE):
         y = 1 - np.sqrt(s2 / (r2 + 1e-7))
         y *= self._l
         self._y = softmax(y, axis=1)
+        return self
 
 
 class LP(BaseLE):
 
-    def fit(self, X, l, epochs=3000, alpha=.5):
+    def fit(self, X, l, epochs=500, alpha=.5):
         super().fit(X, l)
 
-        dis = np.linalg.norm(self._X[:, None] - self._X, axis=-1)
+        dis = squareform(pdist(self._X, 'euclidean'))
         A = np.exp(- dis ** 2 / 2)
         temp = np.linalg.inv(np.sqrt(np.diag(np.sum(A, axis=1))))
         P = np.matmul(np.matmul(temp, A), temp)
@@ -65,6 +67,7 @@ class LP(BaseLE):
         for _ in range(epochs):
             y = alpha * np.matmul(P, y) + (1 - alpha) * self._l
         self._y = softmax(y, axis=1)
+        return self
 
 
 class ML(BaseLE):
@@ -96,6 +99,7 @@ class ML(BaseLE):
                                 solver='quadprog')
 
         self._y = softmax(mu, axis=1)
+        return self
 
 
 class GLLE(BaseBFGS, BaseDeepLE):

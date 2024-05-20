@@ -34,7 +34,7 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
     def _before_train(self):
         self._P, self._W = LDL_LRR.preprocessing(self._y)
 
-    def fit(self, X, y, alpha=1e-2, beta=1e-8, max_iterations=50):
+    def fit(self, X, y, alpha=1e-2, beta=1e-8, **kwargs):
         self._alpha = alpha
         self._beta = beta
-        return super().fit(X, y, max_iterations=max_iterations)
+        return super().fit(X, y, **kwargs)
