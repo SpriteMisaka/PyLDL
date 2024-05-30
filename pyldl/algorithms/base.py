@@ -1,3 +1,4 @@
+import functools
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -124,7 +125,7 @@ class _BaseDeep(keras.Model):
     @staticmethod
     def get_2layer_model(n_features, n_outputs, softmax=True):
         return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
-                                 keras.layers.Dense(n_outputs,
+                                 keras.layers.Dense(n_outputs, kernel_initializer=keras.initializers.Zeros(),
                                                     activation='softmax' if softmax else None,
                                                     use_bias=False)])
 
@@ -276,61 +277,61 @@ class BaseAdam(BaseGD):
 
 class BaseBFGS(BaseDeep):
 
+    @staticmethod
+    def make_val_and_grad_fn(value_fn):
+        @functools.wraps(value_fn)
+        def val_and_grad(x):
+            return tfp.math.value_and_gradient(value_fn, x)
+        return val_and_grad
+
     @tf.function
-    def _assign_new_model_parameters(self, params_1d, model):
+    def _params2model(self, params_1d):
+        model_variables = []
         params = tf.dynamic_partition(params_1d, self._part, self._n_tensors)
-        for i, (shape, param) in enumerate(zip(self._model_shapes, params)):
-            model.trainable_variables[i].assign(tf.reshape(param, shape))
+        for (shape, param) in zip(self._model_shapes, params):
+            model_variables.append(tf.reshape(param, shape))
+        return model_variables
 
-    def _get_obj_func(self, model, loss_function, X, y):
+    def _assign_new_model_parameters(self, params_1d):
+        for i, j in enumerate(self._params2model(params_1d)):
+            self._model.trainable_variables[i].assign(j)
 
-        @tf.function
-        def _f(params_1d):
+    def _loss(self, params_1d):
+        y_pred = keras.activations.softmax(self._X @ self._params2model(params_1d)[0])
+        return self.loss_function(self._y if issubclass(self.__class__, BaseDeepLDL) else self._l, y_pred)
 
-            with tf.GradientTape() as tape:
-                self._assign_new_model_parameters(params_1d, model)
-                loss = loss_function(X, y)
+    def _get_obj_func(self):
+        return self.make_val_and_grad_fn(self._loss)
 
-            grads = tape.gradient(loss, model.trainable_variables)
-            grads = tf.dynamic_stitch(self._idx, grads)
+    def _get_default_model(self):
+        return self.get_2layer_model(self._n_features, self._n_outputs)
 
-            return loss, grads
+    def _optimize_bfgs(self, max_iterations):
 
-        return _f
-
-    def _optimize_bfgs(self, model, loss_function, X, y, max_iterations=50):
-
-        self._model_shapes = tf.shape_n(model.trainable_variables)
+        self._model_shapes = tf.shape_n(self._model.trainable_variables)
         self._n_tensors = len(self._model_shapes)
 
         count = 0
         self._idx = []
         self._part = []
-
         for i, shape in enumerate(self._model_shapes):
             n = np.product(shape)
             self._idx.append(tf.reshape(tf.range(count, count+n, dtype=tf.int32), shape))
             self._part.extend([i]*n)
             count += n
-
         self._part = tf.constant(self._part)
-        
-        func = self._get_obj_func(model, loss_function, X, y)
-        init_params = tf.dynamic_stitch(self._idx, model.trainable_variables)
 
         results = tfp.optimizer.lbfgs_minimize(
-            value_and_gradients_function=func,
-            initial_position=init_params,
+            value_and_gradients_function=self._get_obj_func(),
+            initial_position=tf.dynamic_stitch(self._idx, self._model.trainable_variables),
             max_iterations=max_iterations
         )
 
-        self._assign_new_model_parameters(results.position, model)
+        self._assign_new_model_parameters(results.position)
 
     def fit(self, X, y, max_iterations=50, **kwargs):
         super().fit(X, y, **kwargs)
-        self._optimize_bfgs(self._model, self._loss, self._X,
-                            self._y if issubclass(self.__class__, BaseDeepLDL) else self._l,
-                            max_iterations)
+        self._optimize_bfgs(max_iterations)
         return self
 
 

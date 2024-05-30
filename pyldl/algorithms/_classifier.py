@@ -7,19 +7,16 @@ from pyldl.algorithms.base import BaseDeepLDLClassifier, BaseGD, BaseBFGS
 class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
 
     @tf.function
-    def _loss(self, X, y):
-        y_pred = self._model(X)
+    def _loss(self, params_1d):
+        y_pred = keras.activations.softmax(self._X @ self._params2model(params_1d)[0])
         top2 = tf.gather(y_pred, self._top2, axis=1, batch_dims=1)
         margin = tf.reduce_sum(tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho))
-        mae = keras.losses.mean_absolute_error(y, y_pred)
+        mae = keras.losses.mean_absolute_error(self._y, y_pred)
         return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(self._model)
 
     def _before_train(self):
         self._top2 = tf.math.top_k(self._y, k=2)[1]
         self._entropy = tf.cast(-tf.reduce_sum(self._y * tf.math.log(self._y) + 1e-7, axis=1), dtype=tf.float32)
-
-    def _get_default_model(self):
-        return self.get_2layer_model(self._n_features, self._n_outputs)
 
     def fit(self, X, y, alpha=1e-2, beta=1e-6, rho=1e-2, **kwargs):
         self._alpha = alpha
@@ -31,14 +28,14 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
 class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
 
     @tf.function
-    def _loss(self, X, y):
-        y_pred = self._model(X)
+    def _loss(self, params_1d):
+        y_pred = keras.activations.softmax(self._X @ self._params2model(params_1d)[0])
 
         highest = tf.gather(y_pred, self._highest, axis=1, batch_dims=1)
         rest = tf.gather(y_pred, self._rest, axis=1, batch_dims=1)
         margin = tf.reduce_sum(tf.maximum(0., 1. - (highest - rest) / self._rho))
 
-        real_rest = tf.gather(y, self._rest, axis=1, batch_dims=1)
+        real_rest = tf.gather(self._y, self._rest, axis=1, batch_dims=1)
         rest_mae = tf.reduce_sum(keras.losses.mean_absolute_error(real_rest, rest))
 
         mae = tf.reduce_sum(keras.losses.mean_absolute_error(self._l, y_pred))
@@ -50,9 +47,6 @@ class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
         self._highest = temp[:, 0:1]
         self._rest = temp[:, 1:]
         self._l = tf.one_hot(tf.reshape(self._highest, -1), self._n_outputs)
-
-    def _get_default_model(self):
-        return self.get_2layer_model(self._n_features, self._n_outputs)
 
     def fit(self, X, y, alpha=1e-2, beta=1e-2, gamma=1e-6, rho=1e-2, **kwargs):
         self._alpha = alpha

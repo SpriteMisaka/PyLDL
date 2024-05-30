@@ -15,7 +15,7 @@ import keras
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from pyldl.algorithms.base import BaseLE, BaseDeep, BaseDeepLE, BaseAdam, BaseBFGS
+from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseAdam, BaseBFGS
 
 
 class FCM(BaseLE):
@@ -104,33 +104,6 @@ class ML(BaseLE):
 
 class GLLE(BaseBFGS, BaseDeepLE):
 
-    def _get_obj_func(self, model, loss_function, P, l):
-
-        def _f(params_1d):
-
-            with tf.GradientTape() as tape:
-                y = model(P)
-                E_loss = self._E_loss(y)
-
-            E_gradients = tape.gradient(E_loss, self._E)
-            self._E_optimizer.apply_gradients(zip(E_gradients, self._E))
-
-            for i in range(self._n_clusters):
-                Ei_norm = tf.linalg.norm(self._E[i], axis=1, keepdims=True)
-                self._E[i].assign(self._E[i] / Ei_norm)
-
-            with tf.GradientTape() as tape:
-                self._assign_new_model_parameters(params_1d, model)
-                y = model(P)
-                loss = loss_function(l, y)
-
-            gradients = tape.gradient(loss, model.trainable_variables)
-            gradients = tf.dynamic_stitch(self._idx, gradients)
-
-            return loss, gradients
-
-        return _f
-
     @tf.function
     def _E_loss(self, y):
         E_loss = 0.
@@ -141,9 +114,19 @@ class GLLE(BaseBFGS, BaseDeepLE):
             )
         return E_loss
 
-    @tf.function
-    def _loss_function(self, l, y):
-        mse = tf.reduce_sum((l - y)**2)
+    def _loss(self, params_1d):
+        with tf.GradientTape() as tape:
+            y = self._P @ self._params2model(params_1d)[0]
+            E_loss = self._E_loss(y)
+        E_gradients = tape.gradient(E_loss, self._E)
+        self._E_optimizer.apply_gradients(zip(E_gradients, self._E))
+
+        for i in range(self._n_clusters):
+            Ei_norm = tf.linalg.norm(self._E[i], axis=1, keepdims=True)
+            self._E[i].assign(self._E[i] / Ei_norm)
+
+        y = self._P @ self._params2model(params_1d)[0]
+        mse = tf.reduce_sum((self._l - y)**2)
         lap = tf.linalg.trace(tf.transpose(y) @ self._G @ y)
         return mse + self._alpha * lap + self._beta * self._E_loss(y)
 
@@ -173,14 +156,11 @@ class GLLE(BaseBFGS, BaseDeepLE):
     def _get_default_model(self):
         return self.get_2layer_model(self._P.shape[1], self._n_outputs, softmax=False)
 
-    def fit(self, X, l,
-            alpha=1e-2, beta=1e-4, sigma=10., max_iterations=50, **kwargs):
+    def fit(self, X, l, alpha=1e-2, beta=1e-4, sigma=1., max_iterations=50, **kwargs):
         self._alpha = alpha
         self._beta = beta
         self._sigma = sigma
-        BaseDeep.fit(self, X, l, **kwargs)
-        self._optimize_bfgs(self._model, self._loss_function, self._P, self._l, max_iterations)
-        return self
+        return super().fit(X, l, **kwargs)
 
     def transform(self):
         return keras.activations.softmax(self._call(self._P)).numpy()

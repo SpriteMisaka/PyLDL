@@ -11,12 +11,13 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Shen et al. 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2017.pdf))[*NeurIPS*]: `LDLF`.
   + ([Wang and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2019.pdf))[*IJCAI*]: `LDL4C`$^3$.
   + ([Shen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2020.pdf))[*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
-  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Information Sciences*]: `SSG_LDL`$^4$.
-  + ([González et al. 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021b.pdf))[*Information Fusion*]: `DF_LDL`.
+  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Inf. Sci.*]: `SSG_LDL`$^4$.
+  + ([González et al. 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021b.pdf))[*Inf. Fusion*]: `DF_LDL`.
   + ([Wang and Geng 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021a.pdf))[*IJCAI*]: `LDL_HR`$^3$.
   + ([Wang and Geng 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021b.pdf))[*ICML*]: `LDLM`$^3$.
   + ([Jia et al. 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2021.pdf))[*TKDE*]: `LDL_SCL`.
-  + ([Jia et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023.pdf))[*TKDE*]: `LDL_LRR`.
+  + ([Jia et al. 2023a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023a.pdf))[*TKDE*]: `LDL_LRR`.
+  + ([Jia et al. 2023b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023b.pdf))[*TNNLS*]: `LDL_DPA`.
   + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.

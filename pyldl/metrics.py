@@ -93,6 +93,10 @@ def error_probability(y, y_pred):
     return 1 - y[np.arange(y.shape[0]), np.argmax(y_pred, 1)].mean()
 
 
+def dpa(y, y_pred):
+    return np.mean(np.mean(stats.rankdata(y_pred, axis=1) * y, axis=1))
+
+
 def score(y, y_pred,
           metrics=["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"],
           return_dict=False):
