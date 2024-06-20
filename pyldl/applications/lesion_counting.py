@@ -12,7 +12,7 @@ import keras
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
-from pyldl.algorithms.base import BaseDeepLDL
+from pyldl.algorithms.base import BaseGD, BaseDeepLDL
 
 
 n_grades = 4
@@ -72,9 +72,7 @@ def visualization(X, grade, count, grade_real=None, count_real=None,
     plt.show()
 
 
-class LDL_ACNE(BaseDeepLDL):
-    def __init__(self, random_state=None):
-        super().__init__(None, None, random_state)
+class LDL_ACNE(BaseGD, BaseDeepLDL):
 
     hayashi = [0] + [0 for _ in range(5)] + [1 for _ in range(15)] + \
         [2 for _ in range(30)] + [3 for _ in range(15)]
@@ -84,54 +82,41 @@ class LDL_ACNE(BaseDeepLDL):
     def counts2grades(counts):
         return tf.transpose(tf.math.segment_sum(tf.transpose(counts), LDL_ACNE.hayashi))
 
-    @tf.function
-    def _loss(self, X, counts, counts2grades):
-        features = self._encoder(X)
-        pooling = self._pooling(features)
-        pred_counts = self._top_counts(pooling)
-        pred_grades = self._top_grades(pooling)
+    def _get_default_model(self):
+        inputs = keras.Input(shape=(224, 224, 3))
+        features = keras.applications.ResNet50(include_top=False, weights='imagenet')(inputs)
+        poolings = keras.layers.GlobalAveragePooling2D()(features)
+        counts = keras.layers.Dense(n_counts + 1, activation='softmax')(poolings)
+        grades = keras.layers.Dense(n_grades, activation='softmax')(poolings)
+        return keras.Model(inputs=inputs, outputs=[counts, grades])
 
-        pred_counts2grades = LDL_ACNE.counts2grades(pred_counts)
-        
-        lc = tf.reduce_sum(keras.losses.kl_divergence(counts, pred_counts))
-        lg = tf.reduce_sum(keras.losses.kl_divergence(counts2grades, pred_grades))
-        lc2g = tf.reduce_sum(keras.losses.kl_divergence(counts2grades, pred_counts2grades))
+    @staticmethod
+    def loss_function(y, y_pred):
+        return tf.reduce_sum(keras.losses.kl_divergence(y, y_pred))
+
+    @tf.function
+    def _loss(self, X, y, start, end):
+        y_pred, grades_pred = self._call(X)
+        counts2grades_pred = LDL_ACNE.counts2grades(y_pred)
+
+        lc = self.loss_function(y, y_pred)
+        lg = self.loss_function(self._counts2grades[start:end], grades_pred)
+        lc2g = self.loss_function(self._counts2grades[start:end], counts2grades_pred)
 
         return (1 - self._alpha) * lc + self._alpha / 2 * (lg + lc2g)
 
-    def fit(self, X, counts, learning_rate=1e-4, epochs=500,
-            batch_size=32, alpha=.6):
-        super().fit(X, counts)
-
-        self._batch_size = batch_size
-        self._alpha = alpha
-
-        self._encoder = keras.applications.ResNet50(
-            include_top=False, weights='imagenet',
-            input_shape=(224, 224, 3))
-        self._pooling = keras.layers.GlobalAveragePooling2D()
-        self._top_grades = keras.layers.Dense(n_grades, activation='softmax')
-        self._top_counts = keras.layers.Dense(n_counts + 1, activation='softmax')
-
-        self._optimizer = keras.optimizers.SGD(learning_rate=learning_rate)
-
+    def _before_train(self):
         self._counts2grades = LDL_ACNE.counts2grades(self._y)
-        data = tf.data.Dataset.from_tensor_slices((self._X, self._y, self._counts2grades)).batch(self._batch_size)
 
-        for _ in range(epochs):
-            total_loss = 0.
-            for batch in data:
-                with tf.GradientTape() as tape:
-                    loss = self._loss(batch[0], batch[1], batch[2])
-                gradients = tape.gradient(loss, self.trainable_variables)
-                self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-                total_loss += loss
+    def fit(self, X, y, alpha=.6, **kwargs):
+        self._alpha = alpha
+        return super().fit(X, y, **kwargs)
 
-    def predict(self, X):
-        features = self._encoder(X)
-        pooling = self._pooling(features)
-        pred_counts = self._top_counts(pooling)
-        pred_grades1 = self._top_grades(pooling)
-        pred_grades2 = LDL_ACNE.counts2grades(pred_counts)
-        pred_grades = (pred_grades1 + pred_grades2) / 2.
-        return pred_grades, pred_counts
+    def predict(self, X, return_grades=False):
+        y_pred, grades1 = self._call(X)
+        if not return_grades:
+            return y_pred
+        else:
+            grades2 = LDL_ACNE.counts2grades(y_pred)
+            grades_pred = (grades1 + grades2) / 2.
+            return y_pred, grades_pred

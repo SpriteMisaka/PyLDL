@@ -4,16 +4,24 @@ import logging
 import warnings
 warnings.filterwarnings("ignore")
 
+import csv
+import subprocess
+
 import glob
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
 
+from scipy.interpolate import interp1d
+from scipy.spatial.distance import cdist
+from sklearn.neighbors import kneighbors_graph
+
+import keras
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
 from pyldl.utils import load_dataset
+from pyldl.algorithms.base import BaseGD, BaseDeepLDLClassifier
 
 
 jaffe_index = np.delete(np.arange(1, 220), np.array([8, 12, 21, 76, 108, 183]) - 1)
@@ -39,6 +47,57 @@ def load_jaffe(path, indices=np.arange(213)):
     return np.array(images), y[indices]
 
 
+def extract_ck_plus(input_dir, output_dir, openface_path, basic=True):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    emotions = ['happiness', 'sadness', 'surprise', 'anger', 'disgust', 'fear']
+    if not basic:
+        emotions += ['neutral', 'contempt']
+    for emotion in emotions:
+        emotion_path = os.path.join(input_dir, emotion)
+        command = [
+            os.path.abspath(os.path.join(openface_path, 'FaceLandmarkImg.exe')),
+            '-fdir', os.path.abspath(emotion_path),
+            '-out_dir', os.path.abspath(output_dir),
+            '-2Dfp',
+            '-aus'
+        ]
+        subprocess.run(command, check=True)
+
+
+def load_ck_plus(image_dir, feature_dir=None, basic=True):
+    images = []
+    labels = []
+    mapping = {'happiness': 0, 'sadness': 1, 'surprise': 2, 'anger': 3, 'disgust': 4, 'fear': 5}
+    if feature_dir is not None:
+        fps, aus = [], []
+
+    for root, _, files in os.walk(image_dir):
+        for file in files:
+            if basic and os.path.split(root)[-1] in ['neutral', 'contempt']:
+                continue
+            if file.lower().endswith('.png'):
+                image_path = os.path.join(root, file)
+                image = keras.preprocessing.image.load_img(image_path, target_size=(196, 256),
+                                                           color_mode='grayscale')
+                image = keras.preprocessing.image.img_to_array(image)
+                images.append(image)
+                labels.append(mapping[os.path.split(root)[-1]])
+                if feature_dir is not None:
+                    with open(os.path.join(feature_dir, file.replace('.png', '.csv')), 'r') as f:
+                        my_reader = csv.reader(f, delimiter=',')
+                        features = [i for i in my_reader][1]
+                        fps.append([float(i) for i in features[2:138]])
+                        aus.append([float(i) for i in features[138:]])
+
+    images = np.repeat(np.array(images), 3, -1)
+    labels = np.array(labels)
+    if feature_dir is not None:
+        return images, labels, np.array(fps), np.array(aus)
+    else:
+        return images, labels
+
+
 def visualization(image, distribution, distribution_real,
                   labels=['HA', 'SA', 'SU', 'AN', 'DI', 'FE']):
     _, ax = plt.subplots(1, 2, figsize=(6, 3))
@@ -58,3 +117,64 @@ def visualization(image, distribution, distribution_real,
     ax[1].grid(True, ls='dashed')
     ax[1].get_yaxis().set_visible(False)
     plt.show()
+
+
+class LDL_ALSG(BaseGD, BaseDeepLDLClassifier):
+
+    def _get_default_model(self):
+        inputs = keras.Input(shape=(196, 256, 3))
+        features = keras.applications.ResNet50(
+            include_top=False, weights='imagenet')(inputs)
+        poolings = keras.layers.GlobalAveragePooling2D()(features)
+        outputs = keras.layers.Dense(self._n_outputs, activation='softmax')(poolings)
+        return keras.Model(inputs=inputs, outputs=outputs)
+
+    def _generate_graphs(self, features):
+        graphs = []
+        for i in range(int(np.ceil(self._X.shape[0] / self._batch_size))):
+            start = i * self._batch_size
+            end = min(start + self._batch_size, self._X.shape[0])
+            graph = kneighbors_graph(features[start:end], n_neighbors=5, include_self=False)
+            graph = self._weights[i] * graph.toarray()
+            graphs.append(graph)
+        return graphs
+
+    def _before_train(self):
+        if self._batch_size is None:
+            self._batch_size = self._X.shape[0]
+
+        self._weights = []
+        for i in range(int(np.ceil(self._X.shape[0] / self._batch_size))):
+            start = i * self._batch_size
+            end = min(start + self._batch_size, self._X.shape[0])
+            self._weights.append(np.exp(-(cdist(
+                self._y[start:end], self._y[start:end]
+            ) ** 2) / (2 * self._sigma ** 2)))
+
+        self._fp_graphs = self._generate_graphs(self._fps)
+        self._au_graphs = self._generate_graphs(self._aus)
+
+    @staticmethod
+    def loss_function(y, y_pred):
+        return tf.reduce_sum(keras.losses.categorical_crossentropy(y, y_pred))
+
+    def _aux_loss(self, graph, y_pred):
+        indices = tf.where(graph > 0.)
+        return tf.reduce_sum(keras.losses.kl_divergence(tf.gather(y_pred, indices[:, 0]),
+                                                        tf.gather(y_pred, indices[:, 1])))
+
+    def _loss(self, X, y, start, end):
+        y_pred = self._call(X)
+        ce = self.loss_function(y, y_pred)
+        i = start // self._batch_size
+        fp = self._aux_loss(self._fp_graphs[i], y_pred)
+        au = self._aux_loss(self._au_graphs[i], y_pred)
+        return ce + self._alpha * (fp + au)
+
+    def fit(self, X, y, fps, aus, alpha=1e-3, sigma=1., batch_size=None, **kwargs):
+        self._fps = tf.cast(fps, tf.float32)
+        self._aus = tf.cast(aus, tf.float32)
+        self._alpha = alpha
+        self._sigma = sigma
+        self._batch_size = batch_size
+        return super().fit(X, y, batch_size=self._batch_size, **kwargs)

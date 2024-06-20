@@ -1,20 +1,34 @@
 import functools
+
 import os
+import sys
+import logging
+
+os.environ["KMP_AFFINITY"] = "noverbose"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+stderr = sys.stderr
+sys.stderr = open(os.devnull, 'w')
+import keras
+sys.stderr = stderr
+
+import tensorflow as tf
+
+import absl.logging
+logging.root.removeHandler(absl.logging._absl_handler)
+absl.logging._warn_preinit_stderr = False
+
+logger = tf.get_logger()
+logger.setLevel(logging.FATAL)
+tf.autograph.set_verbosity(0)
+
+import tensorflow_probability as tfp
 
 import warnings
 warnings.filterwarnings("ignore")
 
-import logging
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-
-import keras
-import tensorflow as tf
-tf.get_logger().setLevel(logging.ERROR)
-
-import tensorflow_probability as tfp
 
 from pyldl.metrics import score
 
@@ -148,9 +162,7 @@ class _BaseDeep(keras.Model):
 
     def fit(self, X, y, model=None, metrics=None, verbose=0):
         self._verbose = verbose
-        self._metrics = metrics or (
-            ["error_probability"] if issubclass(self.__class__, BaseDeepLDLClassifier) else ['kl_divergence']
-        )
+        self._metrics = metrics or []
         self._before_train()
         self._model = model or self._get_default_model()
 
@@ -230,39 +242,39 @@ class BaseGD(BaseDeep):
 
         self._optimizer = optimizer or self._get_default_optimizer()
 
-        if self._verbose != 0:
-            progbar = keras.utils.Progbar(epochs, stateful_metrics=self._metrics + ['loss'])
         if not isinstance(callbacks, keras.callbacks.CallbackList):
             callbacks = keras.callbacks.CallbackList(callbacks, model=self)
         callbacks.on_train_begin()
+        if self._verbose != 0:
+            progbar = keras.utils.Progbar(epochs, stateful_metrics=self._metrics + ['loss'])
 
         for epoch in range(epochs):
             if self.stop_training:
                 break
             callbacks.on_epoch_begin(epoch)
             
-            total_loss = 0.
             for step, batch in enumerate(data):
                 start = step * self._batch_size
-                end = start + self._batch_size
+                end = min(start + self._batch_size, self._X.shape[0])
                 callbacks.on_train_batch_begin(step)
                 with tf.GradientTape() as tape:
                     loss = self._loss(batch[0], batch[1], start, end)
-                    total_loss += loss
                 gradients = tape.gradient(loss, self.trainable_variables)
                 self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
                 callbacks.on_train_batch_end(step)
 
             scores = {}
+            val_loss = 0.
             if y_val is not None:
+                val_loss = self.loss_function(y_val, self.predict(X_val))
                 if X_val is not None and issubclass(self.__class__, BaseDeepLDL):
                     scores = self.score(X_val, y_val, metrics=self._metrics, return_dict=True)
                 elif issubclass(self.__class__, BaseDeepLE):
                     scores = self.score(y_val, metrics=self._metrics, return_dict=True)
 
-            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": total_loss})
+            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": val_loss})
             if self._verbose != 0:
-                progbar.update(epoch + 1, values=list(scores.items()) if scores else [('loss', total_loss)],
+                progbar.update(epoch + 1, values=[('loss', val_loss)] + list(scores.items()),
                                finalize=self.stop_training or epochs == epoch + 1)
 
         callbacks.on_train_end()

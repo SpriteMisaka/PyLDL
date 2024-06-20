@@ -20,14 +20,19 @@ class LDLEarlyStopping(keras.callbacks.Callback):
     def __init__(self, monitor='kl_divergence', patience=10):
         super().__init__()
         self._monitor = monitor
-        self._smaller = True if self._monitor == 'loss' else self._monitor in THE_SMALLER_THE_BETTER
         self._patience = patience
-        self._best_weights = None
 
     def on_train_begin(self, logs=None):
         self._wait = 0
         self._stopped_epoch = 0
+        if self._monitor == 'loss':
+            self._smaller = True
+        else:
+            self._smaller = self._monitor in THE_SMALLER_THE_BETTER
+            if self._monitor not in self.model._metrics:
+                self.model._metrics.append(self._monitor)
         self._best = np.Inf if self._smaller else 0.
+        self._best_weights = None
 
     def on_epoch_end(self, epoch, logs=None):
         current = logs.get("loss") if self._monitor == 'loss' else logs.get("scores").get(self._monitor)

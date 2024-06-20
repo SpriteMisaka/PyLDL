@@ -12,7 +12,7 @@ tf.get_logger().setLevel(logging.ERROR)
 
 from IPython.display import HTML, display
 
-from pyldl.algorithms.base import BaseDeepLDL
+from pyldl.algorithms.base import BaseAdam, BaseDeepLDL
 
 
 def load_semeval2020(path):
@@ -92,22 +92,24 @@ def load_glove(path, tokenizer, embedding_dim=100):
     return embeddings_matrix
 
 
-class DL_BiLSTM(BaseDeepLDL):
+class DL_BiLSTM(BaseAdam, BaseDeepLDL):
 
     def __init__(self, tokenizer, embeddings_matrix, n_hidden=256, random_state=None):
         super().__init__(n_hidden, None, random_state)
         self._embeddings_matrix = embeddings_matrix
         self._tokenizer = tokenizer
 
-    @tf.function
-    def _loss(self, X, y):
-        y_pred = self._model(X)
+    @staticmethod
+    def loss_function(y, y_pred):
         y_reshaped = tf.stack((y, 1-y), axis=2)
         return tf.reduce_sum(keras.losses.kl_divergence(y_reshaped, y_pred))
 
-    def fit(self, X, y, learning_rate=1e-3, epochs=3000):
-        super().fit(X, y)
+    @tf.function
+    def _loss(self, X, y, start, end):
+        y_pred = self._model(X)
+        return self.loss_function(y, y_pred)
 
+    def _get_default_model(self):
         n_embeddings = self._embeddings_matrix.shape[1]
 
         inputs = keras.Input(shape=(self._n_features,))
@@ -131,15 +133,7 @@ class DL_BiLSTM(BaseDeepLDL):
         z = lstm * a
 
         outputs = keras.layers.Dense(2, activation='softmax')(z)
-
-        self._model = keras.Model(inputs=inputs, outputs=outputs)
-        self._optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
-
-        for _ in range(epochs):
-            with tf.GradientTape() as tape:
-                loss = self._loss(self._X, self._y)
-            gradients = tape.gradient(loss, self._model.trainable_variables)
-            self._optimizer.apply_gradients(zip(gradients, self._model.trainable_variables))
+        return keras.Model(inputs=inputs, outputs=outputs)
 
     def predict(self, X):
-        return self._model(X)[:, :, 0]
+        return self._call(X)[:, :, 0]
