@@ -1,52 +1,35 @@
 import functools
+from typing import Optional
 
-import os
-import sys
-import logging
-
-os.environ["KMP_AFFINITY"] = "noverbose"
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-stderr = sys.stderr
-sys.stderr = open(os.devnull, 'w')
 import keras
-sys.stderr = stderr
-
 import tensorflow as tf
 
-import absl.logging
-logging.root.removeHandler(absl.logging._absl_handler)
-absl.logging._warn_preinit_stderr = False
-
-logger = tf.get_logger()
-logger.setLevel(logging.FATAL)
-tf.autograph.set_verbosity(0)
-
 import tensorflow_probability as tfp
-
-import warnings
-warnings.filterwarnings("ignore")
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from pyldl.metrics import score
+from pyldl.metrics import score, DEFAULT_METRICS
 
 
-class _Base():
+class _Base:
+    """Base class for all models in PyLDL.
+    """
 
-    def __init__(self, random_state=None):
-        if not random_state is None:
+    def __init__(self, random_state: Optional[int] = None):
+        if random_state is not None:
             np.random.seed(random_state)
 
         self._n_features = None
         self._n_outputs = None
 
-    def fit(self, X, y=None):
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None):
+        """Fit the model.
+        """
         self._X = X
         self._y = y
         self._n_features = self._X.shape[1]
-        if not self._y is None:
+        if self._y is not None:
             self._n_outputs = self._y.shape[1]
         return self
 
@@ -55,51 +38,51 @@ class _Base():
                          "Try to call 'fit()' first with some training data.")
 
     @property
-    def n_features(self):
+    def n_features(self) -> int:
         if self._n_features is None:
             self._not_been_fit()
         return self._n_features
 
     @property
-    def n_outputs(self):
+    def n_outputs(self) -> int:
         if self._n_outputs is None:
             self._not_been_fit()
         return self._n_outputs
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__
 
 
 class _BaseLDL(_Base):
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         pass
 
-    def score(self, X, y, metrics=None, return_dict=False):
+    def score(self, X: np.ndarray, y: np.ndarray,
+              metrics: Optional[list[str]] = None, return_dict: bool = False):
         if metrics is None:
-            metrics = ["chebyshev", "clark", "canberra", "kl_divergence",
-                       "cosine", "intersection"]
+            metrics = DEFAULT_METRICS
         return score(y, self.predict(X), metrics=metrics, return_dict=return_dict)
 
 
 class _BaseLE(_Base):
 
-    def fit(self, X, l):
+    def fit(self, X: np.ndarray, l: np.ndarray):
         super().fit(X, None)
         self._l = l
         self._n_outputs = self._l.shape[1]
         return self
 
-    def transform(self):
+    def transform(self) -> np.ndarray:
         return self._y
 
-    def fit_transform(self, X, l, **kwargs):
+    def fit_transform(self, X: np.ndarray, l: np.ndarray, **kwargs):
         return self.fit(X, l, **kwargs).transform()
 
-    def score(self, y, metrics=None, return_dict=False):
+    def score(self, y: np.ndarray,
+              metrics: Optional[list[str]] = None, return_dict: bool = False):
         if metrics is None:
-            metrics = ["chebyshev", "clark", "canberra", "kl_divergence",
-                       "cosine", "intersection"]
+            metrics = DEFAULT_METRICS
         return score(y, self.transform(), metrics=metrics, return_dict=return_dict)
 
 
@@ -230,17 +213,10 @@ class BaseGD(BaseDeep):
 
     def _get_default_optimizer(self):
         return keras.optimizers.SGD()
-    
-    def fit(self, X, y, epochs=1000, batch_size=None, optimizer=None,
-            X_val=None, y_val=None, callbacks=None, **kwargs):
-        super().fit(X, y, **kwargs)
 
-        self._batch_size = batch_size or self._X.shape[0]
-        data = tf.data.Dataset.from_tensor_slices(
-            (self._X, self._y if issubclass(self.__class__, BaseDeepLDL) else self._l)
-        ).batch(self._batch_size)
+    def train(self, X, y, epochs, batch_size, loss, trainable_variables, callbacks=None, X_val=None, y_val=None):
 
-        self._optimizer = optimizer or self._get_default_optimizer()
+        data = tf.data.Dataset.from_tensor_slices((X, y)).batch(batch_size)
 
         if not isinstance(callbacks, keras.callbacks.CallbackList):
             callbacks = keras.callbacks.CallbackList(callbacks, model=self)
@@ -248,29 +224,35 @@ class BaseGD(BaseDeep):
         if self._verbose != 0:
             progbar = keras.utils.Progbar(epochs, stateful_metrics=self._metrics + ['loss'])
 
+        self.stop_training = False
         for epoch in range(epochs):
             if self.stop_training:
                 break
             callbacks.on_epoch_begin(epoch)
-            
+
             for step, batch in enumerate(data):
-                start = step * self._batch_size
-                end = min(start + self._batch_size, self._X.shape[0])
+                start = step * batch_size
+                end = min(start + batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
                 with tf.GradientTape() as tape:
-                    loss = self._loss(batch[0], batch[1], start, end)
-                gradients = tape.gradient(loss, self.trainable_variables)
-                self._optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+                    l = loss(batch[0], batch[1], start, end)
+                gradients = tape.gradient(l, trainable_variables)
+                self._optimizer.apply_gradients(zip(gradients, trainable_variables))
                 callbacks.on_train_batch_end(step)
 
             scores = {}
             val_loss = 0.
             if y_val is not None:
-                val_loss = self.loss_function(y_val, self.predict(X_val))
-                if X_val is not None and issubclass(self.__class__, BaseDeepLDL):
-                    scores = self.score(X_val, y_val, metrics=self._metrics, return_dict=True)
+                if X_val is not None:
+                    if issubclass(self.__class__, BaseDeepLDLClassifier):
+                        y_val_pred = self.predict_proba(X_val)
+                    elif issubclass(self.__class__, BaseDeepLDL):
+                        y_val_pred = self.predict(X_val)
                 elif issubclass(self.__class__, BaseDeepLE):
-                    scores = self.score(y_val, metrics=self._metrics, return_dict=True)
+                    y_val_pred = self.transform()
+
+                val_loss = self.loss_function(y_val, y_val_pred)
+                scores = score(y_val, y_val_pred, metrics=self._metrics, return_dict=True)
 
             callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": val_loss})
             if self._verbose != 0:
@@ -278,6 +260,15 @@ class BaseGD(BaseDeep):
                                finalize=self.stop_training or epochs == epoch + 1)
 
         callbacks.on_train_end()
+
+    def fit(self, X, y, epochs=1000, batch_size=None, optimizer=None,
+            X_val=None, y_val=None, callbacks=None, **kwargs):
+        super().fit(X, y, **kwargs)
+
+        self._batch_size = batch_size or self._X.shape[0]
+        self._optimizer = optimizer or self._get_default_optimizer()
+        self.train(self._X, self._y if issubclass(self.__class__, BaseDeepLDL) else self._l,
+                   epochs, self._batch_size, self._loss, self.trainable_variables, callbacks, X_val, y_val)
 
         return self
 
@@ -349,7 +340,8 @@ class BaseBFGS(BaseDeep):
 
 class BaseEnsemble(BaseLDL):
 
-    def __init__(self, estimator, n_estimators=None, random_state=None):
+    def __init__(self, estimator: BaseLDL, n_estimators: Optional[int] = None,
+                 random_state: Optional[int] = None):
         super().__init__(random_state)
         self._estimator = estimator
         self._n_estimators = n_estimators

@@ -15,6 +15,8 @@ from ._ssg_ldl import SSG_LDL
 
 from ._label_enhancement import FCM, KM, LP, ML, GLLE, LEVI, LIBLE
 
+from ._ldl_da import LDL_DA
+
 
 __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "CPNN", "BCPNN", "ACPNN", "LDSVR",
@@ -24,4 +26,5 @@ __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "IncomLDL",
            "SSG_LDL",
            "FCM", "KM", "LP", "ML", "GLLE",
-           "LEVI", 'LIBLE']
+           "LEVI", "LIBLE",
+           "LDL_DA"]

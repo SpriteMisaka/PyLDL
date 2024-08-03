@@ -26,9 +26,10 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
 + Structured LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 + LDL applications:
+  + Facial emotion recognition (supported datasets: [*JAFFE*](https://zenodo.org/records/3451524))
   + ([Shirani et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shirani2019.pdf))[*ACL*]: Emphasis selection (supported datasets: [*SemEval2020*](https://github.com/RiTUAL-UH/SemEval2020_Task10_Emphasis_Selection); pre-trained GloVe embeddings can be downloaded [here](https://nlp.stanford.edu/projects/glove/)).
   + ([Wu et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wu2019.pdf))[*ICCV*]: Lesion counting (supported datasets: [*ACNE04*](https://drive.google.com/drive/folders/18yJcHXhzOv7H89t-Lda6phheAicLqMuZ)).
-  + ([Chen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/chen2020.pdf))[*CVPR*]: Facial emotion recognition (supported datasets: [*JAFFE*](https://zenodo.org/records/3451524) and [*CK+*](https://www.jeffcohn.net/Resources/)).
+  + ([Chen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/chen2020.pdf))[*CVPR*]: Facial emotion recognition with auxiliary label space graphs (supported datasets: [*CK+*](https://www.jeffcohn.net/Resources/); OpenFace can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/releases), and the required models can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/wiki/Model-download)).
 
 > $^1$ Technically, these methods are only suitable for totally ordered labels.
 >
@@ -158,7 +159,6 @@ scikit-fuzzy>=0.4.2
 scikit-learn>=1.0.2
 scipy>=1.8.0
 tensorflow>=2.8.0
-tensorflow-addons>=0.22.0
 tensorflow-probability>=0.16.0
 ```
 

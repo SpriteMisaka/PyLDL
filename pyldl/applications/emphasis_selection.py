@@ -41,11 +41,11 @@ def preprocessing(words, freqs, tokenizer=None, maxlen=None):
     if tokenizer is None and maxlen is None:
         new_tokenizer = True
         maxlen = max(map(len, words))
-        tokenizer = keras.preprocessing.text.Tokenizer()
+        tokenizer = tf.keras.preprocessing.text.Tokenizer()
         tokenizer.fit_on_texts(words)
 
     sequences = tokenizer.texts_to_sequences(words)
-    X = keras.preprocessing.sequence.pad_sequences(
+    X = tf.keras.preprocessing.sequence.pad_sequences(
         sequences, maxlen=maxlen, padding='post'
     )
     y = np.array([row + [0] * (maxlen - len(row))
@@ -94,34 +94,36 @@ def load_glove(path, tokenizer, embedding_dim=100):
 
 class DL_BiLSTM(BaseAdam, BaseDeepLDL):
 
-    def __init__(self, tokenizer, embeddings_matrix, n_hidden=256, random_state=None):
+    def __init__(self, tokenizer, embeddings_matrix, n_hidden=512, random_state=None):
         super().__init__(n_hidden, None, random_state)
         self._embeddings_matrix = embeddings_matrix
         self._tokenizer = tokenizer
 
     @staticmethod
     def loss_function(y, y_pred):
-        y_reshaped = tf.stack((y, 1-y), axis=2)
-        return tf.reduce_sum(keras.losses.kl_divergence(y_reshaped, y_pred))
+        return tf.reduce_sum(keras.losses.kl_divergence(y, y_pred))
 
     @tf.function
     def _loss(self, X, y, start, end):
-        y_pred = self._model(X)
-        return self.loss_function(y, y_pred)
+        y_pred = self._call(X)
+        y_reshaped = tf.stack((y, 1-y), axis=2)
+        return self.loss_function(self._mask[start:end] * y_reshaped,
+                                  self._mask[start:end] * y_pred)
+
+    def _create_mask(self, X):
+        mask = tf.cast(tf.greater(X, 0), dtype=tf.float32)
+        return tf.tile(tf.expand_dims(mask, axis=2), [1, 1, 2])
+
+    def _before_train(self):
+        self._mask = self._create_mask(self._X)
 
     def _get_default_model(self):
         n_embeddings = self._embeddings_matrix.shape[1]
 
         inputs = keras.Input(shape=(self._n_features,))
-
-        mask = tf.where(inputs > 0, 1, 0)
-        mask = tf.expand_dims(mask, axis=2)
-        mask = tf.tile(mask, [1, 1, self._n_hidden])
-
         features = keras.layers.Embedding(
             len(self._tokenizer.word_index)+1, n_embeddings,
-            input_length=self._n_features, weights=[self._embeddings_matrix],
-            trainable=True)(inputs)
+            input_shape=(self._n_features, ), trainable=True)(inputs)
         lstm = keras.layers.Bidirectional(keras.layers.LSTM(
             self._n_hidden//2, return_sequences=True))(features)
         lstm = keras.layers.Dropout(.5)(lstm)
@@ -133,7 +135,10 @@ class DL_BiLSTM(BaseAdam, BaseDeepLDL):
         z = lstm * a
 
         outputs = keras.layers.Dense(2, activation='softmax')(z)
-        return keras.Model(inputs=inputs, outputs=outputs)
+        model = keras.Model(inputs=inputs, outputs=outputs)
+        model.layers[1].set_weights([self._embeddings_matrix])
+        return model
 
     def predict(self, X):
-        return self._call(X)[:, :, 0]
+        mask = self._create_mask(X)
+        return (mask * self._call(X))[:, :, 0].numpy()

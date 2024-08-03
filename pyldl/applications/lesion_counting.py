@@ -112,8 +112,16 @@ class LDL_ACNE(BaseGD, BaseDeepLDL):
         self._alpha = alpha
         return super().fit(X, y, **kwargs)
 
-    def predict(self, X, return_grades=False):
-        y_pred, grades1 = self._call(X)
+    def predict(self, X, batch_size=None, return_grades=False):
+
+        if batch_size is None:
+            batch_size = X.shape[0]
+
+        y_pred = np.zeros((X.shape[0], n_counts + 1))
+        grades1 = np.zeros((X.shape[0], n_grades))
+        for i in range(0, X.shape[0], batch_size):
+            y_pred[i:i + batch_size], grades1[i:i + batch_size] = self._call(X[i:i + batch_size])
+
         if not return_grades:
             return y_pred
         else:

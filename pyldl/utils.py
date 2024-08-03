@@ -74,7 +74,7 @@ def load_dataset(name, dir='dataset'):
     return data['features'], data['labels']
 
 
-def random_missing(y, missing_rate=0.2):
+def random_missing(y, missing_rate=.9):
     if missing_rate <= 0. or missing_rate >= 1.:
         raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
     missing_mask = np.random.rand(*y.shape) < missing_rate
