@@ -94,6 +94,76 @@ class BaseLE(_BaseLE, TransformerMixin, BaseEstimator):
     pass
 
 
+class Base(_Base):
+
+    def fit(self, X, y, **kwargs):
+        if issubclass(self.__class__, BaseIncomLDL):
+            mask = kwargs.pop("mask")
+            BaseIncomLDL.fit(self, X, y, mask, **kwargs)
+        elif issubclass(self.__class__, BaseLDL):
+            BaseLDL.fit(self, X, y, **kwargs)
+        elif issubclass(self.__class__, BaseLE):
+            BaseLE.fit(self, X, y, **kwargs)
+        else:
+            raise ValueError("The model must be a subclass of BaseLDL or BaseLE.")
+
+
+class BaseADMM(Base):
+
+    def _update_W(self):
+        pass
+
+    def _update_Z(self):
+        pass
+
+    def _update_V(self):
+        self._V = self._V + self._rho * (self._X @ self._W - self._Z)
+
+    def _before_train(self):
+        pass
+
+    def fit(self, X, y, *, max_iterations=100, rho=1., **kwargs):
+        super().fit(X, y, **kwargs)
+        self._rho = rho
+        self._max_iterations = max_iterations
+
+        self._before_train()
+
+        self._W = np.ones((self._n_features, self._n_outputs))
+        self._Z = np.ones((self._X.shape[0], self._n_outputs))
+        self._V = np.ones((self._X.shape[0], self._n_outputs))
+
+        for i in range(self._max_iterations):
+            self._current_iteration = i + 1
+            self._update_W()
+            self._update_Z()
+            self._update_V()
+
+        return self
+
+    def predict(self, X):
+        return X @ self._W
+
+
+class BaseIncomLDL(BaseLDL):
+
+    @staticmethod
+    def repair(y, mask):
+        b = np.sum(mask, axis=1)
+        c = 1 - np.sum(y, axis=1)
+        b0 = b.copy()
+        b[b == 0] = 1
+        d = c / b
+        A = d[:, np.newaxis] * mask
+        B = (b0 == 1)[:, np.newaxis] * A
+        return y + B, (B == 0) & mask
+
+    def fit(self, X, y, mask):
+        super().fit(X, y)
+        self._y, mask = self.repair(self._y, mask)
+        self._mask = np.where(mask, 0., 1.)
+
+
 class _BaseDeep(keras.Model):
 
     def __init__(self, n_hidden=64, n_latent=None, random_state=None):
@@ -261,7 +331,7 @@ class BaseGD(BaseDeep):
 
         callbacks.on_train_end()
 
-    def fit(self, X, y, epochs=1000, batch_size=None, optimizer=None,
+    def fit(self, X, y, *, epochs=1000, batch_size=None, optimizer=None,
             X_val=None, y_val=None, callbacks=None, **kwargs):
         super().fit(X, y, **kwargs)
 
@@ -332,7 +402,7 @@ class BaseBFGS(BaseDeep):
 
         self._assign_new_model_parameters(results.position)
 
-    def fit(self, X, y, max_iterations=50, **kwargs):
+    def fit(self, X, y, *, max_iterations=50, **kwargs):
         super().fit(X, y, **kwargs)
         self._optimize_bfgs(max_iterations)
         return self

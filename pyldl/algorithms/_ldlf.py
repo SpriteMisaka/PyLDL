@@ -7,7 +7,7 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
 class LDLF(BaseAdam, BaseDeepLDL):
-    """LDLF is proposed in paper Label Distribution Learning Forests.
+    """LDLF is proposed in paper *Label Distribution Learning Forests*.
     """
 
     def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):

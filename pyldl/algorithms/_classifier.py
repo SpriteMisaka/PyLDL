@@ -5,7 +5,7 @@ from pyldl.algorithms.base import BaseDeepLDLClassifier, BaseGD, BaseBFGS
 
 
 class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
-    """LDL4C is proposed in paper Classification with Label Distribution Learning.
+    """LDL4C is proposed in paper *Classification with Label Distribution Learning*.
     """
 
     @tf.function
@@ -28,7 +28,7 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
 
 
 class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
-    """LDL-HR is proposed in paper Learn the Highest Label and Rest Label Description Degrees.
+    """LDL-HR is proposed in paper *Learn the Highest Label and Rest Label Description Degrees*.
     """
 
     @tf.function
@@ -61,7 +61,7 @@ class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
 
 
 class LDLM(BaseGD, BaseDeepLDLClassifier):
-    """LDLM is proposed in paper Label Distribution Learning Machine.
+    """LDLM is proposed in paper *Label Distribution Learning Machine*.
     """
 
     @tf.function

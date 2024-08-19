@@ -1,3 +1,4 @@
+from typing import Optional
 import numpy as np
 
 import keras
@@ -11,11 +12,20 @@ EPS = np.finfo(np.float32).eps
 
 
 class LDL_DA(BaseAdam, BaseDeepLDL):
-    """LDL-DA is proposed in paper Domain Adaptation for Label Distribution Learning.
+    """LDL-DA is proposed in paper *Domain Adaptation for Label Distribution Learning*.
     """
 
     @staticmethod
     def augment(src: np.ndarray, tgt: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """Feature augmentation.
+
+        :param src: Source data (shape: :math:`[m_s,\, n_s]`).
+        :type src: np.ndarray
+        :param tgt: Target data (shape: :math:`[m_t,\, n_t]`).
+        :type tgt: np.ndarray
+        :return: Augmented source and target data (shape: :math:`[m_s,\, n_s + n_t]` and :math:`[m_t,\, n_s + n_t]`, respectively).
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
         sX = np.concatenate((src, np.zeros(shape=(src.shape[0], tgt.shape[1]))), axis=1)
         tX = np.concatenate((np.zeros(shape=(tgt.shape[0], src.shape[1])), tgt), axis=1)
         return sX, tX
@@ -23,10 +33,28 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
     ORDER_SBU_3DFE = (0, 2, 5, 1, 3, 4)
     @staticmethod
     def reorder_y(y: np.ndarray, order: tuple[int]) -> np.ndarray:
+        """Reorder label distributions for consistent label semantics.
+
+        :param y: Label distributions.
+        :type y: np.ndarray
+        :param order: New order.
+        :type order: tuple[int]
+        :return: Reordered label distributions.
+        :rtype: np.ndarray
+        """
         return y[:, order]
 
     @staticmethod
     def pairwise_jsd(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
+        """Pairwise Jensen-Shannon divergence.
+
+        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
+        :type X: tf.Tensor
+        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
+        :type Y: tf.Tensor
+        :return: Pairwise Jensen-Shannon divergence (shape: :math:`[m_X,\, m_Y]`).
+        :rtype: tf.Tensor
+        """
         kl = keras.losses.KLDivergence(reduction=tf.compat.v1.losses.Reduction.NONE)
         temp1 = tf.repeat(X, Y.shape[0], axis=0)
         temp2 = tf.tile(Y, [X.shape[0], 1])
@@ -35,14 +63,32 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         return js
 
     @staticmethod
-    def pairwise_euclidean(X, Y):
+    def pairwise_euclidean(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
+        """Pairwise Euclidean distance.
+
+        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
+        :type X: tf.Tensor
+        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
+        :type Y: tf.Tensor
+        :return: Pairwise Euclidean distance (shape: :math:`[m_X,\, m_Y]`).
+        :rtype: tf.Tensor
+        """
         X2 = tf.tile(tf.reduce_sum(tf.square(X), axis=1, keepdims=True), [1, tf.shape(Y)[0]])
         Y2 = tf.tile(tf.reduce_sum(tf.square(Y), axis=1, keepdims=True), [1, tf.shape(X)[0]])
         XY = tf.matmul(X, tf.transpose(Y))
         return X2 + tf.transpose(Y2) - 2 * XY
 
     @staticmethod
-    def pairwise_cosine(X, Y):
+    def pairwise_cosine(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
+        """Pairwise cosine similarity.
+
+        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
+        :type X: tf.Tensor
+        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
+        :type Y: tf.Tensor
+        :return: Pairwise cosine similarity (shape: :math:`[m_X,\, m_Y]`).
+        :rtype: tf.Tensor
+        """
 
         def paired_cosine_distances(X, Y):
             X_norm = tf.nn.l2_normalize(X, axis=1)
@@ -57,6 +103,15 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
 
     @staticmethod
     def pairwise_label(X, Y):
+        """Pairwise label comparison. True if two labels are the same, otherwise False.
+
+        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
+        :type X: tf.Tensor
+        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
+        :type Y: tf.Tensor
+        :return: Pairwise label comparison (shape: :math:`[m_X,\, m_Y]`).
+        :rtype: tf.Tensor
+        """
         return tf.repeat(X, Y.shape[0]) == tf.tile(Y, [X.shape[0]])
 
     def __init__(self, n_hidden=256, n_latent=64, random_state=None):
@@ -160,9 +215,36 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
     def _ft_loss(self, tX, ty, start, end):
         return self.loss_function(ty, self._call(tX))
 
-    def fit(self, sX, sy, tX, ty, ft_epochs=1000, ft_optimizer=None,
-            callbacks=None, X_val=None, y_val=None,
-            alpha=1e-2, beta=1e-2, r=2, margin=None, fine_tune=True, **kwargs):
+    def fit(self, sX: np.ndarray, sy: np.ndarray, tX: np.ndarray, ty: np.ndarray, *, callbacks=None, X_val=None, y_val=None,
+            ft_epochs : int = 1000, ft_optimizer : Optional[keras.optimizers.Optimizer] = None,
+            alpha : float = 1e-2, beta : float = 1e-2, r : int = 2, margin : Optional[float] = None, fine_tune : bool = True, **kwargs):
+        """Fit the model.
+
+        :param sX: Source features.
+        :type sX: np.ndarray
+        :param sy: Source label distributions.
+        :type sy: np.ndarray
+        :param tX: Target features.
+        :type tX: np.ndarray
+        :param ty: Target label distributions.
+        :type ty: np.ndarray
+        :param ft_epochs: Fine-tuning epochs, defaults to 1000.
+        :type ft_epochs: int, optional
+        :param ft_optimizer: Fine-tuning optimizer, if None, the default optimizer is used, defaults to None.
+        :type ft_optimizer: keras.optimizers.Optimizer, optional
+        :param alpha: Hyperparameter to control the contrastive alignment loss, defaults to 1e-2.
+        :type alpha: float
+        :param beta: Hyperparameter to control the prototype alignment loss, defaults to 1e-2.
+        :type beta: float
+        :param r: Number of prototypes, defaults to 2.
+        :type r: int
+        :param margin: Margin for the similarity measure, defaults to None. If None, cosine similarity is used; otherwise, max-margin euclidean distance is used.
+        :type margin: float, optional
+        :param fine_tune: Whether to fine-tune the model, defaults to True.
+        :type fine_tune: bool, optional
+        :return: Fitted model.
+        :rtype: LDL_DA
+        """
 
         self._tX = tf.cast(tX, tf.float32)
         self._ty = tf.cast(ty, tf.float32)

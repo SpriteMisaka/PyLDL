@@ -9,6 +9,8 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
 class LDL_SCL(BaseAdam, BaseDeepLDL):
+    """LDL-SCL is proposed in paper *Label Distribution Learning with Label Correlations on Local Samples*.
+    """
 
     def __init__(self, n_hidden=None, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)

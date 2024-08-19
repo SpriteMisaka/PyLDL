@@ -3,41 +3,45 @@
 Label distribution learning (LDL) and label enhancement (LE) toolkit implemented in python, including:
 
 + LDL algorithms:
-  + ([Geng, Yin, and Zhou 2013](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2013.pdf))[*TPAMI*]: `CPNN`$^1$.
-  + ([Geng and Hou 2015](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2015.pdf))[*IJCAI*]: `LDSVR`.
-  + ⭐([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf))[*TKDE*]: `SA_BFGS`, `SA_IIS`, `AA_KNN`, `AA_BP`, `PT_Bayes`, and `PT_SVM`.
-  + ([Yang, Sun, and Sun 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/yang2017.pdf))[*AAAI*]: `BCPNN` and `ACPNN`.
-  + ([Xu and Zhou 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2017.pdf))[*IJCAI*]: `IncomLDL`$^2$.
-  + ([Shen et al. 2017](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2017.pdf))[*NeurIPS*]: `LDLF`.
-  + ([Wang and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2019.pdf))[*IJCAI*]: `LDL4C`$^3$.
-  + ([Shen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shen2020.pdf))[*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
-  + ([González et al. 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021a.pdf))[*Inf. Sci.*]: `SSG_LDL`$^4$.
-  + ([González et al. 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/gonz%C3%A1lez2021b.pdf))[*Inf. Fusion*]: `DF_LDL`.
-  + ([Wang and Geng 2021a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021a.pdf))[*IJCAI*]: `LDL_HR`$^3$.
-  + ([Wang and Geng 2021b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wang2021b.pdf))[*ICML*]: `LDLM`$^3$.
-  + ([Jia et al. 2021](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2021.pdf))[*TKDE*]: `LDL_SCL`.
-  + ([Jia et al. 2023a](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023a.pdf))[*TKDE*]: `LDL_LRR`.
-  + ([Jia et al. 2023b](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/jia2023b.pdf))[*TNNLS*]: `LDL_DPA`.
-  + ([Wen et al. 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wen2023.pdf))[*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
+  + [Geng, Yin, and Zhou 2013](https://doi.org/10.1109/tpami.2013.51)) [*TPAMI*]: `CPNN`$^1$.
+  + ([Geng and Hou 2015](https://www.ijcai.org/Abstract/15/494)) [*IJCAI*]: `LDSVR`.
+  + ⭐([Geng 2016](https://doi.org/10.1109/TKDE.2016.2545658)) [*TKDE*]: `SA_BFGS`, `SA_IIS`, `AA_KNN`, `AA_BP`, `PT_Bayes`, and `PT_SVM`.
+  + ([Yang, Sun, and Sun 2017](https://doi.org/10.1609/aaai.v31i1.10485)) [*AAAI*]: `BCPNN` and `ACPNN`.
+  + ([Xu and Zhou 2017](https://doi.org/10.24963/ijcai.2017/443)) [*IJCAI*]: `IncomLDL`$^2$.
+  + ([Shen et al. 2017](https://papers.nips.cc/paper_files/paper/2017/hash/6e2713a6efee97bacb63e52c54f0ada0-Abstract.html)) [*NeurIPS*]: `LDLF`.
+  + ([Wang and Geng 2019](https://doi.org/10.24963/ijcai.2019/515)) [*IJCAI*]: `LDL4C`$^3$.
+  + ([Shen et al. 2020](https://dx.doi.org/10.14177/j.cnki.32-1397n.2020.44.06.004)) [*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
+  + ([González et al. 2021a](https://doi.org/10.1016/j.ins.2020.07.071)) [*Inf. Sci.*]: `SSG_LDL`$^4$.
+  + ([González et al. 2021b](https://doi.org/10.1016/j.inffus.2020.08.024)) [*Inf. Fusion*]: `DF_LDL`.
+  + ([Wang and Geng 2021a](https://doi.org/10.24963/ijcai.2021/426)) [*IJCAI*]: `LDL_HR`$^3$.
+  + ([Wang and Geng 2021b](https://proceedings.mlr.press/v139/wang21h.html)) [*ICML*]: `LDLM`$^3$.
+  + ([Jia et al. 2021](https://doi.org/10.1109/TKDE.2019.2943337)) [*TKDE*]: `LDL_SCL`.
+  + ([Jia et al. 2023a](https://doi.org/10.1109/TKDE.2021.3099294)) [*TKDE*]: `LDL_LRR`.
+  + ([Jia et al. 2023b](https://doi.org/10.1109/TNNLS.2023.3258976)) [*TNNLS*]: `LDL_DPA`.
+  + ([Wen et al. 2023](https://doi.org/10.1109/ICCV51070.2023.02146)) [*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
+  + ([Li and Chen 2024](https://doi.org/10.24963/ijcai.2024/494)) [*IJCAI*]: `WInLDL`$^2$.
+  + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
 + LE algorithms:
-  + ([Xu, Liu, and Geng 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2019.pdf))[*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
-  + ([Xu et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/xu2020.pdf))[*ICML*]: `LEVI`.
-  + ([Zheng, Zhu, and Tang 2023](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/zheng2023.pdf))[*CVPR*]: `LIBLE`.
+  + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
+  + ([Xu et al. 2020](https://proceedings.mlr.press/v119/xu20g.html)) [*ICML*]: `LEVI`.
+  + ([Zheng, Zhu, and Tang 2023](https://doi.org/10.1109/CVPR52729.2023.00724)) [*CVPR*]: `LIBLE`.
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
 + Structured LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 + LDL applications:
-  + Facial emotion recognition (supported datasets: [*JAFFE*](https://zenodo.org/records/3451524))
-  + ([Shirani et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/shirani2019.pdf))[*ACL*]: Emphasis selection (supported datasets: [*SemEval2020*](https://github.com/RiTUAL-UH/SemEval2020_Task10_Emphasis_Selection); pre-trained GloVe embeddings can be downloaded [here](https://nlp.stanford.edu/projects/glove/)).
-  + ([Wu et al. 2019](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/wu2019.pdf))[*ICCV*]: Lesion counting (supported datasets: [*ACNE04*](https://drive.google.com/drive/folders/18yJcHXhzOv7H89t-Lda6phheAicLqMuZ)).
-  + ([Chen et al. 2020](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/chen2020.pdf))[*CVPR*]: Facial emotion recognition with auxiliary label space graphs (supported datasets: [*CK+*](https://www.jeffcohn.net/Resources/); OpenFace can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/releases), and the required models can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/wiki/Model-download)).
+  + Facial emotion recognition (supported datasets: [*JAFFE*](https://zenodo.org/records/3451524) and [*BU-3DFE*](https://www.cs.binghamton.edu/~lijun/Research/3DFE/3DFE_Analysis.html))
+  + ([Shirani et al. 2019](https://doi.org/10.18653/v1/P19-1112)) [*ACL*]: Emphasis selection (supported datasets: [*SemEval2020*](https://github.com/RiTUAL-UH/SemEval2020_Task10_Emphasis_Selection); pre-trained GloVe embeddings can be downloaded [here](https://nlp.stanford.edu/projects/glove/)).
+  + ([Wu et al. 2019](https://doi.org/10.1109/ICCV.2019.01074)) [*ICCV*]: Lesion counting (supported datasets: [*ACNE04*](https://drive.google.com/drive/folders/18yJcHXhzOv7H89t-Lda6phheAicLqMuZ)).
+  + ([Chen et al. 2020](https://doi.org/10.1109/CVPR42600.2020.01400)) [*CVPR*]: Facial emotion recognition with auxiliary label space graphs (supported datasets: [*CK+*](https://www.jeffcohn.net/Resources/); OpenFace can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/releases), and the required models can be downloaded [here](https://github.com/TadasBaltrusaitis/OpenFace/wiki/Model-download)).
 
 > $^1$ Technically, these methods are only suitable for totally ordered labels.
 >
-> $^2$ These are algorithms for incomplete LDL, so you should use `pyldl.utils.random_missing` to generate the missing label distribution matrix and the corresponding mask matrix in the experiments.
+> $^2$ These are algorithms for incomplete LDL, so you should use `pyldl.utils.random_missing` to generate the missing label distribution matrix and the corresponding mask matrix in the experiments. [Here](https://github.com/SpriteMisaka/PyLDL/blob/main/demo/incomplete_settings.ipynb) is a demo on using the incomplete LDL algorithms.
 >
 > $^3$ These are LDL classifiers, so you should use `predict_proba` to get label distributions and `predict` to get predicted labels.
 >
 > $^4$ These are oversampling algorithms for LDL, therefore you should use `fit_transform` to generate synthetic samples.
+>
+> $^5$: To use domain adaptation methods for LDL, you need to provide the source domain data via parameters `sX` and `sy` of the `fit` method. [Here](https://github.com/SpriteMisaka/PyLDL/blob/main/demo/domain_adaptation.ipynb) is a demo on domain adaptation for LDL.
 
 ## Installation
 
@@ -89,7 +93,7 @@ Now, you can load the original implementation of the method, e.g.:
 from pyldl.matlab_algorithms import SA_IIS
 ```
 
-You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) with the `pyldl.utils.plot_artificial` function, e.g.:
+You can visualize the performance of any model on the artificial dataset ([Geng 2016](https://doi.org/10.1109/TKDE.2016.2545658)) with the `pyldl.utils.plot_artificial` function, e.g.:
 
 ```python
 from pyldl.algorithms import LDSVR, SA_BFGS, SA_IIS, AA_KNN, PT_Bayes, GLLE, LIBLE
@@ -137,7 +141,7 @@ Results of ours are as follows.
 | PT-Bayes  |   .116 ± .011   |   .425 ± .031   |   .874 ± .064   |   .073 ± .012   |   .932 ± .011   |   .850 ± .012   |
 |  PT-SVM   |   .117 ± .012   |   .422 ± .027   |   .875 ± .057   |   .072 ± .011   |   .932 ± .011   |   .850 ± .011   |
 
-Results of the original MATLAB implementation ([Geng 2016](https://github.com/SpriteMisaka/PyLDL/blob/main/bibliography/geng2016.pdf)) are as follows.
+Results of the original MATLAB implementation ([Geng 2016](https://doi.org/10.1109/TKDE.2016.2545658)) are as follows.
 
 | Algorithm |    Cheby.(↓)    |    Clark(↓)     |     Can.(↓)     |     K-L(↓)      |     Cos.(↑)     |     Int.(↑)     |
 | :-------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |

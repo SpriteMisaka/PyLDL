@@ -5,7 +5,7 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
 class LDL_LRR(BaseBFGS, BaseDeepLDL):
-    """LDL-LRR is proposed in paper Label Distribution Learning by Maintaining Label Ranking Relation.
+    """LDL-LRR is proposed in paper *Label Distribution Learning by Maintaining Label Ranking Relation*.
     """
 
     @staticmethod

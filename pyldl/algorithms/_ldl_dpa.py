@@ -7,7 +7,7 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
 class LDL_DPA(BaseBFGS, BaseDeepLDL):
-    """LDL-DPA is proposed in paper Adaptive Weighted Ranking-Oriented Label Distribution Learning.
+    """LDL-DPA is proposed in paper *Adaptive Weighted Ranking-Oriented Label Distribution Learning*.
     """
 
     @staticmethod
