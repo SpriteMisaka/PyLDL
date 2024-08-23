@@ -16,6 +16,7 @@ from ._classifier import LDL4C, LDL_HR, LDLM
 from ._ensemble import DF_LDL, AdaBoostLDL
 
 from ._ldlf import LDLF
+from ._ldllc import LDLLC
 from ._ldl_scl import LDL_SCL
 from ._ldl_lrr import LDL_LRR
 from ._ldl_dpa import LDL_DPA
@@ -29,7 +30,7 @@ from ._ldl_da import LDL_DA
 
 __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "CPNN", "BCPNN", "ACPNN", "LDSVR",
-           "LDLF", "LDL_SCL", "LDL_LRR", "LDL_DPA", "CAD", "QFD2", "CJS",
+           "LDLF", "LDLLC", "LDL_SCL", "LDL_LRR", "LDL_DPA", "CAD", "QFD2", "CJS",
            "DF_LDL", "AdaBoostLDL",
            "LDL4C", "LDL_HR", "LDLM",
            "IncomLDL", "WInLDL",

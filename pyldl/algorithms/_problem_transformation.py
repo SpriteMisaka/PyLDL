@@ -2,7 +2,6 @@ import numpy as np
 
 from scipy.spatial.distance import pdist
 
-from sklearn.base import BaseEstimator
 from sklearn.svm import LinearSVC, SVR
 from sklearn.naive_bayes import GaussianNB
 from sklearn.multioutput import MultiOutputRegressor

@@ -5,6 +5,9 @@ from scipy.optimize import minimize, fsolve
 from pyldl.algorithms.base import BaseLDL
 
 
+EPS = np.finfo(np.float64).eps
+
+
 class _SA(BaseLDL):
 
     def __init__(self, random_state=None):
@@ -12,8 +15,8 @@ class _SA(BaseLDL):
         self._W = None
 
     def _loss_function(self, y, y_pred):
-        y_true = np.clip(y, 1e-7, 1)
-        y_pred = np.clip(y_pred, 1e-7, 1)
+        y_true = np.clip(y, EPS, 1)
+        y_pred = np.clip(y_pred, EPS, 1)
         return -1 * np.sum(y_true * np.log(y_pred))
 
     def predict(self, X):

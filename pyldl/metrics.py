@@ -5,7 +5,7 @@ from scipy import stats
 from sklearn.metrics.pairwise import paired_cosine_distances
 
 
-eps = np.finfo(np.float64).eps
+EPS = np.finfo(np.float64).eps
 
 
 THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
@@ -23,8 +23,8 @@ DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", 
 
 def _clip(func):
     def _wrapper(y, y_pred):
-        y = np.clip(y, eps, 1)
-        y_pred = np.clip(y_pred, eps, 1)
+        y = np.clip(y, EPS, 1)
+        y_pred = np.clip(y_pred, EPS, 1)
         return func(y, y_pred)
     return _wrapper
 

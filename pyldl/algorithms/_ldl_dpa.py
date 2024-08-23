@@ -24,16 +24,17 @@ class LDL_DPA(BaseBFGS, BaseDeepLDL):
 
     @tf.function
     def _loss(self, params_1d):
-        y_pred = keras.activations.softmax(self._X @ self._params2model(params_1d)[0])
+        theta = self._params2model(params_1d)[0]
+        y_pred = keras.activations.softmax(self._X @ theta)
         kld = tf.math.reduce_sum(keras.losses.kl_divergence(self._y, y_pred))
         rnkdpa = self.rnkdpa(self._R, y_pred)
         disvar = self.disvar(self._y, y_pred)
-        return kld + self._alpha * rnkdpa + self._beta * disvar + self._gamma * self._l2_reg(self._model)
+        return kld + self._alpha * rnkdpa + self._beta * disvar + self._gamma * self._l2_reg(theta)
 
     def _before_train(self):
         self._R = tf.cast(rankdata(self._y, axis=1), tf.float32)
 
-    def fit(self, X, y, alpha=1e-2, beta=1e-2, gamma=1e-6, **kwargs):
+    def fit(self, X, y, alpha=1e-2, beta=1e-2, gamma=0., **kwargs):
         self._alpha = alpha
         self._beta = beta
         self._gamma = gamma

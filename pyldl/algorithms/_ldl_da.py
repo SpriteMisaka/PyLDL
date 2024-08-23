@@ -5,6 +5,7 @@ import keras
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 
+from pyldl.algorithms.utils import pairwise_euclidean
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
@@ -61,22 +62,6 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         temp3 = 0.5 * (temp1 + temp2)
         js = 0.5 * (kl(temp1, temp3) + kl(temp2, temp3))
         return js
-
-    @staticmethod
-    def pairwise_euclidean(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
-        """Pairwise Euclidean distance.
-
-        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
-        :type X: tf.Tensor
-        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
-        :type Y: tf.Tensor
-        :return: Pairwise Euclidean distance (shape: :math:`[m_X,\, m_Y]`).
-        :rtype: tf.Tensor
-        """
-        X2 = tf.tile(tf.reduce_sum(tf.square(X), axis=1, keepdims=True), [1, tf.shape(Y)[0]])
-        Y2 = tf.tile(tf.reduce_sum(tf.square(Y), axis=1, keepdims=True), [1, tf.shape(X)[0]])
-        XY = tf.matmul(X, tf.transpose(Y))
-        return X2 + tf.transpose(Y2) - 2 * XY
 
     @staticmethod
     def pairwise_cosine(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
@@ -149,7 +134,7 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         mse = self.loss_function(sy, sy_pred)
         mse += self.loss_function(self._ty, ty_pred)
 
-        dis_X = self.pairwise_euclidean(sfeatures, tfeatures)
+        dis_X = pairwise_euclidean(sfeatures, tfeatures)
         sim_X = tf.maximum(self._margin - dis_X, 0.) if self._margin else self.pairwise_cosine(sfeatures, tfeatures)
 
         con = tf.reduce_sum(self._hw[start:end] * dis_X) / (tf.reduce_sum(self._hmask_y[start:end]) + EPS)

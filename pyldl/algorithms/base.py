@@ -105,7 +105,7 @@ class Base(_Base):
         elif issubclass(self.__class__, BaseLE):
             BaseLE.fit(self, X, y, **kwargs)
         else:
-            raise ValueError("The model must be a subclass of BaseLDL or BaseLE.")
+            raise TypeError("The model must be a subclass of BaseLDL or BaseLE.")
 
 
 class BaseADMM(Base):
@@ -176,10 +176,12 @@ class _BaseDeep(keras.Model):
     @staticmethod
     @tf.function
     def _l2_reg(model):
-        reg = 0.
-        for i in model.trainable_variables:
-            reg += tf.reduce_sum(tf.square(i))
-        return reg / 2.
+        if isinstance(model, keras.Model):
+            return tf.reduce_sum([tf.reduce_sum(tf.square(v)) for v in model.trainable_variables]) / 2.
+        elif isinstance(model, tf.Tensor):
+            return tf.reduce_sum(tf.square(model)) / 2.
+        else:
+            raise TypeError("Input must be a keras.Model or tf.Tensor.")
 
     @staticmethod
     @tf.function
@@ -191,10 +193,9 @@ class _BaseDeep(keras.Model):
 
     @staticmethod
     def get_2layer_model(n_features, n_outputs, softmax=True):
+        activation = 'softmax' if softmax else None
         return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
-                                 keras.layers.Dense(n_outputs, kernel_initializer=keras.initializers.Zeros(),
-                                                    activation='softmax' if softmax else None,
-                                                    use_bias=False)])
+                                 keras.layers.Dense(n_outputs, activation=activation, use_bias=False)])
 
     @staticmethod
     def get_3layer_model(n_features, n_hidden, n_outputs):
@@ -276,7 +277,7 @@ class BaseDeep(_BaseDeep):
         elif issubclass(self.__class__, BaseDeepLE):
             BaseDeepLE.fit(self, X, y, **kwargs)
         else:
-            raise ValueError("The model must be a subclass of BaseDeepLDL or BaseDeepLE.")
+            raise TypeError("The model must be a subclass of BaseDeepLDL or BaseDeepLE.")
 
 
 class BaseGD(BaseDeep):

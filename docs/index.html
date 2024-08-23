@@ -55,6 +55,12 @@ documentation for details.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDLLC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LDLLC" title="Link to this definition">¶</a></dt>
+<dd><p>LDLLC is proposed in paper <em>Label Distribution Learning by Exploiting Label Correlations</em>.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLM">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LDLM" title="Link to this definition">¶</a></dt>
 <dd><p>LDLM is proposed in paper <em>Label Distribution Learning Machine</em>.</p>
@@ -126,26 +132,6 @@ documentation for details.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Pairwise cosine similarity (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tf.Tensor</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.pairwise_euclidean">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.pairwise_euclidean" title="Link to this definition">¶</a></dt>
-<dd><p>Pairwise Euclidean distance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n_X]\)</span>).</p></li>
-<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n_Y]\)</span>).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pairwise Euclidean distance (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tf.Tensor</p>
