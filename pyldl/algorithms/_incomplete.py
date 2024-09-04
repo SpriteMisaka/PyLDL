@@ -2,18 +2,13 @@ import numpy as np
 
 from qpsolvers import solve_qp
 
+from pyldl.algorithms.utils import svt, proj
 from pyldl.algorithms.base import BaseADMM, BaseIncomLDL
 
 
 class IncomLDL(BaseADMM, BaseIncomLDL):
     """IncomLDL is proposed in paper *Incomplete Label Distribution Learning*.
     """
-
-    @staticmethod
-    def svt(A, tau):
-        U, S, VT = np.linalg.svd(A, full_matrices=False)
-        S_thresh = np.maximum(S - tau, 0)
-        return U @ np.diag(S_thresh) @ VT
 
     def _update_W(self):
 
@@ -36,7 +31,7 @@ class IncomLDL(BaseADMM, BaseIncomLDL):
     def _update_Z(self):
         A = self._X @ self._W + self._V / self._rho
         tau = self._alpha / self._rho
-        self._Z = self.svt(A, tau)
+        self._Z = svt(A, tau)
 
     def fit(self, X, y, mask, alpha=1e-3, **kwargs):
         self._alpha = alpha
@@ -46,15 +41,6 @@ class IncomLDL(BaseADMM, BaseIncomLDL):
 class WInLDL(BaseADMM, BaseIncomLDL):
     """WInLDL is proposed in paper *No Regularization Is Needed: Efficient and Effective Incomplete Label Distribution Learning*.
     """
-
-    @staticmethod
-    def proj(Y):
-        X = -np.sort(-Y, axis=1)
-        Xtmp = (np.cumsum(X, axis=1) - 1) / np.arange(1, Y.shape[1] + 1)
-        rho = np.sum(X > Xtmp, axis=1) - 1
-        theta = Xtmp[np.arange(Y.shape[0]), rho]
-        X = np.maximum(Y - theta[:, np.newaxis], 0)
-        return X
 
     def _update_W(self):
         self._W = np.linalg.solve(
@@ -67,7 +53,7 @@ class WInLDL(BaseADMM, BaseIncomLDL):
         Y = (self._X @ self._W) * (1 - self._mask) + self._y
         numerator = self._rho * self._X @ self._W + self._V + self._Q * self._Q * Y
         denominator = self._Q * self._Q + self._rho
-        self._Z = self.proj(numerator / denominator)
+        self._Z = proj(numerator / denominator)
 
     def _update_Q(self):
         a = 1 + self._current_iteration / self._max_iterations
@@ -80,6 +66,3 @@ class WInLDL(BaseADMM, BaseIncomLDL):
 
     def fit(self, X, y, mask, rho=2., **kwargs):
         return super().fit(X, y, mask=mask, rho=rho, **kwargs)
-
-    def predict(self, X):
-        return self.proj(X @ self._W)

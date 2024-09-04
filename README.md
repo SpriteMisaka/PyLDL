@@ -3,7 +3,7 @@
 Label distribution learning (LDL) and label enhancement (LE) toolkit implemented in python, including:
 
 + LDL algorithms:
-  + [Geng, Yin, and Zhou 2013](https://doi.org/10.1109/tpami.2013.51)) [*TPAMI*]: `CPNN`$^1$.
+  + ([Geng, Yin, and Zhou 2013](https://doi.org/10.1109/tpami.2013.51)) [*TPAMI*]: `CPNN`$^1$.
   + ([Geng and Hou 2015](https://www.ijcai.org/Abstract/15/494)) [*IJCAI*]: `LDSVR`.
   + ⭐([Geng 2016](https://doi.org/10.1109/TKDE.2016.2545658)) [*TKDE*]: `SA_BFGS`, `SA_IIS`, `AA_KNN`, `AA_BP`, `PT_Bayes`, and `PT_SVM`.
   + ([Yang, Sun, and Sun 2017](https://doi.org/10.1609/aaai.v31i1.10485)) [*AAAI*]: `BCPNN` and `ACPNN`.
@@ -21,6 +21,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Jia et al. 2023b](https://doi.org/10.1109/TNNLS.2023.3258976)) [*TNNLS*]: `LDL_DPA`$^\dagger$.
   + ([Wen et al. 2023](https://doi.org/10.1109/ICCV51070.2023.02146)) [*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
   + ([Li and Chen 2024](https://doi.org/10.24963/ijcai.2024/494)) [*IJCAI*]: `WInLDL`$^2$.
+  + ([Kou et al. 2024](https://doi.org/10.24963/ijcai.2024/478)) [*IJCAI*]: `TLRLDL`$^\dagger$ and `TKLRLDL`$^\dagger$.
   + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.

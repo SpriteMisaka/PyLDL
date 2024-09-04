@@ -10,6 +10,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from pyldl.metrics import score, DEFAULT_METRICS
+from pyldl.algorithms.utils import proj
 
 
 class _Base:
@@ -142,7 +143,7 @@ class BaseADMM(Base):
         return self
 
     def predict(self, X):
-        return X @ self._W
+        return proj(X @ self._W)
 
 
 class BaseIncomLDL(BaseLDL):

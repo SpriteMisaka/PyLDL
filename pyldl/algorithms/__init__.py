@@ -20,6 +20,7 @@ from ._ldllc import LDLLC
 from ._ldl_scl import LDL_SCL
 from ._ldl_lrr import LDL_LRR
 from ._ldl_dpa import LDL_DPA
+from ._lrldl import TLRLDL, TKLRLDL
 
 from ._ssg_ldl import SSG_LDL
 
@@ -31,6 +32,7 @@ from ._ldl_da import LDL_DA
 __all__ = ["SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "PT_Bayes", "PT_SVM",
            "CPNN", "BCPNN", "ACPNN", "LDSVR",
            "LDLF", "LDLLC", "LDL_SCL", "LDL_LRR", "LDL_DPA", "CAD", "QFD2", "CJS",
+           "TLRLDL", "TKLRLDL",
            "DF_LDL", "AdaBoostLDL",
            "LDL4C", "LDL_HR", "LDLM",
            "IncomLDL", "WInLDL",

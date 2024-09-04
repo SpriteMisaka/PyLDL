@@ -5,6 +5,21 @@ import tensorflow as tf
 
 from keras import backend as K
 
+
+def svt(A, tau):
+    U, S, VT = np.linalg.svd(A, full_matrices=False)
+    S_thresh = np.maximum(S - tau, 0)
+    return U @ np.diag(S_thresh) @ VT
+
+
+def proj(Y):
+    X = -np.sort(-Y, axis=1)
+    Xtmp = (np.cumsum(X, axis=1) - 1) / np.arange(1, Y.shape[1] + 1)
+    rho = np.sum(X > Xtmp, axis=1) - 1
+    theta = Xtmp[np.arange(Y.shape[0]), rho]
+    return np.maximum(Y - theta[:, np.newaxis], 0)
+
+
 def pairwise_euclidean(X: tf.Tensor, Y: tf.Tensor = None) -> tf.Tensor:
     """Pairwise Euclidean distance.
 
