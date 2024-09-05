@@ -1,9 +1,7 @@
 import numpy as np
 
-from pyldl.algorithms.utils import svt
+from pyldl.algorithms.utils import svt, binaryzation
 from pyldl.algorithms.base import BaseADMM, BaseLDL
-
-from pyldl.utils import binaryzation
 
 
 class _LRLDL(BaseADMM, BaseLDL):

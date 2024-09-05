@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import requests
 
@@ -11,8 +12,9 @@ import tensorflow as tf
 
 from sklearn.preprocessing import MinMaxScaler
 
-from pyldl.algorithms.base import BaseLDL, BaseLE
 from pyldl.metrics import THE_SMALLER_THE_BETTER
+from pyldl.algorithms.base import BaseLDL, BaseLE
+from pyldl.algorithms.utils import proj, binaryzation
 
 
 class LDLEarlyStopping(keras.callbacks.Callback):
@@ -84,30 +86,8 @@ def random_missing(y, missing_rate=.9):
     return missing_y, missing_mask
 
 
-def binaryzation(y, method='threshold', param=None):
-    r = np.argsort(np.argsort(y))
-
-    if method == 'threshold':
-        if param is None:
-            param = .5
-        elif not isinstance(param, float) or param < 0. or param >= 1.:
-            raise ValueError("Invalid param, when method is 'threshold', "
-                             "param should be a float in the range [0, 1).")
-        b = np.sort(y.T, axis=0)[::-1]
-        cs = np.cumsum(b, axis=0)
-        m = np.argmax(cs >= param, axis=0)
-        return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
-
-    elif method == 'topk':
-        if param is None:
-            param = y.shape[1] // 2
-        elif not isinstance(param, int) or param < 1 or param >= y.shape[1]:
-            raise ValueError("Invalid param, when method is 'topk', "
-                             "param should be an integer in the range [1, number_of_labels).")
-        return np.where(r >= y.shape[1] - param, 1, 0)
-
-    else:
-        raise ValueError("Invalid method, which should be 'threshold' or 'topk'.")
+sys.modules['pyldl.utils.proj'] = proj
+sys.modules['pyldl.utils.binaryzation'] = binaryzation
 
 
 def artificial(X, a=1., b=.5, c=.2, d=1.,

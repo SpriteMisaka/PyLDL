@@ -20,6 +20,32 @@ def proj(Y):
     return np.maximum(Y - theta[:, np.newaxis], 0)
 
 
+def binaryzation(y, method='threshold', param=None):
+    r = np.argsort(np.argsort(y))
+
+    if method == 'threshold':
+        if param is None:
+            param = .5
+        elif not isinstance(param, float) or param < 0. or param >= 1.:
+            raise ValueError("Invalid param, when method is 'threshold', "
+                             "param should be a float in the range [0, 1).")
+        b = np.sort(y.T, axis=0)[::-1]
+        cs = np.cumsum(b, axis=0)
+        m = np.argmax(cs >= param, axis=0)
+        return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
+
+    elif method == 'topk':
+        if param is None:
+            param = y.shape[1] // 2
+        elif not isinstance(param, int) or param < 1 or param >= y.shape[1]:
+            raise ValueError("Invalid param, when method is 'topk', "
+                             "param should be an integer in the range [1, number_of_labels).")
+        return np.where(r >= y.shape[1] - param, 1, 0)
+
+    else:
+        raise ValueError("Invalid method, which should be 'threshold' or 'topk'.")
+
+
 def pairwise_euclidean(X: tf.Tensor, Y: tf.Tensor = None) -> tf.Tensor:
     """Pairwise Euclidean distance.
 
