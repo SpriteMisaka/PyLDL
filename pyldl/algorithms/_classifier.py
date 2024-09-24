@@ -10,7 +10,7 @@ EPS = np.finfo(np.float32).eps
 
 
 class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
-    """LDL4C is proposed in paper *Classification with Label Distribution Learning*.
+    """:class:`LDL4C <pyldl.algorithms.LDL4C>` is proposed in paper :cite:`2019:wang3`.
     """
 
     @tf.function
@@ -34,7 +34,7 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
 
 
 class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
-    """LDL-HR is proposed in paper *Learn the Highest Label and Rest Label Description Degrees*.
+    """:class:`LDL-HR <pyldl.algorithms.LDL_HR>` is proposed in paper :cite:`2021:wang3`.
     """
 
     @tf.function
@@ -68,7 +68,7 @@ class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
 
 
 class LDLM(BaseGD, BaseDeepLDLClassifier):
-    """LDLM is proposed in paper *Label Distribution Learning Machine*.
+    """:class:`LDLM <pyldl.algorithms.LDLM>` is proposed in paper :cite:`2021:wang`.
     """
 
     @tf.function

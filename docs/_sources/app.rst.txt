@@ -1,0 +1,135 @@
+Applications
+------------
+
+.. toctree::
+   :maxdepth: 2
+
+Psychology
+~~~~~~~~~~
+
+Facial Emotion Recognition
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. jinja:: fer_ctx
+
+   {% for name in all_fer_cls %}
+   {{ name.replace('_', '-').lstrip('-') }}
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autoclass:: pyldl.applications.facial_emotion_recognition.{{ name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+   {% for name in all_fer_func %}
+   `{{                  name                  }}`
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autofunction:: pyldl.applications.facial_emotion_recognition.{{ name }}
+
+   {% endfor %}
+
+
+
+References
+^^^^^^^^^^
+
+.. bibliography:: app_psy_references.bib
+   :labelprefix: APP-
+   :cited:
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: app_psy_further_reading.bib
+   :labelprefix: APP-
+   :all:
+
+
+Medicine
+~~~~~~~~
+
+Lesion Counting
+^^^^^^^^^^^^^^^
+
+.. jinja:: lc_ctx
+
+   {% for name in all_lc_cls %}
+   {{ name.replace('_', '-').lstrip('-') }}
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autoclass:: pyldl.applications.lesion_counting.{{ name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+   {% for name in all_lc_func %}
+   `{{                  name                  }}`
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autofunction:: pyldl.applications.lesion_counting.{{ name }}
+
+   {% endfor %}
+
+
+References
+^^^^^^^^^^
+
+.. bibliography:: app_med_references.bib
+   :labelprefix: APP-
+   :cited:
+
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: app_med_further_reading.bib
+   :labelprefix: APP-
+   :all:
+
+
+Text/Natural Language
+~~~~~~~~~~~~~~~~~~~~~
+
+Emphasis Selection
+^^^^^^^^^^^^^^^^^^
+
+.. jinja:: es_ctx
+
+   {% for name in all_es_cls %}
+   {{ name.replace('_', '-').lstrip('-') }}
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autoclass:: pyldl.applications.emphasis_selection.{{ name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+   {% for name in all_es_func %}
+   `{{                  name                  }}`
+   """"""""""""""""""""""""""""""""""""""""""""""""""
+
+   .. autofunction:: pyldl.applications.emphasis_selection.{{ name }}
+
+   {% endfor %}
+
+References
+^^^^^^^^^^
+
+.. bibliography:: app_nl_references.bib
+   :labelprefix: APP-
+   :cited:
+
+
+Computer Vision
+~~~~~~~~~~~~~~~
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: app_cv_further_reading.bib
+   :labelprefix: APP-
+   :all:

@@ -1,11 +1,10 @@
 from typing import Optional
+import sys
 
 import numpy as np
 from scipy import stats
-from sklearn.metrics.pairwise import paired_cosine_distances
 
-
-EPS = np.finfo(np.float64).eps
+from pyldl.algorithms.utils import _clip, _reduction, kl_divergence, sort_loss, DEFAULT_METRICS
 
 
 THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
@@ -18,22 +17,7 @@ THE_LAGER_THE_BETTER = ["cosine", "intersection",
                         "fidelity",
                         "spearman", "kendall", "dpa"]
 
-DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]
-
-
-def _clip(func):
-    def _wrapper(y, y_pred):
-        y = np.clip(y, EPS, 1)
-        y_pred = np.clip(y_pred, EPS, 1)
-        return func(y, y_pred)
-    return _wrapper
-
-
-def _reduction(func):
-    def _wrapper(*args, reduction=np.average):
-        results = func(*args)
-        return reduction(results) if reduction is not None else results
-    return _wrapper
+sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 
 
 @_reduction
@@ -53,14 +37,12 @@ def canberra(y, y_pred):
     return np.sum(np.abs(y - y_pred) / (y + y_pred), 1)
 
 
-@_reduction
-@_clip
-def kl_divergence(y, y_pred):
-    return np.sum(y * (np.log(y) - np.log(y_pred)), 1)
+sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
 
 
 @_reduction
 def cosine(y, y_pred):
+    from sklearn.metrics.pairwise import paired_cosine_distances
     return 1 - paired_cosine_distances(y, y_pred)
 
 
@@ -99,16 +81,7 @@ def mean_absolute_error(y, y_pred):
     return np.abs(yt - yp)
 
 
-@_reduction
-def sort_loss(y, y_pred):
-    i = np.argsort(-y)
-    h = y_pred[np.arange(y_pred.shape[0])[:, np.newaxis], i]
-    res = 0.
-    for j in range(y.shape[1] - 1):
-        for k in range(j + 1, y.shape[1]):
-            res += np.maximum(h[:, k] - h[:, j], 0.) / np.log2(j + 2)
-    res /= np.sum([1. / np.log2(j + 2) for j in range(y.shape[1] - 1)])
-    return res
+sys.modules['pyldl.metrics.sort_loss'] = sort_loss
 
 
 @_reduction

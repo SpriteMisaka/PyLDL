@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Utils &amp; Metrics &#8212; PyLDL 0.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Applications" href="app.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="utils-metrics">
+<h1>Utils &amp; Metrics<a class="headerlink" href="#utils-metrics" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="clip">
+<h2><cite>_clip</cite><a class="headerlink" href="#clip" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils._clip">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">_clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.utils._clip" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="reduction">
+<h2><cite>_reduction</cite><a class="headerlink" href="#reduction" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils._reduction">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.utils._reduction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="binaryzation">
+<h2><cite>binaryzation</cite><a class="headerlink" href="#binaryzation" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.binaryzation">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">binaryzation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.binaryzation" title="Link to this definition">¶</a></dt>
+<dd><p>Transform label distribution matrix to logical label matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Label distribution matrix (shape: <span class="math notranslate nohighlight">\([n,\, l]\)</span>).</p></li>
+<li><p><strong>method</strong> (<em>{'threshold'</em><em>, </em><em>'topk'}</em><em>, </em><em>optional</em>) – <p>Type of binaryzation method, defaults to ‘threshold’. The options are ‘threshold’ and ‘topk’, which can refer to:</p>
+<div class="docutils container" id="id1">
+<div role="list" class="citation-list">
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>BIN-KWT+24<span class="fn-bracket">]</span></span>
+<p>Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 4326–4334. 2024. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2024/478">https://doi.org/10.24963/ijcai.2024/478</a>.</p>
+</div>
+</div>
+</div>
+</p></li>
+<li><p><strong>param</strong> (<em>any</em><em>, </em><em>optional</em>) – Parameter of binaryzation method, defaults to None. If None, the default value is .5 for ‘threshold’ and <span class="math notranslate nohighlight">\(\lfloor l / 2 \rfloor\)</span> for ‘topk’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Logical label matrix (shape: <span class="math notranslate nohighlight">\([n,\, l]\)</span>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="kl-divergence">
+<h2><cite>kl_divergence</cite><a class="headerlink" href="#kl-divergence" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.kl_divergence">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.utils.kl_divergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="pairwise-euclidean">
+<h2><cite>pairwise_euclidean</cite><a class="headerlink" href="#pairwise-euclidean" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_euclidean">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_euclidean" title="Link to this definition">¶</a></dt>
+<dd><p>Pairwise Euclidean distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n_X]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em><em>, </em><em>optional</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n_Y]\)</span>), if None, <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \boldsymbol{X}\)</span>, defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise Euclidean distance (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[np.ndarray, tf.Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="proj">
+<h2><cite>proj</cite><a class="headerlink" href="#proj" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.proj">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">proj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.proj" title="Link to this definition">¶</a></dt>
+<dd><p>This approach is proposed in paper <span id="id19">[<a class="reference internal" href="#id23" title="Laurent Condat. Fast projection onto the simplex and the l1 ball. Mathematical Programming, 158(1):575–585, 2016. URL: https://doi.org/10.1007/s10107-015-0946-6.">Con16</a>]</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Y</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The projection onto the probability simplex.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="soft-thresholding">
+<h2><cite>soft_thresholding</cite><a class="headerlink" href="#soft-thresholding" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.soft_thresholding">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">soft_thresholding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.soft_thresholding" title="Link to this definition">¶</a></dt>
+<dd><p>Soft thresholding operation.
+It is defined as <span class="math notranslate nohighlight">\(\text{soft}(\boldsymbol{A}, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace\)</span>,
+where <span class="math notranslate nohighlight">\(\odot\)</span> denotes element-wise multiplication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of soft thresholding operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="solvel21">
+<h2><cite>solvel21</cite><a class="headerlink" href="#solvel21" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.solvel21">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">solvel21</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.solvel21" title="Link to this definition">¶</a></dt>
+<dd><p>This approach is proposed in paper <span id="id20">[<a class="reference internal" href="#id24" title="Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. IEEE Transactions on Cybernetics, 44(8):1432–1445, 2014. URL: https://doi.org/10.1109/TCYB.2013.2286106.">CY14</a>]</span>.</p>
+<p>The solution to the optimization problem
+<span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,\,1}\)</span>
+is given by the following formula:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\vec{x}_{\bullet j}^{\ast} = \left\{
+\begin{aligned}
+&amp; \frac{\Vert \vec{a}_{\bullet j} \Vert - \tau}{\Vert \vec{a}_{\bullet j} \Vert} \vec{a}_{\bullet j}, &amp; \tau \le \Vert \vec{a}_{\bullet j} \Vert \\
+&amp; 0, &amp; \text{otherwise}
+\end{aligned}
+\right.\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\vec{x}_{\bullet j}\)</span> is the <span class="math notranslate nohighlight">\(j\)</span>-th column of matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span>,
+and <span class="math notranslate nohighlight">\(\vec{a}_{\bullet j}\)</span> is the <span class="math notranslate nohighlight">\(j\)</span>-th column of matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The solution to the optimization problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="svt">
+<h2><cite>svt</cite><a class="headerlink" href="#svt" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.svt">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">svt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.svt" title="Link to this definition">¶</a></dt>
+<dd><p>Singular value thresholding (SVT) is proposed in paper <span id="id21">[<a class="reference internal" href="#id25" title="Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. A singular value thresholding algorithm for matrix completion. SIAM Journal on optimization, 20(4):1956–1982, 2010. URL: https://doi.org/10.1137/080738970.">CCS10</a>]</span>.</p>
+<p>The solution to the optimization problem
+<span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{\ast}\)</span>
+is given by <span class="math notranslate nohighlight">\(\boldsymbol{U} \max \lbrace \boldsymbol{\Sigma} - \tau, 0 \rbrace \boldsymbol{V}^\text{T}\)</span>,
+where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{U} \boldsymbol{\Sigma} \boldsymbol{V}^\text{T}\)</span> is the singular value decomposition of matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The solution to the optimization problem.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="artificial">
+<h2><cite>artificial</cite><a class="headerlink" href="#artificial" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils.artificial">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">artificial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[4.,</span> <span class="pre">2.,</span> <span class="pre">1.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.,</span> <span class="pre">2.,</span> <span class="pre">4.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([[1.,</span> <span class="pre">4.,</span> <span class="pre">2.]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.utils.artificial" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-dataset">
+<h2><cite>load_dataset</cite><a class="headerlink" href="#load-dataset" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils.load_dataset">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dataset'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.utils.load_dataset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="make-ldl">
+<h2><cite>make_ldl</cite><a class="headerlink" href="#make-ldl" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils.make_ldl">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">make_ldl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.utils.make_ldl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="plot-artificial">
+<h2><cite>plot_artificial</cite><a class="headerlink" href="#plot-artificial" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils.plot_artificial">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">plot_artificial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.utils.plot_artificial" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="random-missing">
+<h2><cite>random_missing</cite><a class="headerlink" href="#random-missing" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils.random_missing">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">random_missing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.utils.random_missing" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="canberra">
+<h2><cite>canberra</cite><a class="headerlink" href="#canberra" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.canberra">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.canberra" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="chebyshev">
+<h2><cite>chebyshev</cite><a class="headerlink" href="#chebyshev" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.chebyshev">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.chebyshev" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="clark">
+<h2><cite>clark</cite><a class="headerlink" href="#clark" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.clark">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.clark" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="cosine">
+<h2><cite>cosine</cite><a class="headerlink" href="#cosine" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.cosine">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.cosine" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="dpa">
+<h2><cite>dpa</cite><a class="headerlink" href="#dpa" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.dpa">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">dpa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.dpa" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="error-probability">
+<h2><cite>error_probability</cite><a class="headerlink" href="#error-probability" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.error_probability">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">error_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.error_probability" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="euclidean">
+<h2><cite>euclidean</cite><a class="headerlink" href="#euclidean" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.euclidean">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.euclidean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="fidelity">
+<h2><cite>fidelity</cite><a class="headerlink" href="#fidelity" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.fidelity">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">fidelity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.fidelity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="intersection">
+<h2><cite>intersection</cite><a class="headerlink" href="#intersection" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.intersection">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.intersection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="kendall">
+<h2><cite>kendall</cite><a class="headerlink" href="#kendall" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.kendall">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.kendall" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="mean-absolute-error">
+<h2><cite>mean_absolute_error</cite><a class="headerlink" href="#mean-absolute-error" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.mean_absolute_error">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mean_absolute_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.mean_absolute_error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="score">
+<h2><cite>score</cite><a class="headerlink" href="#score" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.score">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.score" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="sorensen">
+<h2><cite>sorensen</cite><a class="headerlink" href="#sorensen" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.sorensen">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">sorensen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.sorensen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="spearman">
+<h2><cite>spearman</cite><a class="headerlink" href="#spearman" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.spearman">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.spearman" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="squared-chi2">
+<h2><cite>squared_chi2</cite><a class="headerlink" href="#squared-chi2" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.squared_chi2">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">squared_chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.squared_chi2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="zero-one-loss">
+<h2><cite>zero_one_loss</cite><a class="headerlink" href="#zero-one-loss" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.zero_one_loss">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">zero_one_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction=&lt;function</span> <span class="pre">average&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.zero_one_loss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<div class="docutils container" id="id22">
+<div role="list" class="citation-list">
+<div class="citation" id="id23" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id19">Con16</a><span class="fn-bracket">]</span></span>
+<p>Laurent Condat. Fast projection onto the simplex and the l1 ball. <em>Mathematical Programming</em>, 158(1):575–585, 2016. URL: <a class="reference external" href="https://doi.org/10.1007/s10107-015-0946-6">https://doi.org/10.1007/s10107-015-0946-6</a>.</p>
+</div>
+<div class="citation" id="id24" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id20">CY14</a><span class="fn-bracket">]</span></span>
+<p>Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. <em>IEEE Transactions on Cybernetics</em>, 44(8):1432–1445, 2014. URL: <a class="reference external" href="https://doi.org/10.1109/TCYB.2013.2286106">https://doi.org/10.1109/TCYB.2013.2286106</a>.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id21">CCS10</a><span class="fn-bracket">]</span></span>
+<p>Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. A singular value thresholding algorithm for matrix completion. <em>SIAM Journal on optimization</em>, 20(4):1956–1982, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/080738970">https://doi.org/10.1137/080738970</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyLDL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utils &amp; Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#clip"><cite>_clip</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reduction"><cite>_reduction</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#binaryzation"><cite>binaryzation</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kl-divergence"><cite>kl_divergence</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#proj"><cite>proj</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#soft-thresholding"><cite>soft_thresholding</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solvel21"><cite>solvel21</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#svt"><cite>svt</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#artificial"><cite>artificial</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-dataset"><cite>load_dataset</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#make-ldl"><cite>make_ldl</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot-artificial"><cite>plot_artificial</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#random-missing"><cite>random_missing</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#canberra"><cite>canberra</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chebyshev"><cite>chebyshev</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clark"><cite>clark</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cosine"><cite>cosine</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dpa"><cite>dpa</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#error-probability"><cite>error_probability</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#euclidean"><cite>euclidean</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fidelity"><cite>fidelity</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intersection"><cite>intersection</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kendall"><cite>kendall</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mean-absolute-error"><cite>mean_absolute_error</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#score"><cite>score</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sorensen"><cite>sorensen</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spearman"><cite>spearman</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#squared-chi2"><cite>squared_chi2</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zero-one-loss"><cite>zero_one_loss</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="app.html" title="previous chapter">Applications</a></li>
+      <li>Next: <a href="glossary.html" title="next chapter">Glossary</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, SpriteMisaka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

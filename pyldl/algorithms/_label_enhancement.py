@@ -19,6 +19,8 @@ from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseAdam, BaseBFGS
 
 
 class FCM(BaseLE):
+    """:class:`FCM <pyldl.algorithms.FCM>` is proposed in paper :cite:`2018:xu`.
+    """
 
     def fit(self, X, l, n_clusters=50, beta=2):
         super().fit(X, l)
@@ -33,6 +35,8 @@ class FCM(BaseLE):
 
 
 class KM(BaseLE):
+    """:class:`KM <pyldl.algorithms.KM>` is proposed in paper :cite:`2018:xu`.
+    """
 
     def fit(self, X, l):
         super().fit(X, l)
@@ -54,6 +58,8 @@ class KM(BaseLE):
 
 
 class LP(BaseLE):
+    """:class:`LP <pyldl.algorithms.LP>` is proposed in paper :cite:`2018:xu`.
+    """
 
     def fit(self, X, l, epochs=500, alpha=.5):
         super().fit(X, l)
@@ -71,6 +77,8 @@ class LP(BaseLE):
 
 
 class ML(BaseLE):
+    """:class:`ML <pyldl.algorithms.ML>` is proposed in paper :cite:`2018:xu`.
+    """
 
     def fit(self, X, l, beta=1):
         super().fit(X, l)
@@ -103,6 +111,17 @@ class ML(BaseLE):
 
 
 class GLLE(BaseBFGS, BaseDeepLE):
+    """:class:`GLLE <pyldl.algorithms.GLLE>` is proposed in paper :cite:`2018:xu`.
+
+    See also:
+
+    .. bibliography:: le_references.bib
+        :filter: False
+        :labelprefix: GLLE-
+        :keyprefix: glle-
+
+        2021:xu
+    """
 
     @tf.function
     def _E_loss(self, y):
@@ -167,6 +186,17 @@ class GLLE(BaseBFGS, BaseDeepLE):
 
 
 class LEVI(BaseAdam, BaseDeepLE):
+    """:class:`LEVI <pyldl.algorithms.LEVI>` is proposed in paper :cite:`2020:xu3`.
+
+    See also:
+
+    .. bibliography:: le_references.bib
+        :filter: False
+        :labelprefix: LEVI-
+        :keyprefix: levi-
+
+        2023:xu4
+    """
 
     def _call(self, X, l, transform=False):
         inputs = tf.concat((X, l), axis=1)
@@ -225,6 +255,8 @@ class LEVI(BaseAdam, BaseDeepLE):
 
 
 class LIBLE(BaseAdam, BaseDeepLE):
+    """:class:`LIBLE <pyldl.algorithms.LIBLE>` is proposed in paper :cite:`2023:zheng`.
+    """
 
     def __init__(self, n_hidden=64, n_latent=64, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)

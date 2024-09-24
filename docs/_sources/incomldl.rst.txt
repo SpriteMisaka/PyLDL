@@ -1,0 +1,31 @@
+IncomLDL
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+.. jinja:: incomldl_ctx
+
+   {% for class_name in all_incomldl_algs %}
+   {{ class_name.replace('_', '-').lstrip('-') }}
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   .. autoclass:: pyldl.algorithms.{{ class_name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+References
+~~~~~~~~~~
+
+.. bibliography:: incomldl_references.bib
+   :labelprefix: INCOM-LDL-
+   :cited:
+
+Further Reading
+~~~~~~~~~~~~~~~
+
+.. bibliography:: incomldl_further_reading.bib
+   :labelprefix: INCOM-LDL-
+   :all:

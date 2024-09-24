@@ -41,7 +41,9 @@ def load_jaffe_single(path, i, size=(256, 256)):
     return image
 
 
-def load_jaffe(path, indices=np.arange(213), size=(256, 256)):
+def load_jaffe(path, indices=None, size=(256, 256)):
+    if indices is None:
+        indices = np.arange(213)
     images = []
     _, y = load_dataset('SJAFFE')
     for i in indices:
@@ -152,6 +154,8 @@ def visualization(image, distribution, real, style_real='distribution',
 
 
 class LDL_ALSG(BaseGD, BaseDeepLDLClassifier):
+    """:class:`LDL-ALSG <pyldl.algorithms.facial_emotion_recognition.LDL_ALSG>` is proposed in :cite:`2020:chen`.
+    """
 
     def _get_default_model(self):
         inputs = keras.Input(shape=self._X.shape[1:])

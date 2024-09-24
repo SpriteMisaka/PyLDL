@@ -3,14 +3,17 @@ import copy
 import numpy as np
 
 from pyldl.algorithms.base import BaseEnsemble
-from pyldl.metrics import sort_loss
-from ._algorithm_adaptation import AA_KNN
-from ._specialized_algorithms import SA_BFGS
+from pyldl.algorithms.utils import sort_loss
 
 
 class DF_LDL(BaseEnsemble):
+    """:class:`DF-LDL <pyldl.algorithms.DF_LDL>` is proposed in paper :cite:`2021:gonzalez`.
+    """
 
-    def __init__(self, estimator=SA_BFGS(), random_state=None):
+    def __init__(self, estimator=None, random_state=None):
+        from ._specialized_algorithms import SA_BFGS
+        if estimator is None:
+            estimator = SA_BFGS()
         super().__init__(estimator, None, random_state)
 
     def fit(self, X, y):
@@ -41,6 +44,7 @@ class DF_LDL(BaseEnsemble):
 
         self._estimators = L
 
+        from ._algorithm_adaptation import AA_KNN
         self._knn = AA_KNN()
         self._knn.fit(self._X, self._y)
 
@@ -66,7 +70,10 @@ class DF_LDL(BaseEnsemble):
 
 class AdaBoostLDL(BaseEnsemble):
 
-    def __init__(self, estimator=SA_BFGS(), n_estimators=10, random_state=None):
+    def __init__(self, estimator=None, n_estimators=10, random_state=None):
+        from ._specialized_algorithms import SA_BFGS
+        if estimator is None:
+            estimator = SA_BFGS()
         super().__init__(estimator, n_estimators, random_state)
 
     def fit(self, X, y, loss=sort_loss, alpha=1.):

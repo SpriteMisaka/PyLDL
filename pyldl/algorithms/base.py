@@ -1,3 +1,4 @@
+import logging
 import functools
 from typing import Optional
 
@@ -9,8 +10,7 @@ import tensorflow_probability as tfp
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from pyldl.metrics import score, DEFAULT_METRICS
-from pyldl.algorithms.utils import proj
+from pyldl.algorithms.utils import proj, DEFAULT_METRICS
 
 
 class _Base:
@@ -63,6 +63,7 @@ class _BaseLDL(_Base):
               metrics: Optional[list[str]] = None, return_dict: bool = False):
         if metrics is None:
             metrics = DEFAULT_METRICS
+        from pyldl.metrics import score
         return score(y, self.predict(X), metrics=metrics, return_dict=return_dict)
 
 
@@ -84,10 +85,19 @@ class _BaseLE(_Base):
               metrics: Optional[list[str]] = None, return_dict: bool = False):
         if metrics is None:
             metrics = DEFAULT_METRICS
+        from pyldl.metrics import score
         return score(y, self.transform(), metrics=metrics, return_dict=return_dict)
 
 
 class BaseLDL(_BaseLDL, BaseEstimator):
+    """Let :math:`\\mathcal{X} = \\mathbb{R}^{q}` denote the input space and :math:`\\mathcal{Y} = \\lbrace y_i \\rbrace_{i=1}^{l}` denote the label space. 
+    The description degree of :math:`y \\in \\mathcal{Y}` to :math:`\\boldsymbol{x} \\in \\mathcal{X}` is denoted by :math:`d_{\\boldsymbol{x}}^{y}`. 
+    Then the label distribution of :math:`\\boldsymbol{x}` is defined as :math:`\\boldsymbol{d} = \\lbrace d_{\\boldsymbol{x}}^{y} \\rbrace_{y \\in \\mathcal{Y}}`. 
+    Note that :math:`\\boldsymbol{d}` is under the constraints of probability simplex, i.e., :math:`\\boldsymbol{d} \\in \\Delta^{l-1}`, 
+    where :math:`\\Delta^{l-1} = \\lbrace \\boldsymbol{d} \\in \\mathbb{R}^{l} \\,|\\, \\boldsymbol{d} \\geq 0,\, \\boldsymbol{d}^{\\text{T}} \\boldsymbol{1} = 1 \\rbrace`. 
+    Given a training set of :math:`n` samples :math:`\\mathcal{S} = \\lbrace (\\boldsymbol{x}_i,\, \\boldsymbol{d}_i) \\rbrace_{i=1}^{n}`, 
+    the goal of LDL is to learn a conditional probability mass function :math:`p(\\boldsymbol{d} \,|\, \\boldsymbol{x})`.
+    """
     pass
 
 
@@ -111,6 +121,13 @@ class Base(_Base):
 
 class BaseADMM(Base):
 
+    def __init__(self, random_state: Optional[int] = None):
+        super().__init__(random_state)
+        self.EPS_ABS = 1e-4
+        self.EPS_REL = 1e-3
+        self.EPS_ERR = 1e-3
+        self._olds = {}
+
     def _update_W(self):
         pass
 
@@ -123,22 +140,81 @@ class BaseADMM(Base):
     def _before_train(self):
         pass
 
-    def fit(self, X, y, *, max_iterations=100, rho=1., **kwargs):
+    def _get_default_model(self):
+        _W = np.ones((self._n_features, self._n_outputs))
+        _Z = np.ones((self._X.shape[0], self._n_outputs))
+        _V = np.ones((self._X.shape[0], self._n_outputs))
+        return _W, _Z, _V
+
+    @property
+    def constraint(self):
+        return [[self._Z, self._X @ self._W]]
+
+    @property
+    def params(self):
+        return [self._W, self._Z]
+
+    @property
+    def Vs(self):
+        return [self._V]
+
+    def _primal_residual(self):
+        return np.array([np.linalg.norm(c[0] - c[1], 'fro') for c in self.constraint])
+
+    def _dual_residual(self):
+        return np.array([np.linalg.norm(self._rho * (c[0] - self._olds[i]), 'fro') for i, c in enumerate(self.constraint)])
+
+    def _primal_eps(self):
+        return np.sqrt(self._X.shape[0]) * self.EPS_ABS + self.EPS_REL * np.array([np.maximum(
+            np.linalg.norm(c[0], 'fro'), np.linalg.norm(c[1], 'fro')
+        ) for c in self.constraint])
+
+    def _dual_eps(self):
+        return np.sqrt(self._n_outputs) * self.EPS_ABS + self.EPS_REL * np.array([
+            np.linalg.norm(v, 'fro') for v in self.Vs
+        ])
+
+    def _err(self):
+        err = 0.
+        for i, c in enumerate(self.params):
+            err = np.maximum(err, np.abs(c - self._olds[i]).max())
+        return err
+
+    def _restore(self):
+        if self._stopping_criterion == 'primal_dual':
+            for i, c in enumerate(self.constraint):
+                self._olds[i] = c[0]
+        elif self._stopping_criterion == 'error':
+            for i, c in enumerate(self.params):
+                self._olds[i] = c
+
+    def _converged(self):
+        if self._stopping_criterion == 'primal_dual':
+            return np.all(self._primal_residual() <= self._primal_eps()) and np.all(self._dual_residual() <= self._dual_eps())
+        elif self._stopping_criterion == 'error':
+            return self._err() <= self.EPS_ERR
+        elif self._stopping_criterion is None:
+            return False
+
+    def fit(self, X, y, *, max_iterations=100, rho=1., stopping_criterion='primal_dual', **kwargs):
         super().fit(X, y, **kwargs)
         self._rho = rho
         self._max_iterations = max_iterations
+        self._stopping_criterion = stopping_criterion
 
         self._before_train()
 
-        self._W = np.ones((self._n_features, self._n_outputs))
-        self._Z = np.ones((self._X.shape[0], self._n_outputs))
-        self._V = np.ones((self._X.shape[0], self._n_outputs))
+        self._W, self._Z, self._V = self._get_default_model()
 
         for i in range(self._max_iterations):
             self._current_iteration = i + 1
+            self._restore()
             self._update_W()
             self._update_Z()
             self._update_V()
+            if self._converged():
+                logging.info(f"Converged in {self._current_iteration} iterations.")
+                break
 
         return self
 
@@ -267,6 +343,7 @@ class BaseDeepLDLClassifier(BaseDeepLDL):
     def score(self, X, y, metrics=None, return_dict=False):
         if metrics is None:
             metrics = ["zero_one_loss", "error_probability"]
+        from pyldl.metrics import score
         return score(y, self.predict_proba(X), metrics=metrics, return_dict=return_dict)
 
 
@@ -324,6 +401,7 @@ class BaseGD(BaseDeep):
                     y_val_pred = self.transform()
 
                 val_loss = self.loss_function(y_val, y_val_pred)
+                from pyldl.metrics import score
                 scores = score(y_val, y_val_pred, metrics=self._metrics, return_dict=True)
 
             callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": val_loss})

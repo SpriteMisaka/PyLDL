@@ -1,0 +1,100 @@
+Others
+------
+
+.. toctree::
+   :maxdepth: 2
+
+
+Oversampling
+~~~~~~~~~~~~
+
+SSG-LDL
+^^^^^^^
+
+.. autoclass:: pyldl.algorithms.SSG_LDL
+   :members:
+   :private-members:
+
+
+References
+^^^^^^^^^^
+
+.. bibliography:: others_os_references.bib
+   :labelprefix: O-
+   :cited:
+
+Transfer Learning
+~~~~~~~~~~~~~~~~~
+
+LDL-DA
+^^^^^^
+
+.. autoclass:: pyldl.algorithms.LDL_DA
+   :members:
+   :private-members:
+
+References
+^^^^^^^^^^
+
+.. bibliography:: others_tl_references.bib
+   :labelprefix: O-
+   :cited:
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: others_tl_further_reading.bib
+   :labelprefix: O-
+   :all:
+
+
+Predicting from Ranking
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: others_rnk_further_reading.bib
+   :labelprefix: O-
+   :all:
+
+
+Inaccurate/Noisy Labels
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: others_noisy_further_reading.bib
+   :labelprefix: O-
+   :all:
+
+
+Weakly/Semi-Supervision
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: others_ssl_further_reading.bib
+   :labelprefix: O-
+   :all:
+
+
+Population-Level LDL
+~~~~~~~~~~~~~~~~~~~~
+
+Further Reading
+^^^^^^^^^^^^^^^
+
+.. bibliography:: others_pldl_further_reading.bib
+   :labelprefix: O-
+   :all:
+
+
+More Derivative Tasks
+~~~~~~~~~~~~~~~~~~~~~
+
+.. bibliography:: others_further_reading.bib
+   :labelprefix: O-
+   :all:

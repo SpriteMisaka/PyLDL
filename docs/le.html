@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LE &#8212; PyLDL 0.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="IncomLDL" href="incomldl.html" />
+    <link rel="prev" title="LDL" href="ldl.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="le">
+<h1>LE<a class="headerlink" href="#le" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="basele">
+<h2><cite>BaseLE</cite><a class="headerlink" href="#basele" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.base.BaseLE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.base.BaseLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="lible">
+<h2>LIBLE<a class="headerlink" href="#lible" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LIBLE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LIBLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LIBLE" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LIBLE" title="pyldl.algorithms.LIBLE"><code class="xref py py-class docutils literal notranslate"><span class="pre">LIBLE</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id22" title="Qinghai Zheng, Jihua Zhu, and Haoyu Tang. Label information bottleneck for label enhancement. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 7497–7506. 2023. URL: https://doi.org/10.1109/CVPR52729.2023.00724.">LE-ZZT23</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="levi">
+<h2>LEVI<a class="headerlink" href="#levi" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LEVI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LEVI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LEVI" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LEVI" title="pyldl.algorithms.LEVI"><code class="xref py py-class docutils literal notranslate"><span class="pre">LEVI</span></code></a> is proposed in paper <span id="id2">[<a class="reference internal" href="#id24" title="Ning Xu, Jun Shu, Yun-Peng Liu, and Xin Geng. Variational label enhancement. In Proceedings of the International Conference on Machine Learning, 10597–10606. 2020.">LE-XSLG20</a>]</span>.</p>
+<p>See also:</p>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LEVI-XSZ+23<span class="fn-bracket">]</span></span>
+<p>Ning Xu, Jun Shu, Renyi Zheng, Xin Geng, Deyu Meng, and Min-Ling Zhang. Variational label enhancement. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 45(5):6537–6551, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2022.3203678">https://doi.org/10.1109/TPAMI.2022.3203678</a>.</p>
+</div>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="glle">
+<h2>GLLE<a class="headerlink" href="#glle" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.GLLE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">GLLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.GLLE" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.GLLE" title="pyldl.algorithms.GLLE"><code class="xref py py-class docutils literal notranslate"><span class="pre">GLLE</span></code></a> is proposed in paper <span id="id9">[<a class="reference internal" href="#id25" title="Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 2926–2932. 2018. URL: https://doi.org/10.24963/ijcai.2018/406.">LE-XTG18</a>]</span>.</p>
+<p>See also:</p>
+<div class="docutils container" id="id10">
+<div role="list" class="citation-list">
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>GLLE-XLG21<span class="fn-bracket">]</span></span>
+<p>Ning Xu, Yun-Peng Liu, and Xin Geng. Label enhancement for label distribution learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 33(4):1632–1643, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2019.2947040">https://doi.org/10.1109/TKDE.2019.2947040</a>.</p>
+</div>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="ml">
+<h2>ML<a class="headerlink" href="#ml" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.ML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">ML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.ML" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.ML" title="pyldl.algorithms.ML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ML</span></code></a> is proposed in paper <span id="id16">[<a class="reference internal" href="#id25" title="Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 2926–2932. 2018. URL: https://doi.org/10.24963/ijcai.2018/406.">LE-XTG18</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="lp">
+<h2>LP<a class="headerlink" href="#lp" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LP" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LP" title="pyldl.algorithms.LP"><code class="xref py py-class docutils literal notranslate"><span class="pre">LP</span></code></a> is proposed in paper <span id="id17">[<a class="reference internal" href="#id25" title="Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 2926–2932. 2018. URL: https://doi.org/10.24963/ijcai.2018/406.">LE-XTG18</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="km">
+<h2>KM<a class="headerlink" href="#km" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.KM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">KM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.KM" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.KM" title="pyldl.algorithms.KM"><code class="xref py py-class docutils literal notranslate"><span class="pre">KM</span></code></a> is proposed in paper <span id="id18">[<a class="reference internal" href="#id25" title="Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 2926–2932. 2018. URL: https://doi.org/10.24963/ijcai.2018/406.">LE-XTG18</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="fcm">
+<h2>FCM<a class="headerlink" href="#fcm" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.FCM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">FCM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.FCM" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.FCM" title="pyldl.algorithms.FCM"><code class="xref py py-class docutils literal notranslate"><span class="pre">FCM</span></code></a> is proposed in paper <span id="id19">[<a class="reference internal" href="#id25" title="Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 2926–2932. 2018. URL: https://doi.org/10.24963/ijcai.2018/406.">LE-XTG18</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<div class="docutils container" id="id20">
+<div role="list" class="citation-list">
+<div class="citation" id="id22" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LE-ZZT23</a><span class="fn-bracket">]</span></span>
+<p>Qinghai Zheng, Jihua Zhu, and Haoyu Tang. Label information bottleneck for label enhancement. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 7497–7506. 2023. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR52729.2023.00724">https://doi.org/10.1109/CVPR52729.2023.00724</a>.</p>
+</div>
+<div class="citation" id="id24" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">LE-XSLG20</a><span class="fn-bracket">]</span></span>
+<p>Ning Xu, Jun Shu, Yun-Peng Liu, and Xin Geng. Variational label enhancement. In <em>Proceedings of the International Conference on Machine Learning</em>, 10597–10606. 2020.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-XTG18<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id9">1</a>,<a role="doc-backlink" href="#id16">2</a>,<a role="doc-backlink" href="#id17">3</a>,<a role="doc-backlink" href="#id18">4</a>,<a role="doc-backlink" href="#id19">5</a>)</span>
+<p>Ning Xu, An Tao, and Xin Geng. Label enhancement for label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 2926–2932. 2018. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2018/406">https://doi.org/10.24963/ijcai.2018/406</a>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h2>
+<div class="docutils container" id="id26">
+<div role="list" class="citation-list">
+<div class="citation" id="id27" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-GWG24<span class="fn-bracket">]</span></span>
+<p>Yongbiao Gao, Ke Wang, and Xin Geng. Sequential label enhancement. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 35(5):7204–7215, 2024. URL: <a class="reference external" href="https://doi.org/10.1109/TNNLS.2022.3214610">https://doi.org/10.1109/TNNLS.2022.3214610</a>.</p>
+</div>
+<div class="citation" id="id28" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-JLZ23<span class="fn-bracket">]</span></span>
+<p>Xiuyi Jia, Yunan Lu, and Fangwen Zhang. Label enhancement by maintaining positive and negative label relation. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 35(2):1708–1720, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2021.3093099">https://doi.org/10.1109/TKDE.2021.3093099</a>.</p>
+</div>
+<div class="citation" id="id29" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-LLLJ23<span class="fn-bracket">]</span></span>
+<p>Yunan Lu, Weiwei Li, Huaxiong Li, and Xiuyi Jia. Ranking-preserved generative label enhancement. <em>Machine Learning</em>, 112(12):4693–4721, 2023. URL: <a class="reference external" href="https://doi.org/10.1007/s10994-023-06388-9">https://doi.org/10.1007/s10994-023-06388-9</a>.</p>
+</div>
+<div class="citation" id="id30" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-LLJ23<span class="fn-bracket">]</span></span>
+<p>Yunan Lu, Weiwei Li, and Xiuyi Jia. Label enhancement via joint implicit representation clustering. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 4019–4027. 2023. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2023/447">https://doi.org/10.24963/ijcai.2023/447</a>.</p>
+</div>
+<div class="citation" id="id31" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-LHM+23<span class="fn-bracket">]</span></span>
+<p>Yunan Lu, Liang He, Fan Min, Weiwei Li, and Xiuyi Jia. Generative label enhancement with gaussian mixture and partial ranking. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 8975–8983. 2023. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v37i7.26078">https://doi.org/10.1609/aaai.v37i7.26078</a>.</p>
+</div>
+<div class="citation" id="id32" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-TCGJ23<span class="fn-bracket">]</span></span>
+<p>Chao Tan, Sheng Chen, Xin Geng, and Genlin Ji. A novel label enhancement algorithm based on manifold learning. <em>Pattern Recognition</em>, 135:109189, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.patcog.2022.109189">https://doi.org/10.1016/j.patcog.2022.109189</a>.</p>
+</div>
+<div class="citation" id="id33" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-WXLG23<span class="fn-bracket">]</span></span>
+<p>Ke Wang, Ning Xu, Miaogen Ling, and Xin Geng. Fast label enhancement for label distribution learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 35(2):1502–1514, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2021.3092406">https://doi.org/10.1109/TKDE.2021.3092406</a>.</p>
+</div>
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-WZZ+23<span class="fn-bracket">]</span></span>
+<p>Yifei Wang, Yiyang Zhou, Jihua Zhu, Xinyuan Liu, Wenbiao Yan, and Zhiqiang Tian. Contrastive label enhancement. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 4353–4361. 2023. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2023/484">https://doi.org/10.24963/ijcai.2023/484</a>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-ZZT+23<span class="fn-bracket">]</span></span>
+<p>Qinghai Zheng, Jihua Zhu, Haoyu Tang, Xinyuan Liu, Zhongyu Li, and Huimin Lu. Generalized label enhancement with sample correlations. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 35(1):482–495, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2021.3073157">https://doi.org/10.1109/TKDE.2021.3073157</a>.</p>
+</div>
+<div class="citation" id="id36" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-ZAXG22<span class="fn-bracket">]</span></span>
+<p>Xingyu Zhao, Yuexuan An, Ning Xu, and Xin Geng. Fusion label enhancement for multi-label learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3773–3779. 2022. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2022/524">https://doi.org/10.24963/ijcai.2022/524</a>.</p>
+</div>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-GZG21<span class="fn-bracket">]</span></span>
+<p>Yongbiao Gao, Yu Zhang, and Xin Geng. Label enhancement for label distribution learning via prior knowledge. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3223–3229. 2021. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2020/446">https://doi.org/10.24963/ijcai.2020/446</a>.</p>
+</div>
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-TCJG21<span class="fn-bracket">]</span></span>
+<p>Chao Tan, Sheng Chen, Genlin Ji, and Xin Geng. A novel probabilistic label enhancement algorithm for multi-label distribution learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 34(11):5098–5113, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2021.3054465">https://doi.org/10.1109/TKDE.2021.3054465</a>.</p>
+</div>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-TZZ+20<span class="fn-bracket">]</span></span>
+<p>Haoyu Tang, Jihua Zhu, Qinghai Zheng, Jun Wang, Shanmin Pang, and Zhongyu Li. Label enhancement with sample correlations via low-rank representation. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 5932–5939. 2020. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v34i04.6053">https://doi.org/10.1609/aaai.v34i04.6053</a>.</p>
+</div>
+<div class="citation" id="id40" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-ZJL20a<span class="fn-bracket">]</span></span>
+<p>Fangwen Zhang, Xiuyi Jia, and Weiwei Li. Tensor-based multi-view label enhancement for multi-label learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 2369–2375. 2020. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2020/328">https://doi.org/10.24963/ijcai.2020/328</a>.</p>
+</div>
+<div class="citation" id="id41" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-ZJL20b<span class="fn-bracket">]</span></span>
+<p>Wenfang Zhu, Xiuyi Jia, and Weiwei Li. Privileged label enhancement with multi-label learning. In <em>Proceedings of the International Joint Conferences on Artificial Intelligence</em>, 2376–2382. 2020. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2020/329">https://doi.org/10.24963/ijcai.2020/329</a>.</p>
+</div>
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-LXZG19<span class="fn-bracket">]</span></span>
+<p>Jiaqi Lv, Ning Xu, RenYi Zheng, and Xin Geng. Weakly supervised multi-label learning via label enhancement. In <em>Proceedings of the International Joint Conferences on Artificial Intelligence</em>, 3101–3107. 2019. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2019/430">https://doi.org/10.24963/ijcai.2019/430</a>.</p>
+</div>
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LE-XLG19<span class="fn-bracket">]</span></span>
+<p>Ning Xu, Jiaqi Lv, and Xin Geng. Partial label learning via label enhancement. In <em>Proceedings of the AAAI Conference on artificial intelligence</em>, 5557–5564. 2019. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v33i01.33015557">https://doi.org/10.1609/aaai.v33i01.33015557</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyLDL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LE</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basele"><cite>BaseLE</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lible">LIBLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#levi">LEVI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#glle">GLLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ml">ML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lp">LP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#km">KM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fcm">FCM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ldl.html" title="previous chapter">LDL</a></li>
+      <li>Next: <a href="incomldl.html" title="next chapter">IncomLDL</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, SpriteMisaka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/le.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -7,7 +7,18 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
 class LDLF(BaseAdam, BaseDeepLDL):
-    """LDLF is proposed in paper *Label Distribution Learning Forests*.
+    """:class:`LDLF <pyldl.algorithms.LDLF>` is proposed in paper :cite:`2017:shen`.
+
+    The algorithms employs deep neural decision forests. See also:
+
+    .. bibliography:: ldl_references.bib
+        :filter: False
+        :labelprefix: LDLF-
+        :keyprefix: ldlf-
+
+        2015:kontschieder
+
+    :term:`Adam` is used as the optimizer.
     """
 
     def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Others &#8212; PyLDL 0.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Applications" href="app.html" />
+    <link rel="prev" title="LDL4C" href="ldl4c.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="others">
+<h1>Others<a class="headerlink" href="#others" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="oversampling">
+<h2>Oversampling<a class="headerlink" href="#oversampling" title="Link to this heading">¶</a></h2>
+<section id="ssg-ldl">
+<h3>SSG-LDL<a class="headerlink" href="#ssg-ldl" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.SSG_LDL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SSG_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.SSG_LDL" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.SSG_LDL" title="pyldl.algorithms.SSG_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">SSG-LDL</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id3" title="Manuel González, Julián Luengo, José-Ramón Cano, and Salvador García. Synthetic sample generation for label distribution learning. Information Sciences, 544:197–213, 2021. URL: https://doi.org/10.1016/j.ins.2020.07.071.">O-GLCG21</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id2">
+<div role="list" class="citation-list">
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">O-GLCG21</a><span class="fn-bracket">]</span></span>
+<p>Manuel González, Julián Luengo, José-Ramón Cano, and Salvador García. Synthetic sample generation for label distribution learning. <em>Information Sciences</em>, 544:197–213, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.ins.2020.07.071">https://doi.org/10.1016/j.ins.2020.07.071</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="transfer-learning">
+<h2>Transfer Learning<a class="headerlink" href="#transfer-learning" title="Link to this heading">¶</a></h2>
+<section id="ldl-da">
+<h3>LDL-DA<a class="headerlink" href="#ldl-da" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LDL_DA" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_DA" title="pyldl.algorithms.LDL_DA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-DA</span></code></a> is proposed in paper <span id="id4">[<a class="reference internal" href="#id7" title="Haitao Wu, Weiwei Li, and Xiuyi Jia. Domain adaptation for label distribution learning. IEEE Transactions on Big Data, 2024. Early Access. URL: https://doi.org/10.1109/TBDATA.2024.3442562.">O-WLJ24</a>]</span>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.augment">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">augment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.augment" title="Link to this definition">¶</a></dt>
+<dd><p>Feature augmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>np.ndarray</em>) – Source data (shape: <span class="math notranslate nohighlight">\([m_s,\, n_s]\)</span>).</p></li>
+<li><p><strong>tgt</strong> (<em>np.ndarray</em>) – Target data (shape: <span class="math notranslate nohighlight">\([m_t,\, n_t]\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Augmented source and target data (shape: <span class="math notranslate nohighlight">\([m_s,\, n_s + n_t]\)</span> and <span class="math notranslate nohighlight">\([m_t,\, n_s + n_t]\)</span>, respectively).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tX</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ft_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ft_optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optimizer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fine_tune</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Fit the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sX</strong> (<em>np.ndarray</em>) – Source features.</p></li>
+<li><p><strong>sy</strong> (<em>np.ndarray</em>) – Source label distributions.</p></li>
+<li><p><strong>tX</strong> (<em>np.ndarray</em>) – Target features.</p></li>
+<li><p><strong>ty</strong> (<em>np.ndarray</em>) – Target label distributions.</p></li>
+<li><p><strong>ft_epochs</strong> (<em>int</em><em>, </em><em>optional</em>) – Fine-tuning epochs, defaults to 1000.</p></li>
+<li><p><strong>ft_optimizer</strong> (<em>keras.optimizers.Optimizer</em><em>, </em><em>optional</em>) – Fine-tuning optimizer, if None, the default optimizer is used, defaults to None.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Hyperparameter to control the contrastive alignment loss, defaults to 1e-2.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Hyperparameter to control the prototype alignment loss, defaults to 1e-2.</p></li>
+<li><p><strong>r</strong> (<em>int</em>) – Number of prototypes, defaults to 2.</p></li>
+<li><p><strong>margin</strong> (<em>float</em><em>, </em><em>optional</em>) – Margin for the similarity measure, defaults to None. If None, cosine similarity is used; otherwise, max-margin euclidean distance is used.</p></li>
+<li><p><strong>fine_tune</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to fine-tune the model, defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Fitted model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyldl.algorithms.LDL_DA" title="pyldl.algorithms.LDL_DA">LDL_DA</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.pairwise_cosine">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pairwise_cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.pairwise_cosine" title="Link to this definition">¶</a></dt>
+<dd><p>Pairwise cosine similarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n_X]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n_Y]\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise cosine similarity (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tf.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.pairwise_jsd">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pairwise_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.pairwise_jsd" title="Link to this definition">¶</a></dt>
+<dd><p>Pairwise Jensen-Shannon divergence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n_X]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n_Y]\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise Jensen-Shannon divergence (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tf.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.pairwise_label">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pairwise_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.pairwise_label" title="Link to this definition">¶</a></dt>
+<dd><p>Pairwise label comparison. True if two labels are the same, otherwise False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n_X]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n_Y]\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise label comparison (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tf.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DA.reorder_y">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reorder_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.LDL_DA.reorder_y" title="Link to this definition">¶</a></dt>
+<dd><p>Reorder label distributions for consistent label semantics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Label distributions.</p></li>
+<li><p><strong>order</strong> (<em>tuple</em><em>[</em><em>int</em><em>]</em>) – New order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reordered label distributions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="id5">
+<h3>References<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id6">
+<div role="list" class="citation-list">
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">O-WLJ24</a><span class="fn-bracket">]</span></span>
+<p>Haitao Wu, Weiwei Li, and Xiuyi Jia. Domain adaptation for label distribution learning. <em>IEEE Transactions on Big Data</em>, 2024. Early Access. URL: <a class="reference external" href="https://doi.org/10.1109/TBDATA.2024.3442562">https://doi.org/10.1109/TBDATA.2024.3442562</a>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="further-reading">
+<h3>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id8">
+<div role="list" class="citation-list">
+<div class="citation" id="id9" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-ZQAG23<span class="fn-bracket">]</span></span>
+<p>Xingyu Zhao, Lei Qi, Yuexuan An, and Xin Geng. Generalizable label distribution learning. In <em>Proceedings of the ACM International Conference on Multimedia</em>, 8932–8941. 2023. URL: <a class="reference external" href="https://doi.org/10.1145/3581783.3611693">https://doi.org/10.1145/3581783.3611693</a>.</p>
+</div>
+<div class="citation" id="id10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-QSL+22<span class="fn-bracket">]</span></span>
+<p>Lei Qi, Jiaying Shen, Jiaqi Liu, Yinghuan Shi, and Xin Geng. Label distribution learning for generalizable multi-source person re-identification. <em>IEEE Transactions on Information Forensics and Security</em>, 17:3139–3150, 2022. URL: <a class="reference external" href="https://doi.org/10.1109/TIFS.2022.3204219">https://doi.org/10.1109/TIFS.2022.3204219</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="predicting-from-ranking">
+<h2>Predicting from Ranking<a class="headerlink" href="#predicting-from-ranking" title="Link to this heading">¶</a></h2>
+<section id="id11">
+<h3>Further Reading<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id12">
+<div role="list" class="citation-list">
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LLLJ23<span class="fn-bracket">]</span></span>
+<p>Yunan Lu, Weiwei Li, Huaxiong Li, and Xiuyi Jia. Predicting label distribution from tie-allowed multi-label ranking. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 45(12):15364–15379, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2023.3300310">https://doi.org/10.1109/TPAMI.2023.3300310</a>.</p>
+</div>
+<div class="citation" id="id14" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LJ22<span class="fn-bracket">]</span></span>
+<p>Yunan Lu and Xiuyi Jia. Predicting label distribution from multi-label ranking. In <em>Advances in Neural Information Processing Systems</em>, 36931–36943. 2022.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="inaccurate-noisy-labels">
+<h2>Inaccurate/Noisy Labels<a class="headerlink" href="#inaccurate-noisy-labels" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h3>Further Reading<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id16">
+<div role="list" class="citation-list">
+<div class="citation" id="id17" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-HLLJ24<span class="fn-bracket">]</span></span>
+<p>Liang He, Yunan Lu, Weiwei Li, and Xiuyi Jia. Generative calibration of inaccurate annotation for label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 12394–12401. 2024. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v38i11.29131">https://doi.org/10.1609/aaai.v38i11.29131</a>.</p>
+</div>
+<div class="citation" id="id18" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-WL22<span class="fn-bracket">]</span></span>
+<p>Huan Wang and Yan-Fu Li. Robust mechanical fault diagnosis with noisy label based on multistage true label distribution learning. <em>IEEE Transactions on Reliability</em>, 72(3):975–988, 2022. URL: <a class="reference external" href="https://doi.org/10.1109/TR.2022.3190942">https://doi.org/10.1109/TR.2022.3190942</a>.</p>
+</div>
+<div class="citation" id="id19" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LLCJ22<span class="fn-bracket">]</span></span>
+<p>Weiwei Li, Yuqing Lu, Lei Chen, and Xiuyi Jia. Label distribution learning with noisy labels via three-way decisions. <em>International Journal of Approximate Reasoning</em>, 150:19–34, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.ijar.2022.08.009">https://doi.org/10.1016/j.ijar.2022.08.009</a>.</p>
+</div>
+<div class="citation" id="id20" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-SLW+21<span class="fn-bracket">]</span></span>
+<p>Zeren Sun, Huafeng Liu, Qiong Wang, Tianfei Zhou, Qi Wu, and Zhenmin Tang. Co-ldl: a co-training-based label distribution learning method for tackling label noise. <em>IEEE Transactions on Multimedia</em>, 24:1093–1104, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TMM.2021.3116430">https://doi.org/10.1109/TMM.2021.3116430</a>.</p>
+</div>
+<div class="citation" id="id21" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LXZG20<span class="fn-bracket">]</span></span>
+<p>Yun-Peng Liu, Ning Xu, Yu Zhang, and Xin Geng. Label distribution for learning with noisy labels. In <em>Proceedings of the International Conference on International Joint Conferences on Artificial Intelligence</em>, 2568–2574. 2020. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2020/356">https://doi.org/10.24963/ijcai.2020/356</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="weakly-semi-supervision">
+<h2>Weakly/Semi-Supervision<a class="headerlink" href="#weakly-semi-supervision" title="Link to this heading">¶</a></h2>
+<section id="id22">
+<h3>Further Reading<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id23">
+<div role="list" class="citation-list">
+<div class="citation" id="id24" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LZZ+22<span class="fn-bracket">]</span></span>
+<p>Xinyuan Liu, Jihua Zhu, Qinghai Zheng, Zhiqiang Tian, and Zhongyu Li. Semi-supervised label distribution learning with co-regularization. <em>Neurocomputing</em>, 491:353–364, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2022.03.041">https://doi.org/10.1016/j.neucom.2022.03.041</a>.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-JWD+21<span class="fn-bracket">]</span></span>
+<p>Xiuyi Jia, Tao Wen, Weiping Ding, Huaxiong Li, and Weiwei Li. Semi-supervised label distribution learning via projection graph embedding. <em>Information Sciences</em>, 581:840–855, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.ins.2021.10.009">https://doi.org/10.1016/j.ins.2021.10.009</a>.</p>
+</div>
+<div class="citation" id="id26" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-JRC+19<span class="fn-bracket">]</span></span>
+<p>Xiuyi Jia, Tingting Ren, Lei Chen, Jun Wang, Jihua Zhu, and Xianzhong Long. Weakly supervised label distribution learning based on transductive matrix completion with sample correlations. <em>Pattern Recognition Letters</em>, 125:453–462, 2019. URL: <a class="reference external" href="https://doi.org/10.1016/j.patrec.2019.06.012">https://doi.org/10.1016/j.patrec.2019.06.012</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="population-level-ldl">
+<h2>Population-Level LDL<a class="headerlink" href="#population-level-ldl" title="Link to this heading">¶</a></h2>
+<section id="id27">
+<h3>Further Reading<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id28">
+<div role="list" class="citation-list">
+<div class="citation" id="id29" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-WLP+23<span class="fn-bracket">]</span></span>
+<p>Tharindu Cyril Weerasooriya, Sarah Luger, Saloni Poddar, Ashiqur Khudabukhsh, and Christopher Homan. Subjective crowd disagreements for subjective data: uncovering meaningful crowdopinion with population-level learning. In <em>Proceedings of the Annual Meeting of the Association for Computational Linguistics</em>, 950–966. 2023. URL: <a class="reference external" href="https://doi.org/10.18653/v1/2023.acl-long.54">https://doi.org/10.18653/v1/2023.acl-long.54</a>.</p>
+</div>
+<div class="citation" id="id30" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-WLH20<span class="fn-bracket">]</span></span>
+<p>Tharindu Cyril Weerasooriya, Tong Liu, and Christopher M Homan. Neighborhood-based pooling for population-level label distribution learning. In <em>Proceedings of the European Conference on Artificial Intelligence</em>, pages 490–497. 2020. URL: <a class="reference external" href="https://doi.org/10.3233/FAIA200130">https://doi.org/10.3233/FAIA200130</a>.</p>
+</div>
+<div class="citation" id="id31" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LVSBH19<span class="fn-bracket">]</span></span>
+<p>Tong Liu, Akash Venkatachalam, Pratik Sanjay Bongale, and Christopher Homan. Learning to predict population-level label distributions. In <em>Proceedings of the World Wide Web Conference</em>, 1111–1120. 2019. URL: <a class="reference external" href="https://doi.org/10.1145/3308560.3317082">https://doi.org/10.1145/3308560.3317082</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="more-derivative-tasks">
+<h2>More Derivative Tasks<a class="headerlink" href="#more-derivative-tasks" title="Link to this heading">¶</a></h2>
+<div class="docutils container" id="id32">
+<div role="list" class="citation-list">
+<div class="citation" id="id33" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-JGHZ24<span class="fn-bracket">]</span></span>
+<p>Yufei Jin, Richard Gao, Yi He, and Xingquan Zhu. Gldl: graph label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 12965–12974. 2024. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v38i11.29194">https://doi.org/10.1609/aaai.v38i11.29194</a>.</p>
+</div>
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-DLF+23<span class="fn-bracket">]</span></span>
+<p>Xinyue Dong, Tingjin Luo, Ruidong Fan, Wenzhang Zhuge, and Chenping Hou. Active label distribution learning via kernel maximum mean discrepancy. <em>Frontiers of Computer Science</em>, 17(4):174327, 2023. URL: <a class="reference external" href="https://doi.org/10.1007/s11704-022-1624-5">https://doi.org/10.1007/s11704-022-1624-5</a>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-HVW+23<span class="fn-bracket">]</span></span>
+<p>Jintao Huang, Chi-Man Vong, Guangtai Wang, Wenbin Qian, Yimin Zhou, and CL Philip Chen. Joint label enhancement and label distribution learning via stacked graph regularization-based polynomial fuzzy broad learning system. <em>IEEE Transactions on Fuzzy Systems</em>, 31(9):3290–3304, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TFUZZ.2023.3249192">https://doi.org/10.1109/TFUZZ.2023.3249192</a>.</p>
+</div>
+<div class="citation" id="id36" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-XTZ+23<span class="fn-bracket">]</span></span>
+<p>Chao Xu, Hong Tao, Jing Zhang, Dewen Hu, and Chenping Hou. Label distribution changing learning with sample space expanding. <em>Journal of Machine Learning Research</em>, 24(36):1–48, 2023.</p>
+</div>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-XLZG23<span class="fn-bracket">]</span></span>
+<p>Ning Xu, Yun-Peng Liu, Yan Zhang, and Xin Geng. Progressive enhancement of label distributions for partial multilabel learning. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 34(8):4856–4867, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TNNLS.2021.3125366">https://doi.org/10.1109/TNNLS.2021.3125366</a>.</p>
+</div>
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-ZAXG23<span class="fn-bracket">]</span></span>
+<p>Xingyu Zhao, Yuexuan An, Ning Xu, and Xin Geng. Continuous label distribution learning. <em>Pattern Recognition</em>, 133:109056, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.patcog.2022.109056">https://doi.org/10.1016/j.patcog.2022.109056</a>.</p>
+</div>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-ZAX+23<span class="fn-bracket">]</span></span>
+<p>Xingyu Zhao, Yuexuan An, Ning Xu, Jing Wang, and Xin Geng. Imbalanced label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 11336–11344. 2023. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v37i9.26341">https://doi.org/10.1609/aaai.v37i9.26341</a>.</p>
+</div>
+<div class="citation" id="id40" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-DLD+22<span class="fn-bracket">]</span></span>
+<p>Zhixuan Deng, Tianrui Li, Dayong Deng, Keyu Liu, Pengfei Zhang, Shiming Zhang, and Zhipeng Luo. Feature selection for label distribution learning using dual-similarity based neighborhood fuzzy entropy. <em>Information Sciences</em>, 615:385–404, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.ins.2022.10.054">https://doi.org/10.1016/j.ins.2022.10.054</a>.</p>
+</div>
+<div class="citation" id="id41" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-HVQ+22<span class="fn-bracket">]</span></span>
+<p>Jintao Huang, Chi-Man Vong, Wenbin Qian, Qin Huang, and Yimin Zhou. Online label distribution learning using random vector functional-link network. <em>IEEE Transactions on Emerging Topics in Computational Intelligence</em>, 7(4):1177–1190, 2022. URL: <a class="reference external" href="https://doi.org/10.1109/TETCI.2022.3230400">https://doi.org/10.1109/TETCI.2022.3230400</a>.</p>
+</div>
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LLZ+22<span class="fn-bracket">]</span></span>
+<p>Yaojin Lin, Haoyang Liu, Hong Zhao, Qinghua Hu, Xingquan Zhu, and Xindong Wu. Hierarchical feature selection based on label distribution learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 35(6):5964–5976, 2022. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2022.3177246">https://doi.org/10.1109/TKDE.2022.3177246</a>.</p>
+</div>
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-QXYS22<span class="fn-bracket">]</span></span>
+<p>Wenbin Qian, Yinsong Xiong, Jun Yang, and Wenhao Shu. Feature selection for label distribution learning via feature similarity and label correlation. <em>Information Sciences</em>, 582:38–59, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.ins.2021.08.076">https://doi.org/10.1016/j.ins.2021.08.076</a>.</p>
+</div>
+<div class="citation" id="id44" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-RXLG22<span class="fn-bracket">]</span></span>
+<p>Yi Ren, Ning Xu, Miaogen Ling, and Xin Geng. Label distribution for multimodal machine learning. <em>Frontiers of Computer Science</em>, 16:1–11, 2022. URL: <a class="reference external" href="https://doi.org/10.1007/s11704-021-0611-6">https://doi.org/10.1007/s11704-021-0611-6</a>.</p>
+</div>
+<div class="citation" id="id45" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-DGZ+21<span class="fn-bracket">]</span></span>
+<p>Xinyue Dong, Shilin Gu, Wenzhang Zhuge, Tingjin Luo, and Chenping Hou. Active label distribution learning. <em>Neurocomputing</em>, 436:12–21, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2020.12.128">https://doi.org/10.1016/j.neucom.2020.12.128</a>.</p>
+</div>
+<div class="citation" id="id46" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-LZL+21<span class="fn-bracket">]</span></span>
+<p>Xinyuan Liu, Jihua Zhu, Zhongyu Li, Zhiqiang Tian, Xiuyi Jia, and Lei Chen. Unified framework for learning with label distribution. <em>Information Fusion</em>, 75:116–130, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.inffus.2021.04.014">https://doi.org/10.1016/j.inffus.2021.04.014</a>.</p>
+</div>
+<div class="citation" id="id47" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-XLG20<span class="fn-bracket">]</span></span>
+<p>Ning Xu, Yun-Peng Liu, and Xin Geng. Partial multi-label learning with label distribution. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 6510–6517. 2020. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v34i04.6124">https://doi.org/10.1609/aaai.v34i04.6124</a>.</p>
+</div>
+<div class="citation" id="id48" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>O-XG19<span class="fn-bracket">]</span></span>
+<p>Changdong Xu and Xin Geng. Hierarchical classification based on label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 5533–5540. 2019. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v33i01.33015533">https://doi.org/10.1609/aaai.v33i01.33015533</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyLDL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Others</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#oversampling">Oversampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transfer-learning">Transfer Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#predicting-from-ranking">Predicting from Ranking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inaccurate-noisy-labels">Inaccurate/Noisy Labels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#weakly-semi-supervision">Weakly/Semi-Supervision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#population-level-ldl">Population-Level LDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#more-derivative-tasks">More Derivative Tasks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ldl4c.html" title="previous chapter">LDL4C</a></li>
+      <li>Next: <a href="app.html" title="next chapter">Applications</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, SpriteMisaka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/others.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

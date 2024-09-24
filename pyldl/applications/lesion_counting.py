@@ -73,6 +73,8 @@ def visualization(X, grade, count, grade_real=None, count_real=None,
 
 
 class LDL_ACNE(BaseGD, BaseDeepLDL):
+    """This approach is proposed in paper :cite:`2019:wu`.
+    """
 
     hayashi = [0] + [0 for _ in range(5)] + [1 for _ in range(15)] + \
         [2 for _ in range(30)] + [3 for _ in range(15)]

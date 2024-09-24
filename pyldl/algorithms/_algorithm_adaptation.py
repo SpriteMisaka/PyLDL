@@ -9,6 +9,8 @@ from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
 
 
 class AA_KNN(BaseLDL):
+    """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
+    """
 
     def fit(self, X, y, k=5):
         super().fit(X, y)
@@ -21,10 +23,14 @@ class AA_KNN(BaseLDL):
 
 
 class AA_BP(BaseGD, BaseDeepLDL):
+    """:class:`AA-BP <pyldl.algorithms.AA_BP>` is proposed in paper :cite:`2016:geng`.
+    """
     pass
 
 
 class CAD(BaseAdam, BaseDeepLDL):
+    """:class:`CAD <pyldl.algorithms.CAD>` is proposed in paper :cite:`2023:wen`.
+    """
 
     @staticmethod
     @tf.function
@@ -41,6 +47,8 @@ class CAD(BaseAdam, BaseDeepLDL):
 
 
 class QFD2(BaseAdam, BaseDeepLDL):
+    """:class:`QFD2 <pyldl.algorithms.QFD2>` is proposed in paper :cite:`2023:wen`.
+    """
 
     @staticmethod
     @tf.function
@@ -55,6 +63,8 @@ class QFD2(BaseAdam, BaseDeepLDL):
 
 
 class CJS(BaseAdam, BaseDeepLDL):
+    """:class:`CJS <pyldl.algorithms.CJS>` is proposed in paper :cite:`2023:wen`.
+    """
 
     @staticmethod
     @tf.function
@@ -71,6 +81,8 @@ class CJS(BaseAdam, BaseDeepLDL):
 
 
 class CPNN(BaseGD, BaseDeepLDL):
+    """:class:`CPNN <pyldl.algorithms.CPNN>` is proposed in paper :cite:`2013:geng`.
+    """
 
     def _not_proper_mode(self):
         raise ValueError("The argument 'mode' can only be 'none', 'binary' or 'augment'.")
@@ -124,12 +136,34 @@ class CPNN(BaseGD, BaseDeepLDL):
 
 
 class BCPNN(CPNN):
+    """:class:`BCPNN <pyldl.algorithms.BCPNN>` is proposed in paper :cite:`2017:yang`.
+
+    :class:`BCPNN <pyldl.algorithms.BCPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
+
+    .. bibliography:: ldl_references.bib
+        :filter: False
+        :labelprefix: BCPNN-
+        :keyprefix: bcpnn-
+
+        2013:geng
+    """
 
     def __init__(self, **params):
         super().__init__(mode='binary', **params)
 
 
 class ACPNN(CPNN):
+    """:class:`ACPNN <pyldl.algorithms.ACPNN>` is proposed in paper :cite:`2017:yang`.
+
+    :class:`ACPNN <pyldl.algorithms.ACPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
+
+    .. bibliography:: ldl_references.bib
+        :filter: False
+        :labelprefix: ACPNN-
+        :keyprefix: acpnn-
+
+        2013:geng
+    """
 
     def __init__(self, **params):
         super().__init__(mode='augment', **params)

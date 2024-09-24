@@ -1,0 +1,52 @@
+LDL
+---
+
+.. toctree::
+   :maxdepth: 2
+
+
+`BaseLDL`
+~~~~~~~~~
+
+.. autoclass:: pyldl.algorithms.base.BaseLDL
+   :members:
+   :private-members:
+
+
+.. jinja:: ldl_ctx
+
+   {% for class_name in all_ldl_algs %}
+   {% if class_name == 'AdaBoostLDL' %}
+   {% else %}
+   {% if class_name == 'AA_KNN' %}
+   AA-:math:`k`\NN
+   ~~~~~~~~~~~~~~~
+   {% elif class_name in ['TLRLDL', 'TKLRLDL', 'SA_BFGS', 'SA_IIS', 'PT_Bayes', 'PT_SVM'] %}
+   {{ class_name.replace('_', '-').lstrip('-') }}
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   {% else %}
+   {{ class_name.replace('_', '-').lstrip('-') }}
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {% endif %}
+
+   .. autoclass:: pyldl.algorithms.{{ class_name }}
+      :members:
+      :private-members:
+
+   {% endif %}
+   {% endfor %}
+
+References
+~~~~~~~~~~
+
+.. bibliography:: ldl_references.bib
+   :labelprefix: LDL-
+   :cited:
+
+
+Further Reading
+~~~~~~~~~~~~~~~
+
+.. bibliography:: ldl_further_reading.bib
+   :labelprefix: LDL-
+   :all:

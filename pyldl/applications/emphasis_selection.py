@@ -93,6 +93,8 @@ def load_glove(path, tokenizer, embedding_dim=100):
 
 
 class DL_BiLSTM(BaseAdam, BaseDeepLDL):
+    """This approach is proposed in paper :cite:`2019:shirani`.
+    """
 
     def __init__(self, tokenizer, embeddings_matrix, n_hidden=512, random_state=None):
         super().__init__(n_hidden, None, random_state)

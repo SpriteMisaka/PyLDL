@@ -13,7 +13,7 @@ EPS = np.finfo(np.float32).eps
 
 
 class LDL_DA(BaseAdam, BaseDeepLDL):
-    """LDL-DA is proposed in paper *Domain Adaptation for Label Distribution Learning*.
+    """:class:`LDL-DA <pyldl.algorithms.LDL_DA>` is proposed in paper :cite:`2024:wu`.
     """
 
     @staticmethod

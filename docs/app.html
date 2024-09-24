@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Applications &#8212; PyLDL 0.0.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utils &amp; Metrics" href="utils.html" />
+    <link rel="prev" title="Others" href="others.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="applications">
+<h1>Applications<a class="headerlink" href="#applications" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="psychology">
+<h2>Psychology<a class="headerlink" href="#psychology" title="Link to this heading">¶</a></h2>
+<section id="facial-emotion-recognition">
+<h3>Facial Emotion Recognition<a class="headerlink" href="#facial-emotion-recognition" title="Link to this heading">¶</a></h3>
+<section id="ldl-alsg">
+<h4>LDL-ALSG<a class="headerlink" href="#ldl-alsg" title="Link to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.LDL_ALSG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">LDL_ALSG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.LDL_ALSG" title="Link to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-ALSG</span></code> is proposed in <span id="id1">[<a class="reference internal" href="#id3" title="Shikai Chen, Jianfeng Wang, Yuedong Chen, Zhongchao Shi, Xin Geng, and Yong Rui. Label distribution learning on auxiliary label space graphs for facial expression recognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 13984–13993. 2020. URL: https://doi.org/10.1109/CVPR42600.2020.01400.">APP-CWC+20</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="extract-ck-plus">
+<h4><cite>extract_ck_plus</cite><a class="headerlink" href="#extract-ck-plus" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.extract_ck_plus">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">extract_ck_plus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">openface_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.extract_ck_plus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-bu-3dfe">
+<h4><cite>load_bu_3dfe</cite><a class="headerlink" href="#load-bu-3dfe" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.load_bu_3dfe">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">load_bu_3dfe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.load_bu_3dfe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-ck-plus">
+<h4><cite>load_ck_plus</cite><a class="headerlink" href="#load-ck-plus" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.load_ck_plus">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">load_ck_plus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(196,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.load_ck_plus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-jaffe">
+<h4><cite>load_jaffe</cite><a class="headerlink" href="#load-jaffe" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.load_jaffe">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">load_jaffe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.load_jaffe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-jaffe-single">
+<h4><cite>load_jaffe_single</cite><a class="headerlink" href="#load-jaffe-single" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.load_jaffe_single">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">load_jaffe_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.load_jaffe_single" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="visualization">
+<h4><cite>visualization</cite><a class="headerlink" href="#visualization" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.facial_emotion_recognition.visualization">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.facial_emotion_recognition.</span></span><span class="sig-name descname"><span class="pre">visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_real</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distribution'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['HA',</span> <span class="pre">'SA',</span> <span class="pre">'SU',</span> <span class="pre">'AN',</span> <span class="pre">'DI',</span> <span class="pre">'FE']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.facial_emotion_recognition.visualization" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id2">
+<div role="list" class="citation-list">
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">APP-CWC+20</a><span class="fn-bracket">]</span></span>
+<p>Shikai Chen, Jianfeng Wang, Yuedong Chen, Zhongchao Shi, Xin Geng, and Yong Rui. Label distribution learning on auxiliary label space graphs for facial expression recognition. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 13984–13993. 2020. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR42600.2020.01400">https://doi.org/10.1109/CVPR42600.2020.01400</a>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="further-reading">
+<h3>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-BAJB22<span class="fn-bracket">]</span></span>
+<p>Morgan Buisson, Pablo Alonso-Jiménez, and Dmitry Bogdanov. Ambiguity modelling with label distribution learning for music classification. In <em>Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing</em>, 611–615. 2022. URL: <a class="reference external" href="https://doi.org/10.1109/ICASSP43922.2022.9747467">https://doi.org/10.1109/ICASSP43922.2022.9747467</a>.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-SWPX22<span class="fn-bracket">]</span></span>
+<p>Shijing Si, Jianzong Wang, Junqing Peng, and Jing Xiao. Towards speaker age estimation with label distribution learning. In <em>Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing</em>, 4618–4622. 2022. URL: <a class="reference external" href="https://doi.org/10.1109/ICASSP43922.2022.9746378">https://doi.org/10.1109/ICASSP43922.2022.9746378</a>.</p>
+</div>
+<div class="citation" id="id7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-SWL+22<span class="fn-bracket">]</span></span>
+<p>Jianjian Shao, Zhenqian Wu, Yuanyan Luo, Shudong Huang, Xiaorong Pu, and Yazhou Ren. Self-paced label distribution learning for in-the-wild facial expression recognition. In <em>Proceedings of the ACM International Conference on Multimedia</em>, 161–169. 2022. URL: <a class="reference external" href="https://doi.org/10.1145/3503161.3547960">https://doi.org/10.1145/3503161.3547960</a>.</p>
+</div>
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-CGX+21<span class="fn-bracket">]</span></span>
+<p>Jingying Chen, Chen Guo, Ruyi Xu, Kun Zhang, Zongkai Yang, and Honghai Liu. Toward children's empathy ability analysis: joint facial expression recognition and intensity estimation using label distribution learning. <em>IEEE Transactions on Industrial Informatics</em>, 18(1):16–25, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TII.2021.3075989">https://doi.org/10.1109/TII.2021.3075989</a>.</p>
+</div>
+<div class="citation" id="id9" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-ZZG21<span class="fn-bracket">]</span></span>
+<p>Huiying Zhang, Yu Zhang, and Xin Geng. Practical age estimation using deep label distribution learning. <em>Frontiers of Computer Science</em>, 15:1–6, 2021. URL: <a class="reference external" href="https://doi.org/10.1007/s11704-020-8272-4">https://doi.org/10.1007/s11704-020-8272-4</a>.</p>
+</div>
+<div class="citation" id="id10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-SMT+20<span class="fn-bracket">]</span></span>
+<p>Atsuya Sakata, Yasushi Makihara, Noriko Takemura, Daigo Muramatsu, and Yasushi Yagi. How confident are you in your estimate of a human age? uncertainty-aware gait-based age estimation by label distribution learning. In <em>Proceedings of the IEEE International Joint Conference on Biometrics</em>, 1–10. 2020. URL: <a class="reference external" href="https://doi.org/10.1109/IJCB48548.2020.9304914">https://doi.org/10.1109/IJCB48548.2020.9304914</a>.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-WLG+20<span class="fn-bracket">]</span></span>
+<p>Xin Wen, Biying Li, Haiyun Guo, Zhiwei Liu, Guosheng Hu, Ming Tang, and Jinqiao Wang. Adaptive variance based label distribution learning for facial age estimation. In <em>Proceedings of the European Conference on Computer Vision</em>, 379–395. 2020. URL: <a class="reference external" href="https://doi.org/10.1007/978-3-030-58592-1_23">https://doi.org/10.1007/978-3-030-58592-1_23</a>.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-ZLLL20<span class="fn-bracket">]</span></span>
+<p>Zhaoli Zhang, Chenghang Lai, Hai Liu, and You-Fu Li. Infrared facial expression recognition via gaussian-based label distribution learning in the dark illumination environment for human emotion detection. <em>Neurocomputing</em>, 409:341–350, 2020. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2020.05.081">https://doi.org/10.1016/j.neucom.2020.05.081</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-GZWG18<span class="fn-bracket">]</span></span>
+<p>Bin-Bin Gao, Hong-Yu Zhou, Jianxin Wu, and Xin Geng. Age estimation using expectation of label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 712–718. 2018. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2018/99">https://doi.org/10.24963/ijcai.2018/99</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="medicine">
+<h2>Medicine<a class="headerlink" href="#medicine" title="Link to this heading">¶</a></h2>
+<section id="lesion-counting">
+<h3>Lesion Counting<a class="headerlink" href="#lesion-counting" title="Link to this heading">¶</a></h3>
+<section id="ldl-acne">
+<h4>LDL-ACNE<a class="headerlink" href="#ldl-acne" title="Link to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.applications.lesion_counting.LDL_ACNE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.applications.lesion_counting.</span></span><span class="sig-name descname"><span class="pre">LDL_ACNE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.lesion_counting.LDL_ACNE" title="Link to this definition">¶</a></dt>
+<dd><p>This approach is proposed in paper <span id="id14">[<a class="reference internal" href="#id18" title="Xiaoping Wu, Ni Wen, Jie Liang, Yu-Kun Lai, Dongyu She, Ming-Ming Cheng, and Jufeng Yang. Joint acne image grading and counting via label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 10642–10651. 2019. URL: https://doi.org/10.1109/ICCV.2019.01074.">APP-WWL+19</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="load-acne04">
+<h4><cite>load_acne04</cite><a class="headerlink" href="#load-acne04" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.lesion_counting.load_acne04">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.lesion_counting.</span></span><span class="sig-name descname"><span class="pre">load_acne04</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.lesion_counting.load_acne04" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="preprocessing">
+<h4><cite>preprocessing</cite><a class="headerlink" href="#preprocessing" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.lesion_counting.preprocessing">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.lesion_counting.</span></span><span class="sig-name descname"><span class="pre">preprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.lesion_counting.preprocessing" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="id15">
+<h4><cite>visualization</cite><a class="headerlink" href="#id15" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.lesion_counting.visualization">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.lesion_counting.</span></span><span class="sig-name descname"><span class="pre">visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_real</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_real</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['#00FF00',</span> <span class="pre">'#FFFF00',</span> <span class="pre">'#FF5500',</span> <span class="pre">'#FF0000']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['Mild',</span> <span class="pre">'Moderate',</span> <span class="pre">'Severe',</span> <span class="pre">'Very</span> <span class="pre">Severe']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.lesion_counting.visualization" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+<section id="id16">
+<h3>References<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id17">
+<div role="list" class="citation-list">
+<div class="citation" id="id18" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">APP-WWL+19</a><span class="fn-bracket">]</span></span>
+<p>Xiaoping Wu, Ni Wen, Jie Liang, Yu-Kun Lai, Dongyu She, Ming-Ming Cheng, and Jufeng Yang. Joint acne image grading and counting via label distribution learning. In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 10642–10651. 2019. URL: <a class="reference external" href="https://doi.org/10.1109/ICCV.2019.01074">https://doi.org/10.1109/ICCV.2019.01074</a>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="id19">
+<h3>Further Reading<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id20">
+<div role="list" class="citation-list">
+<div class="citation" id="id21" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-LLL+23<span class="fn-bracket">]</span></span>
+<p>Xiangyu Li, Xinjie Liang, Gongning Luo, Wei Wang, Kuanquan Wang, and Shuo Li. Ambiguity-aware breast tumor cellularity estimation via self-ensemble label distribution learning. <em>Medical Image Analysis</em>, 90:102944, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.media.2023.102944">https://doi.org/10.1016/j.media.2023.102944</a>.</p>
+</div>
+<div class="citation" id="id22" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-LLW+23<span class="fn-bracket">]</span></span>
+<p>Xiangyu Li, Gongning Luo, Wei Wang, Kuanquan Wang, and Shuo Li. Curriculum label distribution learning for imbalanced medical image segmentation. <em>Medical Image Analysis</em>, 89:102911, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.media.2023.102911">https://doi.org/10.1016/j.media.2023.102911</a>.</p>
+</div>
+<div class="citation" id="id23" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-QHZ23<span class="fn-bracket">]</span></span>
+<p>Keke Qin, Wu Huang, and Tao Zhang. Multitask deep label distribution learning for blood pressure prediction. <em>Information Fusion</em>, 95:426–445, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.inffus.2023.02.019">https://doi.org/10.1016/j.inffus.2023.02.019</a>.</p>
+</div>
+<div class="citation" id="id24" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-WZJ+22<span class="fn-bracket">]</span></span>
+<p>Jun Wang, Fengyexin Zhang, Xiuyi Jia, Xin Wang, Han Zhang, Shihui Ying, Qian Wang, Jun Shi, and Dinggang Shen. Multi-class asd classification via label distribution learning with class-shared and class-specific decomposition. <em>Medical Image Analysis</em>, 75:102294, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.media.2021.102294">https://doi.org/10.1016/j.media.2021.102294</a>.</p>
+</div>
+<div class="citation" id="id25" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-CCJ+21<span class="fn-bracket">]</span></span>
+<p>Chao Chen, Zhihong Chen, Xinyu Jin, Lanjuan Li, William Speier, and Corey W Arnold. Attention-guided discriminative region localization and label distribution learning for bone age assessment. <em>IEEE Journal of Biomedical and Health Informatics</em>, 26(3):1208–1218, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/JBHI.2021.3095128">https://doi.org/10.1109/JBHI.2021.3095128</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="text-natural-language">
+<h2>Text/Natural Language<a class="headerlink" href="#text-natural-language" title="Link to this heading">¶</a></h2>
+<section id="emphasis-selection">
+<h3>Emphasis Selection<a class="headerlink" href="#emphasis-selection" title="Link to this heading">¶</a></h3>
+<section id="dl-bilstm">
+<h4>DL-BiLSTM<a class="headerlink" href="#dl-bilstm" title="Link to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.applications.emphasis_selection.DL_BiLSTM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.applications.emphasis_selection.</span></span><span class="sig-name descname"><span class="pre">DL_BiLSTM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.emphasis_selection.DL_BiLSTM" title="Link to this definition">¶</a></dt>
+<dd><p>This approach is proposed in paper <span id="id26">[<a class="reference internal" href="#id31" title="Amirreza Shirani, Franck Dernoncourt, Paul Asente, Nedim Lipka, Seokhwan Kim, Jose Echevarria, and Thamar Solorio. Learning emphasis selection for written text in visual media from crowd-sourced label distributions. In Proceedings of the Annual Meeting of the Association for Computational Linguistics, 1167–1172. 2019. URL: https://doi.org/10.18653/v1/P19-1112.">APP-SDA+19</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="load-glove">
+<h4><cite>load_glove</cite><a class="headerlink" href="#load-glove" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.emphasis_selection.load_glove">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.emphasis_selection.</span></span><span class="sig-name descname"><span class="pre">load_glove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.emphasis_selection.load_glove" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="load-semeval2020">
+<h4><cite>load_semeval2020</cite><a class="headerlink" href="#load-semeval2020" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.emphasis_selection.load_semeval2020">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.emphasis_selection.</span></span><span class="sig-name descname"><span class="pre">load_semeval2020</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.emphasis_selection.load_semeval2020" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="id27">
+<h4><cite>preprocessing</cite><a class="headerlink" href="#id27" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.emphasis_selection.preprocessing">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.emphasis_selection.</span></span><span class="sig-name descname"><span class="pre">preprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.emphasis_selection.preprocessing" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="id28">
+<h4><cite>visualization</cite><a class="headerlink" href="#id28" title="Link to this heading">¶</a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.applications.emphasis_selection.visualization">
+<span class="sig-prename descclassname"><span class="pre">pyldl.applications.emphasis_selection.</span></span><span class="sig-name descname"><span class="pre">visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">255</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">68</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">68</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.applications.emphasis_selection.visualization" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+<section id="id29">
+<h3>References<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id30">
+<div role="list" class="citation-list">
+<div class="citation" id="id31" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id26">APP-SDA+19</a><span class="fn-bracket">]</span></span>
+<p>Amirreza Shirani, Franck Dernoncourt, Paul Asente, Nedim Lipka, Seokhwan Kim, Jose Echevarria, and Thamar Solorio. Learning emphasis selection for written text in visual media from crowd-sourced label distributions. In <em>Proceedings of the Annual Meeting of the Association for Computational Linguistics</em>, 1167–1172. 2019. URL: <a class="reference external" href="https://doi.org/10.18653/v1/P19-1112">https://doi.org/10.18653/v1/P19-1112</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="computer-vision">
+<h2>Computer Vision<a class="headerlink" href="#computer-vision" title="Link to this heading">¶</a></h2>
+<section id="id32">
+<h3>Further Reading<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<div class="docutils container" id="id33">
+<div role="list" class="citation-list">
+<div class="citation" id="id34" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-MLM+23<span class="fn-bracket">]</span></span>
+<p>Haoyu Ma, Ningning Lu, Junjun Mei, Tao Guan, Yu Zhang, and Xin Geng. Label distribution learning for scene text detection. <em>Frontiers of Computer Science</em>, 17(6):176339, 2023. URL: <a class="reference external" href="https://doi.org/10.1007/s11704-022-1446-5">https://doi.org/10.1007/s11704-022-1446-5</a>.</p>
+</div>
+<div class="citation" id="id35" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-XLZ+23<span class="fn-bracket">]</span></span>
+<p>Hang Xu, Xinyuan Liu, Qiang Zhao, Yike Ma, Chenggang Yan, and Feng Dai. Gaussian label distribution learning for spherical image object detection. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 1033–1042. 2023. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR52729.2023.00106">https://doi.org/10.1109/CVPR52729.2023.00106</a>.</p>
+</div>
+<div class="citation" id="id36" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-CLWC22<span class="fn-bracket">]</span></span>
+<p>Zhiwen Cao, Dongfang Liu, Qifan Wang, and Yingjie Chen. Towards unbiased label distribution learning for facial pose estimation using anisotropic spherical gaussian. In <em>Proceedings of the European Conference on Computer Vision</em>, 737–753. 2022. URL: <a class="reference external" href="https://doi.org/10.1007/978-3-031-19775-8_43">https://doi.org/10.1007/978-3-031-19775-8_43</a>.</p>
+</div>
+<div class="citation" id="id37" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-LG19<span class="fn-bracket">]</span></span>
+<p>Miaogen Ling and Xin Geng. Indoor crowd counting by mixture of gaussians label distribution learning. <em>IEEE Transactions on Image Processing</em>, 28(11):5691–5701, 2019. URL: <a class="reference external" href="https://doi.org/10.1109/TIP.2019.2922818">https://doi.org/10.1109/TIP.2019.2922818</a>.</p>
+</div>
+<div class="citation" id="id38" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-SG19<span class="fn-bracket">]</span></span>
+<p>Kai Su and Xin Geng. Soft facial landmark detection by label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 5008–5015. 2019. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v33i01.33015008">https://doi.org/10.1609/aaai.v33i01.33015008</a>.</p>
+</div>
+<div class="citation" id="id39" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-YCZ+18<span class="fn-bracket">]</span></span>
+<p>Jufeng Yang, Liyi Chen, Le Zhang, Xiaoxiao Sun, Dongyu She, Shao-Ping Lu, and Ming-Ming Cheng. Historical context-based style classification of painting images via label distribution learning. In <em>Proceedings of the ACM International Conference on Multimedia</em>, 1154–1162. 2018. URL: <a class="reference external" href="https://doi.org/10.1145/3240508.3240593">https://doi.org/10.1145/3240508.3240593</a>.</p>
+</div>
+<div class="citation" id="id40" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-GL17<span class="fn-bracket">]</span></span>
+<p>Xin Geng and Miaogen Ling. Soft video parsing by label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 1331–1337. 2017. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v31i1.10729">https://doi.org/10.1609/aaai.v31i1.10729</a>.</p>
+</div>
+<div class="citation" id="id41" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-RG17<span class="fn-bracket">]</span></span>
+<p>Yi Ren and Xin Geng. Sense beauty by label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 2648–2654. 2017. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2017/369">https://doi.org/10.24963/ijcai.2017/369</a>.</p>
+</div>
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>APP-ZWG15<span class="fn-bracket">]</span></span>
+<p>Zhaoxiang Zhang, Mo Wang, and Xin Geng. Crowd counting in public video surveillance by label distribution learning. <em>Neurocomputing</em>, 166:151–163, 2015. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2015.03.083">https://doi.org/10.1016/j.neucom.2015.03.083</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyLDL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#psychology">Psychology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#medicine">Medicine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#text-natural-language">Text/Natural Language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#computer-vision">Computer Vision</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="others.html" title="previous chapter">Others</a></li>
+      <li>Next: <a href="utils.html" title="next chapter">Utils &amp; Metrics</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, SpriteMisaka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/app.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

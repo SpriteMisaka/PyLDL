@@ -8,11 +8,10 @@ from pyldl.algorithms.utils import pairwise_euclidean
 from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
-EPS = np.finfo(np.float32).eps
-
-
 class LDLLC(BaseBFGS, BaseDeepLDL):
-    """LDLLC is proposed in paper *Label Distribution Learning by Exploiting Label Correlations*.
+    """:class:`LDLLC <pyldl.algorithms.LDLLC>` is proposed in paper :cite:`2018:jia`.
+
+    :term:`BFGS` is used as optimization algorithm.
     """
 
     @tf.function

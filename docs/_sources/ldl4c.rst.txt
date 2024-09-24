@@ -1,0 +1,31 @@
+LDL4C
+-----
+
+.. toctree::
+   :maxdepth: 2
+
+.. jinja:: ldl4c_ctx
+
+   {% for class_name in all_ldl4c_algs %}
+   {{ class_name.replace('_', '-').lstrip('-') }}
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   .. autoclass:: pyldl.algorithms.{{ class_name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+References
+~~~~~~~~~~
+
+.. bibliography:: ldl4c_references.bib
+   :labelprefix: LDL4C-
+   :cited:
+
+Further Reading
+~~~~~~~~~~~~~~~
+
+.. bibliography:: ldl4c_further_reading.bib
+   :labelprefix: LDL4C-
+   :all:

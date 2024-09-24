@@ -1,0 +1,29 @@
+Glossary
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+.. glossary::
+
+   Adam
+      A SGD-based optimization algorithm. See :cite:`2015:kingma` for details.
+
+   ADMM
+      The alternating direction method of multipliers (ADMM) algorithm. See :cite:`2011:boyd` for details.
+
+   BFGS
+      The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm.
+
+   IIS
+      The improved iterative scaling (IIS) algorithm.
+
+   MaxEnt
+      The maximum entropy (MaxEnt) model.
+
+References
+~~~~~~~~~~
+
+.. bibliography:: glossary_references.bib
+   :labelprefix: GLO-
+   :cited:

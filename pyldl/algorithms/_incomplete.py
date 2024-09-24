@@ -7,7 +7,7 @@ from pyldl.algorithms.base import BaseADMM, BaseIncomLDL
 
 
 class IncomLDL(BaseADMM, BaseIncomLDL):
-    """IncomLDL is proposed in paper *Incomplete Label Distribution Learning*.
+    """:class:`IncomLDL <pyldl.algorithms.IncomLDL>` is proposed in paper :cite:`2017:xu`.
     """
 
     def _update_W(self):
@@ -39,7 +39,7 @@ class IncomLDL(BaseADMM, BaseIncomLDL):
 
 
 class WInLDL(BaseADMM, BaseIncomLDL):
-    """WInLDL is proposed in paper *No Regularization Is Needed: Efficient and Effective Incomplete Label Distribution Learning*.
+    """:class:`WInLDL <pyldl.algorithms.WInLDL>` is proposed in paper :cite:`2024:li`.
     """
 
     def _update_W(self):
