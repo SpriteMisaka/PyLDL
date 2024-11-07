@@ -20,7 +20,7 @@ class _PT(BaseLDL):
         m, c = y.shape[0], y.shape[1]
         Xr = np.repeat(X, c, axis=0)
         yr = np.tile(np.arange(c), m)
-        p = y.reshape(-1) / m
+        p = y.reshape(-1) / np.sum(y)
 
         select = np.random.choice(m*c, size=m*c, p=p)
         return Xr[select], yr[select]

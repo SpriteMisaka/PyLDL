@@ -50,7 +50,7 @@ class LDLF(BaseAdam, BaseDeepLDL):
         return mu
 
     def _get_default_model(self):
-        return keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
+        return keras.Sequential([keras.layers.InputLayer(input_shape=(self._n_features, )),
                                  keras.layers.Dense(self._n_hidden, activation='sigmoid'),
                                  keras.layers.Dense(self._n_latent, activation="sigmoid")])
 

@@ -298,14 +298,14 @@ class _BaseDeep(keras.Model):
         self._model = model or self._get_default_model()
 
 
-class BaseDeepLDL(_BaseLDL, _BaseDeep):
+class BaseDeepLDL(BaseLDL, _BaseDeep):
 
     def __init__(self, n_hidden=64, n_latent=None, random_state=None):
-        _BaseLDL.__init__(self, random_state)
+        BaseLDL.__init__(self, random_state)
         _BaseDeep.__init__(self, n_hidden, n_latent, random_state)
 
     def fit(self, X, y, **kwargs):
-        _BaseLDL.fit(self, X, y)
+        BaseLDL.fit(self, X, y)
         self._X = tf.cast(self._X, dtype=tf.float32)
         self._y = tf.cast(self._y, dtype=tf.float32)
         _BaseDeep.fit(self, self._X, self._y, **kwargs)
@@ -315,14 +315,14 @@ class BaseDeepLDL(_BaseLDL, _BaseDeep):
         return self._call(X).numpy()
 
 
-class BaseDeepLE(_BaseLE, _BaseDeep):
+class BaseDeepLE(BaseLE, _BaseDeep):
 
     def __init__(self, n_hidden=64, n_latent=None, random_state=None):
-        _BaseLE.__init__(self, random_state)
+        BaseLE.__init__(self, random_state)
         _BaseDeep.__init__(self, n_hidden, n_latent, random_state)
 
     def fit(self, X, l, **kwargs):
-        _BaseLE.fit(self, X, l)
+        BaseLE.fit(self, X, l)
         self._X = tf.cast(self._X, dtype=tf.float32)
         self._l = tf.cast(self._l, dtype=tf.float32)
         _BaseDeep.fit(self, self._X, self._l, **kwargs)
@@ -379,18 +379,19 @@ class BaseGD(BaseDeep):
                 break
             callbacks.on_epoch_begin(epoch)
 
+            total_loss = 0.
             for step, batch in enumerate(data):
                 start = step * batch_size
                 end = min(start + batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
                 with tf.GradientTape() as tape:
                     l = loss(batch[0], batch[1], start, end)
+                    total_loss += l
                 gradients = tape.gradient(l, trainable_variables)
                 self._optimizer.apply_gradients(zip(gradients, trainable_variables))
                 callbacks.on_train_batch_end(step)
 
             scores = {}
-            val_loss = 0.
             if y_val is not None:
                 if X_val is not None:
                     if issubclass(self.__class__, BaseDeepLDLClassifier):
@@ -400,13 +401,12 @@ class BaseGD(BaseDeep):
                 elif issubclass(self.__class__, BaseDeepLE):
                     y_val_pred = self.transform()
 
-                val_loss = self.loss_function(y_val, y_val_pred)
                 from pyldl.metrics import score
                 scores = score(y_val, y_val_pred, metrics=self._metrics, return_dict=True)
 
-            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": val_loss})
+            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": total_loss})
             if self._verbose != 0:
-                progbar.update(epoch + 1, values=[('loss', val_loss)] + list(scores.items()),
+                progbar.update(epoch + 1, values=[('loss', total_loss)] + list(scores.items()),
                                finalize=self.stop_training or epochs == epoch + 1)
 
         callbacks.on_train_end()

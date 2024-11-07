@@ -76,10 +76,18 @@ def load_dataset(name, dir='dataset'):
     return data['features'], data['labels']
 
 
-def random_missing(y, missing_rate=.9):
+def random_missing(y, missing_rate=.9, weighted=False):
     if missing_rate <= 0. or missing_rate >= 1.:
         raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
-    missing_mask = np.random.rand(*y.shape) < missing_rate
+    if weighted:
+        p = 1 - y
+        p /= np.sum(p)
+        size = int(y.size * missing_rate)
+        select = np.random.choice(y.size, size=size, replace=False, p=p.flatten())
+        missing_mask = np.zeros_like(y, dtype=bool)
+        missing_mask.flat[select] = True
+    else:
+        missing_mask = np.random.rand(*y.shape) < missing_rate
     missing_y = y.copy()
     missing_y[missing_mask] = np.nan
     missing_y[np.isnan(missing_y)] = 0.
@@ -88,6 +96,22 @@ def random_missing(y, missing_rate=.9):
 
 sys.modules['pyldl.utils.proj'] = proj
 sys.modules['pyldl.utils.binaryzation'] = binaryzation
+
+
+def emphasize(y, rate=.5, **kwargs):
+    from scipy.special import softmax
+    emphasized_y = y.copy()
+    l = binaryzation(y, **kwargs)
+    indices = np.random.choice(y.shape[0], size=int(y.shape[0] * rate), replace=False)
+    for i in indices:
+        n_pos = int(np.ceil(l[i].sum() / 2))
+        where = np.where(l[i] == 1)[0]
+        l[i] = 0
+        select = np.random.choice(where.size, size=n_pos, replace=False)
+        l[i, where[select]] = 1
+        emphasized_y[i] += l[i]
+        emphasized_y[i] = softmax(emphasized_y[i])
+    return emphasized_y
 
 
 def artificial(X, a=1., b=.5, c=.2, d=1.,

@@ -5,7 +5,8 @@ import keras
 import tensorflow as tf
 
 from pyldl.algorithms.utils import RProp
-from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
+from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD
+from pyldl.algorithms.loss_function_engineering import _CAD, _QFD2, _CJS
 
 
 class AA_KNN(BaseLDL):
@@ -28,56 +29,22 @@ class AA_BP(BaseGD, BaseDeepLDL):
     pass
 
 
-class CAD(BaseAdam, BaseDeepLDL):
+class CAD(_CAD, AA_BP):
     """:class:`CAD <pyldl.algorithms.CAD>` is proposed in paper :cite:`2023:wen`.
     """
-
-    @staticmethod
-    @tf.function
-    def loss_function(y, y_pred):
-        def _CAD(y, y_pred):
-            return tf.reduce_mean(tf.abs(
-                tf.cumsum(y, axis=1) - tf.cumsum(y_pred, axis=1)
-            ), axis=1)
-        return tf.math.reduce_sum(
-            tf.map_fn(lambda i: _CAD(y[:, :i], y_pred[:, :i]),
-                      tf.range(1, y.shape[1] + 1),
-                      fn_output_signature=tf.float32)
-        )
+    pass
 
 
-class QFD2(BaseAdam, BaseDeepLDL):
+class QFD2(_QFD2, AA_BP):
     """:class:`QFD2 <pyldl.algorithms.QFD2>` is proposed in paper :cite:`2023:wen`.
     """
-
-    @staticmethod
-    @tf.function
-    def _loss_function(y, y_pred):
-        Q = y - y_pred
-        j = tf.reshape(tf.range(y.shape[1]), [y.shape[1], 1])
-        k = tf.reshape(tf.range(y.shape[1]), [1, y.shape[1]])
-        A = tf.cast(1 - tf.abs(j - k) / (y.shape[1] - 1), dtype=tf.float32)
-        return tf.math.reduce_mean(
-            tf.linalg.diag_part(tf.matmul(tf.matmul(Q, A), tf.transpose(Q)))
-        )
+    pass
 
 
-class CJS(BaseAdam, BaseDeepLDL):
+class CJS(_CJS, AA_BP):
     """:class:`CJS <pyldl.algorithms.CJS>` is proposed in paper :cite:`2023:wen`.
     """
-
-    @staticmethod
-    @tf.function
-    def loss_function(y, y_pred):
-        def _CJS(y, y_pred):
-            m = 0.5 * (y + y_pred)
-            js = 0.5 * (keras.losses.kl_divergence(y, m) + keras.losses.kl_divergence(y_pred, m))
-            return tf.reduce_mean(js)
-        return tf.math.reduce_sum(
-            tf.map_fn(lambda i: _CJS(y[:, :i], y_pred[:, :i]),
-                      tf.range(1, y.shape[1] + 1),
-                      fn_output_signature=tf.float32)
-        )
+    pass
 
 
 class CPNN(BaseGD, BaseDeepLDL):
