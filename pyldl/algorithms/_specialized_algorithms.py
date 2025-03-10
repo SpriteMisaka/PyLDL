@@ -6,21 +6,18 @@ from pyldl.algorithms.base import BaseLDL
 from pyldl.algorithms.utils import kl_divergence
 
 
-EPS = np.finfo(np.float64).eps
-
-
 class _SA(BaseLDL):
     """Base class for :class:`pyldl.algorithms.SA_IIS` and :class:`pyldl.algorithms.SA_BFGS`.
 
     SA refers to *specialized algorithms*, where :term:`MaxEnt` is employed as model.
     """
 
-    def __init__(self, random_state=None):
-        super().__init__(random_state)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._W = None
 
-    def _loss_function(self, y, y_pred):
-        return kl_divergence(y, y_pred, reduction=np.sum)
+    def _loss_function(self, D, D_pred):
+        return kl_divergence(D, D_pred, reduction=np.sum)
 
     def _call(self, X):
         return softmax(X @ self._W, axis=1)
@@ -43,15 +40,15 @@ class SA_BFGS(_SA):
 
     def _obj_func(self, w):
         self._W = w.reshape(self._n_features, self._n_outputs)
-        y_pred = self._call(self._X)
+        D_pred = self._call(self._X)
 
-        loss = self._loss_function(self._y, y_pred)
-        grad = (self._X.T @ (y_pred - self._y)).reshape(-1, )
+        loss = self._loss_function(self._D, D_pred)
+        grad = (self._X.T @ (D_pred - self._D)).reshape(-1, )
 
         return loss, grad
 
-    def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
-        super().fit(X, y)
+    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
+        super().fit(X, D)
 
         w0 = np.random.random(self._n_features * self._n_outputs)
         optimize_result = minimize(self._obj_func, w0, method='L-BFGS-B', jac=True,
@@ -78,32 +75,31 @@ class SA_IIS(_SA):
         2010:geng
     """
 
-    def fit(self, X, y, max_iterations=600, convergence_criterion=1e-6):
-        super().fit(X, y)
+    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
+        super().fit(X, D)
 
         self._W = np.random.random((self._n_features, self._n_outputs))
 
         flag = True
         counter = 1
-        y_pred = self._call(self._X)
+        D_pred = self._call(self._X)
 
-        XTy = self._X.T @ self._y
+        XD = self._X.T @ self._D
         absX = np.sum(np.abs(self._X), axis=1)
 
         while flag:
             delta = np.empty(shape=(self._n_features, self._n_outputs), dtype=np.float32)
             for k in range(self._n_features):
+                z = np.sign(self._X[:, k]) * absX
                 for j in range(self._n_outputs):
                     def func(x):
-                        temp1 = XTy[k, j]
-                        temp2 = np.sum(y_pred[:, j] * self._X[:, k] * np.exp(x * np.sign(self._X[:, k]) * absX))
-                        return temp1 - temp2
-                    delta[k][j] = fsolve(func, .0, xtol=EPS)
+                        return XD[k, j] - np.sum(D_pred[:, j] * self._X[:, k] * np.exp(x * z))
+                    delta[k][j] = fsolve(func, .0)[0]
 
-            l2 = self._loss_function(self._y, y_pred)
+            l2 = self._loss_function(self._D, D_pred)
             self._W += delta
-            y_pred = self._call(self._X)
-            l1 = self._loss_function(self._y, y_pred)
+            D_pred = self._call(self._X)
+            l1 = self._loss_function(self._D, D_pred)
 
             if l2 - l1 < convergence_criterion or counter >= max_iterations:
                 flag = False

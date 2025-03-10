@@ -10,10 +10,12 @@ class _LRLDL(BaseADMM, BaseLDL):
     :term:`ADMM` is used as optimization algorithm.
     """
 
-    def __init__(self, mode='threshold', param=None, random_state=None):
+    def __init__(self, mode='threshold', param=None, alpha=1e-3, beta=1e-3, random_state=None):
         super().__init__(random_state)
         self._mode = mode
         self._param = param
+        self._alpha = alpha
+        self._beta = beta
 
     def _update_W(self):
         """Please note that Eq. (8) in paper :cite:`2024:kou` should be corrected to:
@@ -40,7 +42,7 @@ class _LRLDL(BaseADMM, BaseLDL):
             \\end{aligned}
         """
         OTX = self._O.T @ self._X
-        temp1 = (self._rho * self._Z.T - self._V.T + self._L.T) @ OTX + self._y.T @ self._X
+        temp1 = (self._rho * self._Z.T - self._V.T + self._L.T) @ OTX + self._D.T @ self._X
         temp2 = self._X.T @ self._X + 2 * self._I1 + (1 + self._rho) * self._X.T @ self._O @ OTX
         self._W = np.transpose(temp1 @ np.linalg.inv(temp2))
 
@@ -66,11 +68,11 @@ class _LRLDL(BaseADMM, BaseLDL):
         self._rho *= 1.1
 
     def _before_train(self):
-        self._O = np.random.random((self._X.shape[0], self._X.shape[0]))
-        self._L = binaryzation(self._y, method=self._mode, param=self._param)
+        self._O = np.random.random((self._n_samples, self._n_samples))
+        self._L = binaryzation(self._D, method=self._mode, param=self._param)
 
         self._I1 = self._beta * np.eye(self._n_features)
-        self._I2 = self._beta * np.eye(self._X.shape[0])
+        self._I2 = self._beta * np.eye(self._n_samples)
 
     @property
     def constraint(self):
@@ -80,11 +82,8 @@ class _LRLDL(BaseADMM, BaseLDL):
     def params(self):
         return [self._W.T, self._O, self._Z.T]
 
-    def fit(self, X, y, alpha=1e-3, beta=1e-3,
-            rho=1e-3, stopping_criterion='error', **kwargs):
-        self._alpha = alpha
-        self._beta = beta
-        return super().fit(X, y, rho=rho, stopping_criterion=stopping_criterion, **kwargs)
+    def fit(self, X, D, rho=1e-3, stopping_criterion='error', **kwargs):
+        return super().fit(X, D, rho=rho, stopping_criterion=stopping_criterion, **kwargs)
 
 
 class TLRLDL(_LRLDL):
@@ -93,8 +92,8 @@ class TLRLDL(_LRLDL):
     A threshold-based :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix.
     """
 
-    def __init__(self, param=None, random_state=None):
-        super().__init__('threshold', param, random_state)
+    def __init__(self, **kwargs):
+        super().__init__('threshold', **kwargs)
 
 
 class TKLRLDL(_LRLDL):
@@ -103,5 +102,5 @@ class TKLRLDL(_LRLDL):
     A top-:math:`k` :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix.
     """
 
-    def __init__(self, param=None, random_state=None):
-        super().__init__('topk', param, random_state)
+    def __init__(self, **kwargs):
+        super().__init__('topk', **kwargs)

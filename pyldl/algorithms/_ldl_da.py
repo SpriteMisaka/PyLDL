@@ -33,17 +33,17 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
 
     ORDER_SBU_3DFE = (0, 2, 5, 1, 3, 4)
     @staticmethod
-    def reorder_y(y: np.ndarray, order: tuple[int]) -> np.ndarray:
+    def reorder_D(D: np.ndarray, order: tuple[int]) -> np.ndarray:
         """Reorder label distributions for consistent label semantics.
 
-        :param y: Label distributions.
-        :type y: np.ndarray
+        :param D: Label distributions.
+        :type D: np.ndarray
         :param order: New order.
         :type order: tuple[int]
         :return: Reordered label distributions.
         :rtype: np.ndarray
         """
-        return y[:, order]
+        return D[:, order]
 
     @staticmethod
     def pairwise_jsd(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
@@ -60,8 +60,7 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         temp1 = tf.repeat(X, Y.shape[0], axis=0)
         temp2 = tf.tile(Y, [X.shape[0], 1])
         temp3 = 0.5 * (temp1 + temp2)
-        js = 0.5 * (kl(temp1, temp3) + kl(temp2, temp3))
-        return js
+        return 0.5 * (kl(temp1, temp3) + kl(temp2, temp3))
 
     @staticmethod
     def pairwise_cosine(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
@@ -99,11 +98,10 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         """
         return tf.repeat(X, Y.shape[0]) == tf.tile(Y, [X.shape[0]])
 
-    def __init__(self, n_hidden=256, n_latent=64, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+    def __init__(self, n_hidden=256, n_latent=64, **kwargs):
+        super().__init__(n_hidden, n_latent, **kwargs)
 
     def _get_default_model(self):
-
         encoder = keras.Sequential([keras.layers.InputLayer(input_shape=(self._n_features,)),
                                     keras.layers.Dense(self._n_hidden, activation=keras.layers.LeakyReLU(alpha=0.01)),
                                     keras.layers.Dense(self._n_hidden, activation=keras.layers.LeakyReLU(alpha=0.01)),
@@ -122,30 +120,30 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
 
     @staticmethod
     @tf.function
-    def loss_function(y, y_pred):
-        return tf.math.reduce_mean(keras.losses.kl_divergence(y, y_pred))
+    def loss_function(D, D_pred):
+        return tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
 
-    def _loss(self, sX, sy, start, end):
+    def _loss(self, sX, sD, start, end):
 
-        sfeatures, sy_pred = self._call(sX, predict=False)
-        tfeatures, ty_pred = self._call(self._tX, predict=False)
+        sfeatures, sD_pred = self._call(sX, predict=False)
+        tfeatures, tD_pred = self._call(self._tX, predict=False)
         features = tf.concat([sfeatures, tfeatures], axis=0)
 
-        mse = self.loss_function(sy, sy_pred)
-        mse += self.loss_function(self._ty, ty_pred)
+        mse = self.loss_function(sD, sD_pred)
+        mse += self.loss_function(self._tD, tD_pred)
 
         dis_X = pairwise_euclidean(sfeatures, tfeatures)
         sim_X = tf.maximum(self._margin - dis_X, 0.) if self._margin else self.pairwise_cosine(sfeatures, tfeatures)
 
-        con = tf.reduce_sum(self._hw[start:end] * dis_X) / (tf.reduce_sum(self._hmask_y[start:end]) + EPS)
-        con += tf.reduce_sum(self._lw[start:end] * sim_X) / (tf.reduce_sum(self._lmask_y[start:end]) + EPS)
+        con = tf.reduce_sum(self._hw[start:end] * dis_X) / (tf.reduce_sum(self._hmask_D[start:end]) + EPS)
+        con += tf.reduce_sum(self._lw[start:end] * sim_X) / (tf.reduce_sum(self._lmask_D[start:end]) + EPS)
 
         s_seg = self._seg[start:end]
-        t_seg = self._seg[self._sy.shape[0]:]
+        t_seg = self._seg[self._sD.shape[0]:]
         seg = tf.concat([s_seg, t_seg], axis=0)
 
         s_entropy = tf.reshape(self._entropy[start:end], (-1, 1))
-        t_entropy = tf.reshape(self._entropy[self._sy.shape[0]:], (-1, 1))
+        t_entropy = tf.reshape(self._entropy[self._sD.shape[0]:], (-1, 1))
         entropy = tf.concat([s_entropy, t_entropy], axis=0)
 
         def mwc(W, X, seg, nc):
@@ -172,35 +170,35 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
     def _before_train(self):
 
         self._sX = self._X
-        self._sy = self._y
+        self._sD = self._D
 
-        shlabel = tf.argmax(self._sy, axis=1)
-        thlabel = tf.argmax(self._ty, axis=1)
-        sllabel = tf.argmin(self._sy, axis=1)
-        tllabel = tf.argmin(self._ty, axis=1)
+        shlabel = tf.argmax(self._sD, axis=1)
+        thlabel = tf.argmax(self._tD, axis=1)
+        sllabel = tf.argmin(self._sD, axis=1)
+        tllabel = tf.argmin(self._tD, axis=1)
 
-        pairs_y = self.pairwise_jsd(self._sy, self._ty)
+        pairs_y = self.pairwise_jsd(self._sD, self._tD)
         pairs_y = tf.cast(
             MinMaxScaler().fit_transform(pairs_y.numpy().reshape(-1, 1)).reshape(-1),
         tf.float32)
 
-        self._hmask_y = tf.where(self.pairwise_label(shlabel, thlabel), 1., 0.)
-        self._hw = tf.reshape((1 - pairs_y) * self._hmask_y, (self._sy.shape[0], self._ty.shape[0]))
+        self._hmask_D = tf.where(self.pairwise_label(shlabel, thlabel), 1., 0.)
+        self._hw = tf.reshape((1 - pairs_y) * self._hmask_D, (self._sD.shape[0], self._tD.shape[0]))
 
-        self._lmask_y = tf.where(tf.logical_or(self.pairwise_label(sllabel, thlabel),
+        self._lmask_D = tf.where(tf.logical_or(self.pairwise_label(sllabel, thlabel),
                                                self.pairwise_label(shlabel, tllabel)), 1., 0.)
-        self._lw = tf.reshape(pairs_y * self._lmask_y, (self._sy.shape[0], self._ty.shape[0]))
+        self._lw = tf.reshape(pairs_y * self._lmask_D, (self._sD.shape[0], self._tD.shape[0]))
 
         self._nc = self._n_outputs * (self._n_outputs - 1)
-        concat_y = tf.concat([self._sy, self._ty], axis=0)
-        temp = tf.argsort(concat_y, axis=1)[:, -self._r:][:, ::-1]
+        concat_D = tf.concat([self._sD, self._tD], axis=0)
+        temp = tf.argsort(concat_D, axis=1)[:, -self._r:][:, ::-1]
         _, self._seg = tf.raw_ops.UniqueV2(x=temp, axis=[0])
-        self._entropy = -tf.reduce_sum(concat_y * tf.math.log(concat_y + EPS), axis=1)
+        self._entropy = -tf.reduce_sum(concat_D * tf.math.log(concat_D + EPS), axis=1)
 
     def _ft_loss(self, tX, ty, start, end):
         return self.loss_function(ty, self._call(tX))
 
-    def fit(self, sX: np.ndarray, sy: np.ndarray, tX: np.ndarray, ty: np.ndarray, *, callbacks=None, X_val=None, y_val=None,
+    def fit(self, sX: np.ndarray, sD: np.ndarray, tX: np.ndarray, tD: np.ndarray, *, callbacks=None, X_val=None, D_val=None,
             ft_epochs : int = 1000, ft_optimizer : Optional[keras.optimizers.Optimizer] = None,
             alpha : float = 1e-2, beta : float = 1e-2, r : int = 2, margin : Optional[float] = None, fine_tune : bool = True, **kwargs):
         """Fit the model.
@@ -232,18 +230,18 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         """
 
         self._tX = tf.cast(tX, tf.float32)
-        self._ty = tf.cast(ty, tf.float32)
+        self._tD = tf.cast(tD, tf.float32)
 
         self._alpha = alpha
         self._beta = beta
         self._r = r
         self._margin = margin
 
-        super().fit(sX, sy, callbacks=callbacks, X_val=X_val, y_val=y_val,**kwargs)
+        super().fit(sX, sD, callbacks=callbacks, X_val=X_val, D_val=D_val,**kwargs)
 
         if fine_tune:
             self._ft_optimizer = ft_optimizer or self._get_default_optimizer()
-            self.train(self._tX, self._ty, ft_epochs, self._tX.shape[0],
-                    self._ft_loss, self._model['decoder'].trainable_variables, callbacks, X_val, y_val)
+            self.train(self._tX, self._tD, ft_epochs, self._tX.shape[0],
+                    self._ft_loss, self._model['decoder'].trainable_variables, callbacks, X_val, D_val)
 
         return self

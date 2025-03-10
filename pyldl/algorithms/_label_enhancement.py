@@ -22,15 +22,15 @@ class FCM(BaseLE):
     """:class:`FCM <pyldl.algorithms.FCM>` is proposed in paper :cite:`2018:xu`.
     """
 
-    def fit(self, X, l, n_clusters=50, beta=2):
-        super().fit(X, l)
+    def fit(self, X, L, n_clusters=50, beta=2):
+        super().fit(X, L)
         _, u, _, _, _, _, _ = fuzz.cluster.cmeans(
             self._X.T, n_clusters, beta,
             error=1e-7, maxiter=10000, init=None
         )
-        A = np.matmul(l.T, u.T)
-        y = fuzz.maxprod_composition(u.T, A.T)
-        self._y = softmax(y, axis=1)
+        A = np.matmul(L.T, u.T)
+        D = fuzz.maxprod_composition(u.T, A.T)
+        self._D = softmax(D, axis=1)
         return self
 
 
@@ -38,22 +38,22 @@ class KM(BaseLE):
     """:class:`KM <pyldl.algorithms.KM>` is proposed in paper :cite:`2018:xu`.
     """
 
-    def fit(self, X, l):
-        super().fit(X, l)
+    def fit(self, X, L):
+        super().fit(X, L)
 
-        l = l > 0
+        L = L > 0
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
-        s2 = np.zeros(self._l.shape)
+        s2 = np.zeros(self._L.shape)
         for j in range(self._n_outputs):
-            c = self._X[l[:, j].reshape(-1)]
+            c = self._X[L[:, j].reshape(-1)]
             temp1 = np.sum(rbf_kernel(c, gamma=gamma)) / (c.shape[0] ** 2)
             temp2 = -2 * np.sum(rbf_kernel(self._X, c, gamma=gamma), axis=1) / c.shape[0]
             s2[:, j] += temp1 + temp2 + 1
 
         r2 = np.max(s2, axis=0).reshape(1, -1)
-        y = 1 - np.sqrt(s2 / (r2 + 1e-7))
-        y *= self._l
-        self._y = softmax(y, axis=1)
+        D = 1 - np.sqrt(s2 / (r2 + 1e-7))
+        D *= self._L
+        self._D = softmax(D, axis=1)
         return self
 
 
@@ -61,18 +61,18 @@ class LP(BaseLE):
     """:class:`LP <pyldl.algorithms.LP>` is proposed in paper :cite:`2018:xu`.
     """
 
-    def fit(self, X, l, epochs=500, alpha=.5):
-        super().fit(X, l)
+    def fit(self, X, L, epochs=500, alpha=.5):
+        super().fit(X, L)
 
         dis = squareform(pdist(self._X, 'euclidean'))
         A = np.exp(- dis ** 2 / 2)
         temp = np.linalg.inv(np.sqrt(np.diag(np.sum(A, axis=1))))
         P = np.matmul(np.matmul(temp, A), temp)
 
-        y = self._l
+        D = self._L
         for _ in range(epochs):
-            y = alpha * np.matmul(P, y) + (1 - alpha) * self._l
-        self._y = softmax(y, axis=1)
+            D = alpha * np.matmul(P, D) + (1 - alpha) * self._L
+        self._D = softmax(D, axis=1)
         return self
 
 
@@ -80,9 +80,9 @@ class ML(BaseLE):
     """:class:`ML <pyldl.algorithms.ML>` is proposed in paper :cite:`2018:xu`.
     """
 
-    def fit(self, X, l, beta=1):
-        super().fit(X, l)
-        l[l == 0] = -1
+    def fit(self, X, L, beta=1):
+        super().fit(X, L)
+        L[L == 0] = -1
         knn = NearestNeighbors(n_neighbors=self.n_outputs+1)
         knn.fit(self._X)
 
@@ -95,18 +95,18 @@ class ML(BaseLE):
         M += 1e-5 * np.eye(*M.shape)
         M = M.astype(np.float64)
 
-        b = np.zeros((l.shape[0], 1), dtype=np.float64) - beta
-        mu = np.zeros(l.shape)
+        b = np.zeros((L.shape[0], 1), dtype=np.float64) - beta
+        mu = np.zeros(L.shape)
 
         for k in range(self.n_outputs):
-            A = -np.diag(l[:, k]).astype(np.float64)
+            A = -np.diag(L[:, k]).astype(np.float64)
             mu[:, k] = solve_qp(P=2*M,
-                                q=np.zeros((l.shape[0],), dtype=np.float64),
+                                q=np.zeros((L.shape[0],), dtype=np.float64),
                                 G=A,
                                 h=b,
                                 solver='quadprog')
 
-        self._y = softmax(mu, axis=1)
+        self._D = softmax(mu, axis=1)
         return self
 
 
@@ -123,10 +123,16 @@ class GLLE(BaseBFGS, BaseDeepLE):
         2021:xu
     """
 
+    def __init__(self, alpha=1e-2, beta=1e-4, sigma=1., **kwargs):
+        super().__init__(**kwargs)
+        self._alpha = alpha
+        self._beta = beta
+        self._sigma = sigma
+
     @tf.function
-    def _E_loss(self, y):
+    def _E_loss(self, D):
         E_loss = 0.
-        groups = tf.dynamic_partition(y, tf.constant(self._cluster_results), self._n_clusters)
+        groups = tf.dynamic_partition(D, tf.constant(self._cluster_results), self._n_clusters)
         for i in range(self._n_clusters):
             E_loss += tf.linalg.trace(
                 tf.transpose(groups[i]) @ self._E[i] @ tf.transpose(self._E[i]) @ groups[i]
@@ -135,8 +141,8 @@ class GLLE(BaseBFGS, BaseDeepLE):
 
     def _loss(self, params_1d):
         with tf.GradientTape() as tape:
-            y = self._P @ self._params2model(params_1d)[0]
-            E_loss = self._E_loss(y)
+            D = self._P @ self._params2model(params_1d)[0]
+            E_loss = self._E_loss(D)
         E_gradients = tape.gradient(E_loss, self._E)
         self._E_optimizer.apply_gradients(zip(E_gradients, self._E))
 
@@ -144,10 +150,10 @@ class GLLE(BaseBFGS, BaseDeepLE):
             Ei_norm = tf.linalg.norm(self._E[i], axis=1, keepdims=True)
             self._E[i].assign(self._E[i] / Ei_norm)
 
-        y = self._P @ self._params2model(params_1d)[0]
-        mse = tf.reduce_sum((self._l - y)**2)
-        lap = tf.linalg.trace(tf.transpose(y) @ self._G @ y)
-        return mse + self._alpha * lap + self._beta * self._E_loss(y)
+        D = self._P @ self._params2model(params_1d)[0]
+        mse = tf.reduce_sum((self._L - D)**2)
+        lap = tf.linalg.trace(tf.transpose(D) @ self._G @ D)
+        return mse + self._alpha * lap + self._beta * self._E_loss(D)
 
     def _before_train(self):
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
@@ -175,12 +181,6 @@ class GLLE(BaseBFGS, BaseDeepLE):
     def _get_default_model(self):
         return self.get_2layer_model(self._P.shape[1], self._n_outputs, softmax=False)
 
-    def fit(self, X, l, alpha=1e-2, beta=1e-4, sigma=1., max_iterations=50, **kwargs):
-        self._alpha = alpha
-        self._beta = beta
-        self._sigma = sigma
-        return super().fit(X, l, **kwargs)
-
     def transform(self):
         return keras.activations.softmax(self._call(self._P)).numpy()
 
@@ -198,8 +198,12 @@ class LEVI(BaseAdam, BaseDeepLE):
         2023:xu4
     """
 
-    def _call(self, X, l, transform=False):
-        inputs = tf.concat((X, l), axis=1)
+    def __init__(self, alpha=1., **kwargs):
+        super().__init__(**kwargs)
+        self._alpha = alpha
+
+    def _call(self, X, L, transform=False):
+        inputs = tf.concat((X, L), axis=1)
 
         latent = self._model["encoder"](inputs)
         mean = latent[:, :self._n_outputs]
@@ -214,17 +218,17 @@ class LEVI(BaseAdam, BaseDeepLE):
 
         samples = d.sample()
         X_hat = self._model["decoder_X"](samples)
-        l_hat = self._model["decoder_l"](samples)
+        L_hat = self._model["decoder_L"](samples)
 
-        return d, std_d, samples, X_hat, l_hat
+        return d, std_d, samples, X_hat, L_hat
 
-    def _loss(self, X, l, start, end):
-        d, std_d, samples, X_hat, l_hat = self._call(X, l)
+    def _loss(self, X, L, start, end):
+        d, std_d, samples, X_hat, L_hat = self._call(X, L)
         kl = tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1)
         rec_X = keras.losses.mean_squared_error(X, X_hat)
-        rec_y = keras.losses.binary_crossentropy(l, l_hat)
+        rec_L = keras.losses.binary_crossentropy(L, L_hat)
 
-        return tf.reduce_sum((l - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_y)
+        return tf.reduce_sum((L - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_L)
 
     def _get_default_model(self):
 
@@ -238,34 +242,30 @@ class LEVI(BaseAdam, BaseDeepLE):
                                       keras.layers.Dense(self._n_hidden, activation='softplus'),
                                       keras.layers.Dense(self._n_features, activation=None)])
 
-        decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
+        decoder_L = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
                                       keras.layers.Dense(self._n_hidden, activation='softplus'),
                                       keras.layers.Dense(self._n_outputs, activation=None)])
 
-        return {"encoder": encoder, "decoder_X": decoder_X, "decoder_l": decoder_l}
-
-    def fit(self, X, l, alpha=1., **kwargs):
-        self._alpha = alpha
-        return super().fit(X, l, **kwargs)
+        return {"encoder": encoder, "decoder_X": decoder_X, "decoder_L": decoder_L}
 
     def transform(self):
-        return keras.activations.softmax(
-            self._call(self._X, self._l, transform=True)
-        ).numpy()
+        return keras.activations.softmax(self._call(self._X, self._L, transform=True)).numpy()
 
 
 class LIBLE(BaseAdam, BaseDeepLE):
     """:class:`LIBLE <pyldl.algorithms.LIBLE>` is proposed in paper :cite:`2023:zheng`.
     """
 
-    def __init__(self, n_hidden=64, n_latent=64, random_state=None):
+    def __init__(self, n_hidden=64, n_latent=64, alpha=1e-3, beta=1e-3, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
+        self._alpha = alpha
+        self._beta = beta
 
     def _call(self, X, transform=False):
         latent = self._model["encoder"](X)
         mean = latent[:, :self._n_latent]
         if transform:
-            return self._model["decoder_y"](mean)
+            return self._model["decoder_D"](mean)
 
         var = tf.math.softplus(latent[:, self._n_latent:])
 
@@ -274,19 +274,19 @@ class LIBLE(BaseAdam, BaseDeepLE):
                                          scale=np.ones(self._n_latent, dtype=np.float32))
 
         h = d.sample()
-        l_hat = self._model["decoder_l"](h)
-        y_hat = self._model["decoder_y"](h)
+        L_hat = self._model["decoder_L"](h)
+        D_hat = self._model["decoder_D"](h)
         g = self._model["decoder_g"](h)
 
-        return d, std_d, l_hat, y_hat, g
+        return d, std_d, L_hat, D_hat, g
 
-    def _loss(self, X, l, start, end):
-        d, std_d, l_hat, y_hat, g = self._call(X)
+    def _loss(self, X, L, start, end):
+        d, std_d, L_hat, D_hat, g = self._call(X)
         kl = tf.reduce_sum(tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1))
-        rec_l = tf.reduce_sum((l - l_hat)**2)
-        rec_y = tf.reduce_sum(g**(-2) * (l - y_hat)**2 + tf.math.log(tf.abs(g**2)))
+        rec_L = tf.reduce_sum((L - L_hat)**2)
+        rec_D = tf.reduce_sum(g**(-2) * (L - D_hat)**2 + tf.math.log(tf.abs(g**2)))
 
-        return rec_l + self._alpha * kl + self._beta * rec_y
+        return rec_L + self._alpha * kl + self._beta * rec_D
 
     def _get_default_model(self):
 
@@ -298,20 +298,15 @@ class LIBLE(BaseAdam, BaseDeepLE):
                                       keras.layers.Dense(self._n_hidden, activation='tanh'),
                                       keras.layers.Dense(1, activation='sigmoid')])
         
-        decoder_l = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+        decoder_L = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
                                       keras.layers.Dense(self._n_hidden, activation='tanh'),
                                       keras.layers.Dense(self._n_outputs, activation=None)])
         
-        decoder_y = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
+        decoder_D = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
                                       keras.layers.Dense(self._n_hidden, activation='tanh'),
                                       keras.layers.Dense(self._n_outputs, activation=None)])
 
-        return {"encoder": encoder, "decoder_g": decoder_g, "decoder_l": decoder_l, "decoder_y": decoder_y}
-
-    def fit(self, X, l, alpha=1e-3, beta=1e-3, **kwargs):
-        self._alpha = alpha
-        self._beta = beta
-        return super().fit(X, l, **kwargs)
+        return {"encoder": encoder, "decoder_g": decoder_g, "decoder_L": decoder_L, "decoder_D": decoder_D}
 
     def transform(self):
         return keras.activations.softmax(self._call(self._X, transform=True)).numpy()

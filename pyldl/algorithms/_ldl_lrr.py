@@ -15,32 +15,32 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
     :term:`BFGS` is used as the optimization algorithm.
     """
 
+    def __init__(self, alpha=1e-2, beta=0., **kwargs):
+        super().__init__(**kwargs)
+        self._alpha = alpha
+        self._beta = beta
+
     @staticmethod
     @tf.function
-    def ranking_loss(y_pred, P, W):
-        Phat = tf.math.sigmoid(y_pred[:, :, None] - y_pred[:, None, :])
-        l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - Phat, EPS, 1.)) +\
-              P * tf.math.log(tf.clip_by_value(Phat, EPS, 1.))) * W
+    def ranking_loss(D_pred, P, W):
+        P_hat = tf.math.sigmoid(D_pred[:, :, None] - D_pred[:, None, :])
+        l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - P_hat, EPS, 1.)) +\
+              P * tf.math.log(tf.clip_by_value(P_hat, EPS, 1.))) * W
         return -tf.reduce_sum(l)
 
     @staticmethod
     @tf.function
-    def preprocessing(y):
-        diff = y[:, :, None] - y[:, None, :]
+    def preprocessing(D):
+        diff = D[:, :, None] - D[:, None, :]
         return tf.where(diff > .5, 1., 0.), tf.square(diff)
 
     @tf.function
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
-        y_pred = keras.activations.softmax(self._X @ theta)
-        kld = tf.math.reduce_mean(keras.losses.kl_divergence(self._y, y_pred))
-        rnk = self.ranking_loss(y_pred, self._P, self._W) / (2 * self._X.shape[0])
+        D_pred = keras.activations.softmax(self._X @ theta)
+        kld = tf.math.reduce_mean(keras.losses.kl_divergence(self._D, D_pred))
+        rnk = self.ranking_loss(D_pred, self._P, self._W) / (2 * self._n_samples)
         return kld + self._alpha * rnk + self._beta * self._l2_reg(theta)
 
     def _before_train(self):
-        self._P, self._W = self.preprocessing(self._y)
-
-    def fit(self, X, y, alpha=1e-2, beta=0., **kwargs):
-        self._alpha = alpha
-        self._beta = beta
-        return super().fit(X, y, **kwargs)
+        self._P, self._W = self.preprocessing(self._D)

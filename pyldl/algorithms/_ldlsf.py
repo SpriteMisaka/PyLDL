@@ -11,6 +11,12 @@ class LDLSF(BaseADMM, BaseLDL):
     :term:`ADMM` is used as optimization algorithm.
     """
 
+    def __init__(self, alpha=1e-4, beta=1e-2, gamma=1e-3, random_state=None):
+        super().__init__(random_state)
+        self._alpha = alpha
+        self._beta = beta
+        self._gamma = gamma
+
     def _update_W(self):
 
         def _obj_func(w):
@@ -21,7 +27,7 @@ class LDLSF(BaseADMM, BaseLDL):
             W12 = self._W - self._W1 - self._W2
 
             def _W_loss():
-                fro = np.linalg.norm(XW - self._y, 'fro') ** 2 / 2.
+                fro = np.linalg.norm(XW - self._D, 'fro') ** 2 / 2.
                 con1 = np.linalg.norm(W12, 'fro') ** 2
                 con2 = np.linalg.norm(s) ** 2
                 con = self._rho * (con1 + con2) / 2.
@@ -32,7 +38,7 @@ class LDLSF(BaseADMM, BaseLDL):
                 return fro + con + inn + self._gamma * tr
 
             def _W_grad():
-                grad = self._X.T @ (XW - self._y)
+                grad = self._X.T @ (XW - self._D)
                 grad += self._V
                 grad += self._rho * (W12)
                 grad += self._X.T @ self._V2 @ lT
@@ -57,8 +63,8 @@ class LDLSF(BaseADMM, BaseLDL):
     def _before_train(self):
         self._W1 = .5 * np.eye(self._n_features, self._n_outputs)
         self._W2 = .5 * np.eye(self._n_features, self._n_outputs)
-        self._V2 = np.zeros((self._X.shape[0], 1))
-        R = np.corrcoef(self._y, rowvar=False)
+        self._V2 = np.zeros((self._n_samples, 1))
+        R = np.corrcoef(self._D, rowvar=False)
         P = np.diag(R @ np.ones((self._n_outputs, )))
         self._PR = P - R
 
@@ -71,7 +77,7 @@ class LDLSF(BaseADMM, BaseLDL):
     def constraint(self):
         XW = self._X @ self._W
         return [[self._W1 + self._W2, self._W],
-                [np.ones((self._X.shape[0], 1)), XW @ np.ones((self._n_outputs, 1))]]
+                [np.ones((self._n_samples, 1)), XW @ np.ones((self._n_outputs, 1))]]
 
     @property
     def params(self):
@@ -81,8 +87,5 @@ class LDLSF(BaseADMM, BaseLDL):
     def Vs(self):
         return [self._V, self._V2]
 
-    def fit(self, X, y, alpha=1e-4, beta=1e-2, gamma=1e-3, rho=1e-3, **kwargs):
-        self._alpha = alpha
-        self._beta = beta
-        self._gamma = gamma
-        return super().fit(X, y, rho=rho, **kwargs)
+    def fit(self, X, D, rho=1e-3, **kwargs):
+        return super().fit(X, D, rho=rho, **kwargs)

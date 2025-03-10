@@ -75,14 +75,14 @@ from pyldl.metrics import score
 from sklearn.model_selection import train_test_split
 
 dataset_name = 'SJAFFE'
-X, y = load_dataset(dataset_name)
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+X, D = load_dataset(dataset_name)
+X_train, X_test, D_train, D_test = train_test_split(X, D)
 
 model = SA_BFGS()
-model.fit(X_train, y_train)
+model.fit(X_train, D_train)
 
-y_pred = model.predict(X_test)
-print(score(y_test, y_pred))
+D_pred = model.predict(X_test)
+print(score(D_test, D_pred))
 ```
 
 For those who would like to use the original implementation:

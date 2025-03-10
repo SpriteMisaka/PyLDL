@@ -5,8 +5,6 @@ import numpy as np
 import keras
 import tensorflow as tf
 
-from keras import backend as K
-
 
 EPS = np.finfo(np.float64).eps
 
@@ -14,35 +12,35 @@ DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", 
 
 
 def _clip(func):
-    def _wrapper(y, y_pred):
-        y = np.clip(y, EPS, 1)
-        y_pred = np.clip(y_pred, EPS, 1)
-        return func(y, y_pred)
+    def _wrapper(D, D_pred, **kwargs):
+        D = np.clip(D, EPS, 1)
+        D_pred = np.clip(D_pred, EPS, 1)
+        return func(D, D_pred, **kwargs)
     return _wrapper
 
 
 def _reduction(func):
-    def _wrapper(*args, reduction=np.average):
-        results = func(*args)
+    def _wrapper(*args, reduction=np.average, **kwargs):
+        results = func(*args, **kwargs)
         return reduction(results) if reduction is not None else results
     return _wrapper
 
 
 @_reduction
 @_clip
-def kl_divergence(y, y_pred):
-    return np.sum(y * (np.log(y) - np.log(y_pred)), 1)
+def kl_divergence(D, D_pred):
+    return np.sum(D * (np.log(D) - np.log(D_pred)), 1)
 
 
 @_reduction
-def sort_loss(y, y_pred):
-    i = np.argsort(-y)
-    h = y_pred[np.arange(y_pred.shape[0])[:, np.newaxis], i]
+def sort_loss(D, D_pred):
+    i = np.argsort(-D)
+    h = D_pred[np.arange(D_pred.shape[0])[:, np.newaxis], i]
     res = 0.
-    for j in range(y.shape[1] - 1):
-        for k in range(j + 1, y.shape[1]):
+    for j in range(D.shape[1] - 1):
+        for k in range(j + 1, D.shape[1]):
             res += np.maximum(h[:, k] - h[:, j], 0.) / np.log2(j + 2)
-    res /= np.sum([1. / np.log2(j + 2) for j in range(y.shape[1] - 1)])
+    res /= np.sum([1. / np.log2(j + 2) for j in range(D.shape[1] - 1)])
     return res
 
 
@@ -111,26 +109,26 @@ def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
     return np.where(norms > tau, ((norms - tau) / norms) * A, 0.)
 
 
-def proj(Y: np.ndarray) -> np.ndarray:
+def proj(D: np.ndarray) -> np.ndarray:
     """This approach is proposed in paper :cite:`2016:condat`.
 
-    :param Y: Matrix :math:`\\boldsymbol{Y}`.
-    :type Y: np.ndarray
+    :param D: Matrix :math:`\\boldsymbol{D}`.
+    :type D: np.ndarray
     :return: The projection onto the probability simplex.
     :rtype: np.ndarray
     """
-    X = -np.sort(-Y, axis=1)
-    Xtmp = (np.cumsum(X, axis=1) - 1) / np.arange(1, Y.shape[1] + 1)
+    X = -np.sort(-D, axis=1)
+    Xtmp = (np.cumsum(X, axis=1) - 1) / np.arange(1, D.shape[1] + 1)
     rho = np.sum(X > Xtmp, axis=1) - 1
-    theta = Xtmp[np.arange(Y.shape[0]), rho]
-    return np.maximum(Y - theta[:, np.newaxis], 0)
+    theta = Xtmp[np.arange(D.shape[0]), rho]
+    return np.maximum(D - theta[:, np.newaxis], 0)
 
 
-def binaryzation(y: np.ndarray, method='threshold', param: any = None) -> np.ndarray:
+def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.ndarray:
     """Transform label distribution matrix to logical label matrix.
 
-    :param y: Label distribution matrix (shape: :math:`[n,\\, l]`).
-    :type y: np.ndarray
+    :param D: Label distribution matrix (shape: :math:`[n,\\, l]`).
+    :type D: np.ndarray
     :param method: Type of binaryzation method, defaults to 'threshold'. The options are 'threshold' and 'topk', which can refer to:
 
         .. bibliography:: ldl_references.bib
@@ -146,7 +144,7 @@ def binaryzation(y: np.ndarray, method='threshold', param: any = None) -> np.nda
     :return: Logical label matrix (shape: :math:`[n,\\, l]`).
     :rtype: np.ndarray
     """
-    r = np.argsort(np.argsort(y))
+    r = np.argsort(np.argsort(D))
 
     if method == 'threshold':
         if param is None:
@@ -154,18 +152,18 @@ def binaryzation(y: np.ndarray, method='threshold', param: any = None) -> np.nda
         elif not isinstance(param, float) or param < 0. or param >= 1.:
             raise ValueError("Invalid param, when method is 'threshold', "
                              "param should be a float in the range [0, 1).")
-        b = np.sort(y.T, axis=0)[::-1]
+        b = np.sort(D.T, axis=0)[::-1]
         cs = np.cumsum(b, axis=0)
         m = np.argmax(cs >= param, axis=0)
-        return np.where(r >= y.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
+        return np.where(r >= D.shape[1] - m.reshape(-1, 1) - 1, 1, 0)
 
     elif method == 'topk':
         if param is None:
-            param = y.shape[1] // 2
-        elif not isinstance(param, int) or param < 1 or param >= y.shape[1]:
+            param = D.shape[1] // 2
+        elif not isinstance(param, int) or param < 1 or param >= D.shape[1]:
             raise ValueError("Invalid param, when method is 'topk', "
                              "param should be an integer in the range [1, number_of_labels).")
-        return np.where(r >= y.shape[1] - param, 1, 0)
+        return np.where(r >= D.shape[1] - param, 1, 0)
 
     else:
         raise ValueError("Invalid method, which should be 'threshold' or 'topk'.")
@@ -194,61 +192,52 @@ def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
 class RProp(keras.optimizers.Optimizer):
 
     def __init__(self, init_alpha=1e-3, scale_up=1.2, scale_down=0.5, min_alpha=1e-6, max_alpha=50., **kwargs):
-        super(RProp, self).__init__(name='rprop', **kwargs)
-        self.init_alpha = K.variable(init_alpha, name='init_alpha')
-        self.scale_up = K.variable(scale_up, name='scale_up')
-        self.scale_down = K.variable(scale_down, name='scale_down')
-        self.min_alpha = K.variable(min_alpha, name='min_alpha')
-        self.max_alpha = K.variable(max_alpha, name='max_alpha')
+        super(RProp, self).__init__(name='rprop', learning_rate=init_alpha, **kwargs)
+        self._init_alpha = init_alpha
+        self._scale_up = scale_up
+        self._scale_down = scale_down
+        self._min_alpha = min_alpha
+        self._max_alpha = max_alpha
 
-    def apply_gradients(self, grads_and_vars):
-        grads, trainable_variables = zip(*grads_and_vars)
-        self.get_updates(trainable_variables, grads)
+    def build(self, variables):
+        if self.built:
+            return
+        super().build(variables)
+        shapes = [tf.shape(p) for p in variables]
+        self._alphas = [tf.Variable(tf.ones(shape) * self._init_alpha) for shape in shapes]
+        self._old_grads = [tf.Variable(tf.zeros(shape)) for shape in shapes]
+        self._prev_weight_deltas = [tf.Variable(tf.zeros(shape)) for shape in shapes]
 
-    def get_updates(self, params, gradients):
-        grads = gradients
-        shapes = [K.int_shape(p) for p in params]
-        alphas = [K.variable(np.ones(shape) * self.init_alpha) for shape in shapes]
-        old_grads = [K.zeros(shape) for shape in shapes]
-        prev_weight_deltas = [K.zeros(shape) for shape in shapes]
-        self.updates = []
+    def update_step(self, gradient, variable, _):
+        idx = self._get_variable_index(variable)
+        alpha = self._alphas[idx]
+        old_grad = self._old_grads[idx]
+        prev_weight_delta = self._prev_weight_deltas[idx]
 
-        for param, grad, old_grad, prev_weight_delta, alpha in zip(params, grads,
-                                                                   old_grads, prev_weight_deltas,
-                                                                   alphas):
+        new_alpha = tf.where(
+            tf.greater(gradient * old_grad, 0),
+            tf.minimum(alpha * self._scale_up, self._max_alpha),
+            tf.where(tf.less(gradient * old_grad, 0), tf.maximum(alpha * self._scale_down, self._min_alpha), alpha)
+        )
 
-            new_alpha = K.switch(
-                K.greater(grad * old_grad, 0),
-                K.minimum(alpha * self.scale_up, self.max_alpha),
-                K.switch(K.less(grad * old_grad, 0), K.maximum(alpha * self.scale_down, self.min_alpha), alpha)
-            )
+        new_delta = tf.where(tf.greater(gradient, 0), -new_alpha,
+                             tf.where(tf.less(gradient, 0), new_alpha, tf.zeros_like(new_alpha)))
 
-            new_delta = K.switch(K.greater(grad, 0),
-                                 -new_alpha,
-                                 K.switch(K.less(grad, 0),
-                                          new_alpha,
-                                          K.zeros_like(new_alpha)))
+        weight_delta = tf.where(tf.less(gradient*old_grad, 0), -prev_weight_delta, new_delta)
+        gradient = tf.where(tf.less(gradient * old_grad, 0), tf.zeros_like(gradient), gradient)
 
-            weight_delta = K.switch(K.less(grad*old_grad, 0), -prev_weight_delta, new_delta)
-
-            new_param = param + weight_delta
-
-            grad = K.switch(K.less(grad*old_grad, 0), K.zeros_like(grad), grad)
-
-            self.updates.append(K.update(param, new_param))
-            self.updates.append(K.update(alpha, new_alpha))
-            self.updates.append(K.update(old_grad, grad))
-            self.updates.append(K.update(prev_weight_delta, weight_delta))
-
-        return self.updates
+        self.assign(variable, variable + weight_delta)
+        alpha.assign(new_alpha)
+        old_grad.assign(gradient)
+        prev_weight_delta.assign(weight_delta)
 
     def get_config(self):
         config = {
-            'init_alpha': float(K.get_value(self.init_alpha)),
-            'scale_up': float(K.get_value(self.scale_up)),
-            'scale_down': float(K.get_value(self.scale_down)),
-            'min_alpha': float(K.get_value(self.min_alpha)),
-            'max_alpha': float(K.get_value(self.max_alpha)),
+            'init_alpha': self._init_alpha,
+            'scale_up': self._scale_up,
+            'scale_down': self._scale_down,
+            'min_alpha': self._min_alpha,
+            'max_alpha': self._max_alpha,
         }
         base_config = super(RProp, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))

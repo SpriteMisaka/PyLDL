@@ -47,12 +47,14 @@ class LDLEarlyStopping(keras.callbacks.Callback):
             self._best_weights = self.model.get_weights()
         else:
             self._wait += 1
-            if self._wait >= self._patience:
+            if self._patience is not None and self._wait >= self._patience:
                 self._stopped_epoch = epoch
                 self.model.stop_training = True
                 self.model.set_weights(self._best_weights)
 
     def on_train_end(self, logs=None):
+        if self._patience is None:
+            self.model.set_weights(self._best_weights)
         if self.model._verbose != 0 and self._stopped_epoch > 0:
             tf.print(f"Epoch {self._stopped_epoch}: early stopping (best {self._monitor}: {self._best}).")
 
@@ -61,57 +63,59 @@ def load_dataset(name, dir='dataset'):
     if not os.path.exists(dir):
         logging.info(f'Directory {dir} does not exist, creating it.')
         os.makedirs(dir)
-    dataset_path = os.path.join(dir, name+'.mat')
+    dataset_path = os.path.join(dir, f'{name}.mat')
     if not os.path.exists(dataset_path):
         logging.info(f'Dataset {name}.mat does not exist, downloading it now, please wait...')
-        url = f'https://raw.githubusercontent.com/SpriteMisaka/PyLDL/main/dataset/{name}.mat'
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(dataset_path, 'wb') as f:
-                f.write(response.content)
-            logging.info(f'Dataset {name}.mat downloaded successfully.')
-        else:
-            raise ValueError(f'Failed to download {name}.mat')
+        download_dataset(name, dataset_path)
     data = sio.loadmat(dataset_path)
     return data['features'], data['labels']
 
 
-def random_missing(y, missing_rate=.9, weighted=False):
+def download_dataset(name, dataset_path):
+    url = f'https://raw.githubusercontent.com/SpriteMisaka/PyLDL/main/dataset/{name}.mat'
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise ValueError(f'Failed to download {name}.mat')
+    with open(dataset_path, 'wb') as f:
+        f.write(response.content)
+    logging.info(f'Dataset {name}.mat downloaded successfully.')
+
+
+def random_missing(D, missing_rate=.9, weighted=False):
     if missing_rate <= 0. or missing_rate >= 1.:
         raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
     if weighted:
-        p = 1 - y
-        p /= np.sum(p)
-        size = int(y.size * missing_rate)
-        select = np.random.choice(y.size, size=size, replace=False, p=p.flatten())
-        missing_mask = np.zeros_like(y, dtype=bool)
+        missing_mask = np.zeros_like(D, dtype=bool)
+        p = 1 - D
+        p /= np.sum(p).flatten()
+        select = np.random.choice(D.size, size=int(D.size * missing_rate), replace=False, p=p)
         missing_mask.flat[select] = True
     else:
-        missing_mask = np.random.rand(*y.shape) < missing_rate
-    missing_y = y.copy()
-    missing_y[missing_mask] = np.nan
-    missing_y[np.isnan(missing_y)] = 0.
-    return missing_y, missing_mask
+        missing_mask = np.random.rand(*D.shape) < missing_rate
+    missing_D = D.copy()
+    missing_D[missing_mask] = np.nan
+    missing_D[np.isnan(missing_D)] = 0.
+    return missing_D, missing_mask
 
 
 sys.modules['pyldl.utils.proj'] = proj
 sys.modules['pyldl.utils.binaryzation'] = binaryzation
 
 
-def emphasize(y, rate=.5, **kwargs):
+def emphasize(D, rate=.5, **kwargs):
     from scipy.special import softmax
-    emphasized_y = y.copy()
-    l = binaryzation(y, **kwargs)
-    indices = np.random.choice(y.shape[0], size=int(y.shape[0] * rate), replace=False)
+    emphasized_D = D.copy()
+    L = binaryzation(D, **kwargs)
+    indices = np.random.choice(D.shape[0], size=int(D.shape[0] * rate), replace=False)
     for i in indices:
-        n_pos = int(np.ceil(l[i].sum() / 2))
-        where = np.where(l[i] == 1)[0]
-        l[i] = 0
+        n_pos = int(np.ceil(L[i].sum() / 2))
+        where = np.where(L[i] == 1)[0]
+        L[i] = 0
         select = np.random.choice(where.size, size=n_pos, replace=False)
-        l[i, where[select]] = 1
-        emphasized_y[i] += l[i]
-        emphasized_y[i] = softmax(emphasized_y[i])
-    return emphasized_y
+        L[i, where[select]] = 1
+        emphasized_D[i] += L[i]
+        emphasized_D[i] = softmax(emphasized_D[i])
+    return emphasized_D
 
 
 def artificial(X, a=1., b=.5, c=.2, d=1.,
@@ -123,14 +127,14 @@ def artificial(X, a=1., b=.5, c=.2, d=1.,
     psi1 = np.matmul(t, w1.T)**2
     psi2 = (np.matmul(t, w2.T) + lambda1 * psi1)**2
     psi3 = (np.matmul(t, w3.T) + lambda2 * psi2)**2
-    y = np.concatenate([psi1, psi2, psi3], axis=1)
-    return y / np.sum(y, axis=1).reshape(-1, 1)
+    D = np.concatenate([psi1, psi2, psi3], axis=1)
+    return D / np.sum(D, axis=1).reshape(-1, 1)
 
 
 def make_ldl(n_samples=200, **kwargs):
     X = np.random.uniform(-1, 1, (n_samples, 3))
-    y = artificial(X, **kwargs)
-    return X, y
+    D = artificial(X, **kwargs)
+    return X, D
 
 
 def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
@@ -148,16 +152,16 @@ def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
     X = np.concatenate([bb, cc], axis=1)
 
     if isinstance(model, BaseLDL):
-        X_train, y_train = make_ldl()
-        model.fit(X_train, y_train)
-        y = model.predict(X)
+        X_train, D_train = make_ldl()
+        model.fit(X_train, D_train)
+        D = model.predict(X)
     else:
-        y = artificial(X, **kwargs)
+        D = artificial(X, **kwargs)
         if isinstance(model, BaseLE):
-            l = binaryzation(y)
-            y = model.fit_transform(X, l)
+            l = binaryzation(D)
+            D = model.fit_transform(X, l)
 
-    c = MinMaxScaler(feature_range=(1e-7, 1-1e-7)).fit_transform(y)
+    c = MinMaxScaler(feature_range=(1e-7, 1-1e-7)).fit_transform(D)
     colors = c.reshape(n_samples, n_samples, 3)
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
@@ -173,11 +177,10 @@ def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
     ax.yaxis.set_pane_color((1., 1., 1., 1.))
     ax.zaxis.set_pane_color((1., 1., 1., 1.))
     ax.plot_surface(a1, a2, a3, facecolors=colors)
-    
-    if file_name is not None:
-        if isinstance(file_name, str):
-            fig.savefig(f'{file_name}.pdf', bbox_inches='tight')
-        else:
-            raise ValueError("Invalid file name, which should be a string.")
-    else:
+
+    if file_name is None:
         plt.show()
+    elif isinstance(file_name, str):
+        fig.savefig(f'{file_name}.pdf', bbox_inches='tight')
+    else:
+        raise ValueError("Invalid file name, which should be a string.")

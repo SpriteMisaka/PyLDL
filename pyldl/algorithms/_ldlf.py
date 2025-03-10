@@ -67,20 +67,20 @@ class LDLF(BaseAdam, BaseDeepLDL):
         ) for _ in range(self._n_estimators)]
 
     @tf.function
-    def _loss(self, X, y, start=None, end=None):
+    def _loss(self, X, D, start=None, end=None):
         loss = 0.
         for i in range(self._n_estimators):
             _mu = self._call(X, i)
             _prob = tf.matmul(_mu, self._pi[i])
 
-            loss += tf.math.reduce_mean(keras.losses.kl_divergence(y, _prob))
+            loss += tf.math.reduce_mean(keras.losses.kl_divergence(D, _prob))
 
-            _y = tf.expand_dims(y, axis=1)
+            _D = tf.expand_dims(D, axis=1)
             _pi = tf.expand_dims(self._pi[i], axis=0)
             _mu = tf.expand_dims(_mu, axis=2)
             _prob = tf.clip_by_value(
-                tf.expand_dims(_prob, axis=1), clip_value_min=1e-6, clip_value_max=1.0)
-            _new_pi = tf.multiply(tf.multiply(_y, _pi), _mu) / _prob
+                tf.expand_dims(_prob, axis=1), clip_value_min=1e-7, clip_value_max=1.)
+            _new_pi = tf.multiply(tf.multiply(_D, _pi), _mu) / _prob
             _new_pi = tf.reduce_sum(_new_pi, axis=0)
             _new_pi = keras.activations.softmax(_new_pi)
             self._pi[i].assign(_new_pi)

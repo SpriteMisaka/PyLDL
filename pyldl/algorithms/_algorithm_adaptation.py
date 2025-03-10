@@ -13,14 +13,14 @@ class AA_KNN(BaseLDL):
     """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
     """
 
-    def fit(self, X, y, k=5):
-        super().fit(X, y)
+    def fit(self, X, D, k=5):
+        super().fit(X, D)
         self._model = NearestNeighbors(n_neighbors=k).fit(self._X)
         return self
 
     def predict(self, X):
         _, inds = self._model.kneighbors(X)
-        return np.average(self._y[inds], axis=1)
+        return np.average(self._D[inds], axis=1)
 
 
 class AA_BP(BaseGD, BaseDeepLDL):
@@ -51,21 +51,18 @@ class CPNN(BaseGD, BaseDeepLDL):
     """:class:`CPNN <pyldl.algorithms.CPNN>` is proposed in paper :cite:`2013:geng`.
     """
 
-    def _not_proper_mode(self):
-        raise ValueError("The argument 'mode' can only be 'none', 'binary' or 'augment'.")
-
     def __init__(self, mode='none', v=5, n_hidden=64, n_latent=None, random_state=None):
         super().__init__(n_hidden, n_latent, random_state)
-        if mode == 'none' or mode == 'binary' or mode == 'augment':
+        if mode in ['none', 'binary', 'augment']:
             self._mode = mode
         else:
-            self._not_proper_mode()
+            raise ValueError("The argument 'mode' can only be 'none', 'binary' or 'augment'.")
         self._v = v
 
     @staticmethod
     @tf.function
-    def loss_function(y, y_pred):
-        return tf.math.reduce_mean(keras.losses.kl_divergence(y, y_pred))
+    def loss_function(D, D_pred):
+        return tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
 
     def _get_default_model(self):
         input_shape = (self._n_features + (1 if self._mode == 'none' else self._n_outputs),)
@@ -78,13 +75,13 @@ class CPNN(BaseGD, BaseDeepLDL):
 
     def _before_train(self):
         if self._mode == 'augment':
-            n = self._X.shape[0]
-            one_hot = tf.one_hot(tf.math.argmax(self._y, axis=1), self.n_outputs)
+            n = self._n_samples
+            one_hot = tf.one_hot(tf.math.argmax(self._D, axis=1), self.n_outputs)
             self._X = tf.repeat(self._X, self._v, axis=0)
-            self._y = tf.repeat(self._y, self._v, axis=0)
+            self._D = tf.repeat(self._D, self._v, axis=0)
             one_hot = tf.repeat(one_hot, self._v, axis=0)
             v = tf.reshape(tf.tile([1 / (i + 1) for i in range(self._v)], [n]), (-1, 1))
-            self._y += self._y * one_hot * v
+            self._D += self._D * one_hot * v
 
     def _make_inputs(self, X):
         temp = tf.reshape(tf.tile([i + 1 for i in range(self._n_outputs)], [X.shape[0]]), (-1, 1))
@@ -98,8 +95,7 @@ class CPNN(BaseGD, BaseDeepLDL):
         inputs = self._make_inputs(X)
         outputs = self._model(inputs)
         results = tf.reshape(outputs, (X.shape[0], self._n_outputs))
-        b = tf.reshape(-tf.math.log(tf.math.reduce_sum(tf.math.exp(results), axis=1)), (-1, 1))
-        return tf.math.exp(b + results)
+        return tf.math.exp(results - tf.math.reduce_logsumexp(results, axis=1, keepdims=True))
 
 
 class BCPNN(CPNN):

@@ -26,14 +26,14 @@ from pyldl.utils import load_dataset
 from pyldl.algorithms.base import BaseGD, BaseDeepLDLClassifier
 
 
-jaffe_index = np.delete(np.arange(1, 220), np.array([8, 12, 21, 76, 108, 183]) - 1)
+JAFFE_INDEX = np.delete(np.arange(1, 220), np.array([8, 12, 21, 76, 108, 183]) - 1)
 
 
 def load_jaffe_single(path, i, size=(256, 256)):
-    index = jaffe_index[i]
+    index = JAFFE_INDEX[i]
     image_path = os.path.join(path, f'*.{index}.tiff')
     files = glob.glob(image_path)
-    if len(files) == 0:
+    if not files:
         raise ValueError(f'No image found for index {index} in {path}')
     image = keras.preprocessing.image.load_img(files[0])
     image = tf.image.resize(image, size)
@@ -56,7 +56,7 @@ def load_bu_3dfe(path, size=(256, 256)):
     names = [f"F{i:04d}" for i in range(1, 57)] + [f"M{i:04d}" for i in range(1, 45)]
     for name in names:
         if not os.path.exists(os.path.join(path, name)):
-            with rarfile.RarFile(os.path.join(path, name + '.rar')) as file:
+            with rarfile.RarFile(os.path.join(path, f'{name}.rar')) as file:
                 for i in file.namelist():
                     if i.endswith('_F2D.bmp'):
                         file.extract(i, path)
@@ -112,7 +112,7 @@ def load_ck_plus(image_dir, feature_dir=None, size=(196, 256), basic=True):
                 if feature_dir is not None:
                     with open(os.path.join(feature_dir, file.replace('.png', '.csv')), 'r') as f:
                         my_reader = csv.reader(f, delimiter=',')
-                        features = [i for i in my_reader][1]
+                        features = list(my_reader)[1]
                         fps.append([float(i) for i in features[2:138]])
                         aus.append([float(i) for i in features[138:]])
 
@@ -124,13 +124,14 @@ def load_ck_plus(image_dir, feature_dir=None, size=(196, 256), basic=True):
         return images, labels
 
 
-def visualization(image, distribution, real, style_real='distribution',
-                  labels=['HA', 'SA', 'SU', 'AN', 'DI', 'FE']):
+def visualization(image, distribution, real, style_real='distribution', labels=None):
+    if labels is None:
+        labels = ['HA', 'SA', 'SU', 'AN', 'DI', 'FE']
     _, ax = plt.subplots(1, 2, figsize=(6, 3))
     ax[0].axis('off')
     ax[0].imshow(image / 255.)
 
-    label_range = np.array([i for i in range(len(labels))])
+    label_range = np.array(list(range(len(labels))))
     x = np.linspace(0, len(labels)-1, 100)
     inter_model = interp1d(label_range, distribution, kind='cubic')
     y = inter_model(x)
@@ -153,7 +154,16 @@ def visualization(image, distribution, real, style_real='distribution',
     plt.show()
 
 
-class LDL_ALSG(BaseGD, BaseDeepLDLClassifier):
+class BaseFacialEmotionRecognition(BaseDeepLDLClassifier):
+
+    def score(self, X, D, metrics=None, return_dict=False):
+        if metrics is None:
+            metrics = ['accuracy']
+        from pyldl.metrics import score
+        return score(np.argmax(D, axis=1), np.argmax(self.predict_proba(X), axis=1), metrics, return_dict)
+
+
+class LDL_ALSG(BaseGD, BaseFacialEmotionRecognition):
     """:class:`LDL-ALSG <pyldl.algorithms.facial_emotion_recognition.LDL_ALSG>` is proposed in :cite:`2020:chen`.
     """
 
@@ -167,47 +177,44 @@ class LDL_ALSG(BaseGD, BaseDeepLDLClassifier):
 
     def _generate_graphs(self, features, sigma):
         graphs = []
-        for i in range(int(np.ceil(self._X.shape[0] / self._batch_size))):
+        for i in range(int(np.ceil(self._n_samples / self._batch_size))):
             start = i * self._batch_size
-            end = min(start + self._batch_size, self._X.shape[0])
+            end = min(start + self._batch_size, self._n_samples)
             graph = kneighbors_graph(features[start:end], n_neighbors=5, include_self=False)
             a = np.exp(-(cdist(
-                self._y[start:end], self._y[start:end]
+                self._D[start:end], self._D[start:end]
             ) ** 2) / (2 * sigma ** 2))
             graph = a * graph.toarray()
             graphs.append(graph)
         return graphs
 
     def _before_train(self):
-        if self._batch_size is None:
-            self._batch_size = self._X.shape[0]
-
         self._fp_graphs = self._generate_graphs(self._fps, self._fp_sigma)
         self._au_graphs = self._generate_graphs(self._aus, self._au_sigma)
 
     @staticmethod
-    def loss_function(y, y_pred):
-        return tf.reduce_sum(keras.losses.categorical_crossentropy(y, y_pred))
+    def loss_function(L, D_pred):
+        return tf.reduce_sum(keras.losses.categorical_crossentropy(L, D_pred))
 
-    def _aux_loss(self, graph, y_pred):
+    def _aux_loss(self, graph, D_pred):
         indices = tf.where(graph > 0.)
-        return tf.reduce_sum(keras.losses.kl_divergence(tf.gather(y_pred, indices[:, 0]),
-                                                        tf.gather(y_pred, indices[:, 1])))
+        return tf.reduce_sum(keras.losses.kl_divergence(tf.gather(D_pred, indices[:, 0]),
+                                                        tf.gather(D_pred, indices[:, 1])))
 
-    def _loss(self, X, y, start, end):
-        y_pred = self._call(X)
-        ce = self.loss_function(y, y_pred)
+    def _loss(self, X, L, start, _):
+        D_pred = self._call(X)
+        ce = self.loss_function(L, D_pred)
         i = start // self._batch_size
-        fp = self._aux_loss(self._fp_graphs[i], y_pred)
-        au = self._aux_loss(self._au_graphs[i], y_pred)
+        fp = self._aux_loss(self._fp_graphs[i], D_pred)
+        au = self._aux_loss(self._au_graphs[i], D_pred)
         return ce + self._alpha * (fp + au)
 
-    def fit(self, X, y, fps, aus, alpha=5e-4,
-            fp_sigma=68., au_sigma=1., batch_size=None, **kwargs):
+    def fit(self, X, L, fps, aus, alpha=5e-4,
+            fp_sigma=68., au_sigma=1., batch_size=None, L_val=None, **kwargs):
         self._fps = tf.cast(fps, tf.float32)
         self._aus = tf.cast(aus, tf.float32)
         self._alpha = alpha
         self._fp_sigma = fp_sigma
         self._au_sigma = au_sigma
         self._batch_size = batch_size
-        return super().fit(X, y, batch_size=self._batch_size, **kwargs)
+        return super().fit(X, L, batch_size=self._batch_size, D_val=L_val, **kwargs)

@@ -36,13 +36,13 @@ class BaseMatlabLDL(BaseLDL):
         super().__init__(random_state)
         self._info_python, self._info_matlab = info_python, info_matlab
         exec(f"self._{self._info_python} = None")
-    
-    def fit(self, X, y):
-        super().fit(X, y)
+
+    def fit(self, X, D):
+        super().fit(X, D)
 
         with BaseMatlabLDL.MatlabLDLExec():
             _set_arr('features', X)
-            _set_arr('labels', y)
+            _set_arr('labels', D)
             with io.StringIO() as target:
                 exec(f"eng.{self.__class__.__name__}_fit(nargout=0, stdout=target)")
             if self._info_matlab == 'weights':
@@ -80,14 +80,14 @@ class AA_KNN(BaseMatlabLDL):
 
     def __init__(self, random_state=None):
         BaseLDL.__init__(self, random_state)
-    
-    def fit(self, X, y):
-        BaseLDL.fit(self, X, y)
+
+    def fit(self, X, D):
+        BaseLDL.fit(self, X, D)
 
     def predict(self, X):
         with BaseMatlabLDL.MatlabLDLExec():
             _set_arr('features', self._X)
-            _set_arr('labels', self._y)
+            _set_arr('labels', self._D)
             _set_arr('testFeatures', X)
             with io.StringIO() as target:
                 eng.AA_KNN(nargout=0, stdout=target)
@@ -96,6 +96,7 @@ class AA_KNN(BaseMatlabLDL):
 
 class AA_BP(BaseMatlabLDL):
 
+    @staticmethod
     def _get_weights(name):
         size = _get_arr(f"size(net.{name})")[0].astype(np.int32)
         weights = [None for _ in range(size[0] * size[1])]
@@ -104,6 +105,7 @@ class AA_BP(BaseMatlabLDL):
             weights[i] = matlab.double(w)
         return weights
 
+    @staticmethod
     def _set_weights(name, weights):
         eng.workspace[f'{name}'] = weights
 
@@ -133,13 +135,13 @@ class AA_BP(BaseMatlabLDL):
     def predict(self, X):
         with BaseMatlabLDL.MatlabLDLExec():
             _set_arr('features', self._X)
-            _set_arr('labels', self._y)
+            _set_arr('labels', self._D)
             _set_arr('testFeatures', X)
             self._load_net()
             with io.StringIO() as target:
                 eng.AA_BP_predict(nargout=0, stdout=target)
             return np.array(eng.workspace['preDistribution'])
-            
+
 
 class _PT(BaseMatlabLDL):
 

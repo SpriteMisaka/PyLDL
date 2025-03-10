@@ -48,13 +48,11 @@ def preprocessing(words, freqs, tokenizer=None, maxlen=None):
     X = tf.keras.preprocessing.sequence.pad_sequences(
         sequences, maxlen=maxlen, padding='post'
     )
-    y = np.array([row + [0] * (maxlen - len(row))
+    D = np.array([row + [0] * (maxlen - len(row))
                   if len(row) < maxlen else row[:maxlen]
                   for row in freqs], dtype=np.float32)
 
-    if new_tokenizer:
-        return X, y, tokenizer, maxlen
-    return X, y
+    return (X, D, tokenizer, maxlen) if new_tokenizer else (X, D)
 
 
 def visualization(words, y=None, threshold=.2, r=255, g=68, b=68):
@@ -92,7 +90,15 @@ def load_glove(path, tokenizer, embedding_dim=100):
     return embeddings_matrix
 
 
-class DL_BiLSTM(BaseAdam, BaseDeepLDL):
+class BaseEmphasisSelection(BaseDeepLDL):
+
+    def score(self, X, D, metrics=None, return_dict=False):
+        if metrics is None:
+            metrics = ['top_k', 'match_m', 'max_roc_auc']
+        return super().score(X, D, metrics, return_dict)
+
+
+class DL_BiLSTM(BaseAdam, BaseEmphasisSelection):
     """This approach is proposed in paper :cite:`2019:shirani`.
     """
 
@@ -102,15 +108,15 @@ class DL_BiLSTM(BaseAdam, BaseDeepLDL):
         self._tokenizer = tokenizer
 
     @staticmethod
-    def loss_function(y, y_pred):
-        return tf.reduce_sum(keras.losses.kl_divergence(y, y_pred))
+    def loss_function(D, D_pred):
+        return tf.reduce_sum(keras.losses.kl_divergence(D, D_pred))
 
     @tf.function
-    def _loss(self, X, y, start, end):
-        y_pred = self._call(X)
-        y_reshaped = tf.stack((y, 1-y), axis=2)
-        return self.loss_function(self._mask[start:end] * y_reshaped,
-                                  self._mask[start:end] * y_pred)
+    def _loss(self, X, D, start, end):
+        D_pred = self._call(X)
+        D_reshaped = tf.stack((D, 1-D), axis=2)
+        return self.loss_function(self._mask[start:end] * D_reshaped,
+                                  self._mask[start:end] * D_pred)
 
     def _create_mask(self, X):
         mask = tf.cast(tf.greater(X, 0), dtype=tf.float32)
