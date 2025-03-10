@@ -1,2 +1,2 @@
-demo/** linguist-vendored
+demo/** -linguist-vendored
 *.ipynb linguist-detectable
