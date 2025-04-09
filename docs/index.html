@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>PyLDL Documentation &#8212; PyLDL 0.0.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
     <script src="_static/documentation_options.js?v=47de8214"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="LDL" href="ldl.html" />
@@ -41,11 +41,9 @@
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#lrldl">LRLDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-lrr">LDL-LRR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-dpa">LDL-DPA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ldl.html#cad">CAD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ldl.html#qfd2">QFD2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ldl.html#cjs">CJS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#df-ldl">DF-LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-scl">LDL-SCL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#duo-ldl">Duo-LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-lclr">LDL-LCLR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldlsf">LDLSF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldllc">LDLLC</a></li>
@@ -53,11 +51,15 @@
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#acpnn">ACPNN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldlf">LDLF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#sa">SA</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ldl.html#aa-knn">AA-<span class="math notranslate nohighlight">\(k\)</span>NN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ldl.html#aa-bp">AA-BP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#aa">AA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#pt">PT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldsvr">LDSVR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#cpnn">CPNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#cad"><cite>cad</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#cjs"><cite>cjs</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#concentrated-loss"><cite>concentrated_loss</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#qfd2"><cite>qfd2</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#unimodal-loss"><cite>unimodal_loss</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#references">References</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#further-reading">Further Reading</a></li>
 </ul>
@@ -65,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="le.html">LE</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="le.html#basele"><cite>BaseLE</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="le.html#lible">LIBLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="le.html#conle">ConLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="le.html#levi">LEVI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="le.html#glle">GLLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="le.html#ml">ML</a></li>
@@ -93,9 +96,13 @@
 <li class="toctree-l1"><a class="reference internal" href="others.html">Others</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="others.html#oversampling">Oversampling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#transfer-learning">Transfer Learning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="others.html#predicting-from-ranking">Predicting from Ranking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="others.html#predicting-from-alts">Predicting from Alts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#inaccurate-noisy-labels">Inaccurate/Noisy Labels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#weakly-semi-supervision">Weakly/Semi-Supervision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="others.html#active-online-learning">Active/Online Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="others.html#feature-selection">Feature Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="others.html#joint-ldl-le">Joint LDL &amp; LE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="others.html#graph-ldl">Graph LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#population-level-ldl">Population-Level LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#more-derivative-tasks">More Derivative Tasks</a></li>
 </ul>
@@ -112,16 +119,20 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#reduction"><cite>_reduction</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#kl-divergence"><cite>kl_divergence</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#proj"><cite>proj</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#soft-thresholding"><cite>soft_thresholding</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#solvel21"><cite>solvel21</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#svt"><cite>svt</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#artificial"><cite>artificial</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#download-dataset"><cite>download_dataset</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#emphasize"><cite>emphasize</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-dataset"><cite>load_dataset</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#make-ldl"><cite>make_ldl</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#plot-artificial"><cite>plot_artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#random-missing"><cite>random_missing</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#accuracy"><cite>accuracy</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#canberra"><cite>canberra</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#chebyshev"><cite>chebyshev</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#clark"><cite>clark</cite></a></li>
@@ -132,11 +143,19 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#fidelity"><cite>fidelity</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#intersection"><cite>intersection</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#kendall"><cite>kendall</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#match-m"><cite>match_m</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#max-roc-auc"><cite>max_roc_auc</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#mean-absolute-error"><cite>mean_absolute_error</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#mean-squared-error"><cite>mean_squared_error</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#precision"><cite>precision</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#score"><cite>score</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#sensitivity"><cite>sensitivity</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#sorensen"><cite>sorensen</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#spearman"><cite>spearman</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#specificity"><cite>specificity</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#squared-chi2"><cite>squared_chi2</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#top-k"><cite>top_k</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#youden-index"><cite>youden_index</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#zero-one-loss"><cite>zero_one_loss</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#references">References</a></li>
 </ul>
@@ -165,7 +184,16 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
@@ -185,16 +213,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -211,8 +229,8 @@
       &#169;2024, SpriteMisaka.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/index.rst.txt"

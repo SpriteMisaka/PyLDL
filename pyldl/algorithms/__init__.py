@@ -8,14 +8,13 @@ import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
 from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR
-from ._algorithm_adaptation import AA_BP, AA_KNN, CAD, QFD2, CJS, CPNN, BCPNN, ACPNN
+from ._algorithm_adaptation import AA_BP, AA_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL
 from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS
 
 from ._incomplete import IncomLDL, WInLDL
 from ._classifier import LDL4C, LDL_HR, LDLM
 from ._ensemble import DF_LDL, AdaBoostLDL
 
-from ._ldlf import LDLF
 from ._ldllc import LDLLC
 from ._ldlsf import LDLSF
 from ._ldl_lclr import LDL_LCLR
@@ -26,7 +25,7 @@ from ._lrldl import _LRLDL, TLRLDL, TKLRLDL
 
 from ._ssg_ldl import SSG_LDL
 
-from ._label_enhancement import FCM, KM, LP, ML, GLLE, LEVI, LIBLE
+from ._label_enhancement import FCM, KM, LP, ML, GLLE, LEVI, LIBLE, ConLE
 
 from ._ldl_da import LDL_DA
 
@@ -35,9 +34,9 @@ _ldl__ = [
 # -------------------- 2024 --------------------
 "_LRLDL", "TKLRLDL", "TLRLDL",
 # -------------------- 2023 --------------------
-"LDL_LRR", "LDL_DPA", "CAD", "QFD2", "CJS",
+"LDL_LRR", "LDL_DPA",
 # -------------------- 2021 --------------------
-"DF_LDL", "LDL_SCL",
+"DF_LDL", "LDL_SCL", "Duo_LDL",
 # -------------------- 2020 --------------------
 "AdaBoostLDL",
 # -------------------- 2019 --------------------
@@ -56,7 +55,7 @@ _ldl__ = [
 
 _le__ = [
 # -------------------- 2023 --------------------
-"LIBLE",
+"LIBLE", "ConLE",
 # -------------------- 2020 --------------------
 "LEVI",
 # -------------------- 2019 --------------------

@@ -8,7 +8,7 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 
 from pyldl.algorithms.utils import proj, DEFAULT_METRICS
 
@@ -95,7 +95,7 @@ class BaseLDL(_BaseLDL, BaseEstimator):
     The description degree of :math:`y \\in \\mathcal{Y}` to :math:`\\boldsymbol{x} \\in \\mathcal{X}` is denoted by :math:`d_{\\boldsymbol{x}}^{y}`. 
     Then the label distribution of :math:`\\boldsymbol{x}` is defined as :math:`\\boldsymbol{d} = \\lbrace d_{\\boldsymbol{x}}^{y} \\rbrace_{y \\in \\mathcal{Y}}`. 
     Note that :math:`\\boldsymbol{d}` is under the constraints of probability simplex, i.e., :math:`\\boldsymbol{d} \\in \\Delta^{l-1}`, 
-    where :math:`\\Delta^{l-1} = \\lbrace \\boldsymbol{d} \\in \\mathbb{R}^{l} \\,|\\, \\boldsymbol{d} \\geq 0,\, \\boldsymbol{d}^{\\text{T}} \\boldsymbol{1} = 1 \\rbrace`. 
+    where :math:`\\Delta^{l-1} = \\lbrace \\boldsymbol{d} \\in \\mathbb{R}^{l} \\,|\\, \\boldsymbol{d} \\geq 0,\, \\boldsymbol{d}^{\\top} \\boldsymbol{1} = 1 \\rbrace`. 
     Given a training set of :math:`n` samples :math:`\\mathcal{S} = \\lbrace (\\boldsymbol{x}_i,\, \\boldsymbol{d}_i) \\rbrace_{i=1}^{n}`, 
     the goal of LDL is to learn a conditional probability mass function :math:`p(\\boldsymbol{d} \,|\, \\boldsymbol{x})`.
     """
@@ -270,16 +270,16 @@ class _BaseDeep(keras.Model):
         return self._model(X)
 
     @staticmethod
-    def get_2layer_model(n_features, n_outputs, softmax=True):
-        activation = 'softmax' if softmax else None
+    def get_2layer_model(n_features, n_outputs, activation='softmax'):
         return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
                                  keras.layers.Dense(n_outputs, activation=activation, use_bias=False)])
 
     @staticmethod
-    def get_3layer_model(n_features, n_hidden, n_outputs, activation='sigmoid'):
+    def get_3layer_model(n_features, n_hidden, n_outputs,
+                         hidden_activation='sigmoid', output_activation='softmax'):
         return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
-                                 keras.layers.Dense(n_hidden, activation=activation),
-                                 keras.layers.Dense(n_outputs, activation='softmax')])
+                                 keras.layers.Dense(n_hidden, activation=hidden_activation),
+                                 keras.layers.Dense(n_outputs, activation=output_activation)])
 
     def _get_default_model(self):
         return self.get_3layer_model(self._n_features, self._n_hidden, self._n_outputs)

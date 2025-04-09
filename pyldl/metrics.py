@@ -10,13 +10,15 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, preci
 
 THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
                           "euclidean", "sorensen", "squared_chi2",
-                          "mean_absolute_error",
+                          "mean_absolute_error", "mean_squared_error",
                           "sort_loss",
                           "zero_one_loss", "error_probability"]
 
 THE_LARGER_THE_BETTER = ["cosine", "intersection",
                          "fidelity",
-                         "spearman", "kendall", "dpa"]
+                         "spearman", "kendall", "dpa",
+                         "match_m", "top_k", "max_roc_auc",
+                         "precision", "specificity", "sensitivity", "youden_index", "accuracy"]
 
 sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 

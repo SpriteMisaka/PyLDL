@@ -15,7 +15,8 @@ import keras
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseAdam, BaseBFGS
+from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseGD, BaseAdam, BaseBFGS
+from pyldl.algorithms.utils import pairwise_cosine
 
 
 class FCM(BaseLE):
@@ -115,7 +116,7 @@ class GLLE(BaseBFGS, BaseDeepLE):
 
     See also:
 
-    .. bibliography:: le_references.bib
+    .. bibliography:: bib/le/references.bib
         :filter: False
         :labelprefix: GLLE-
         :keyprefix: glle-
@@ -158,7 +159,7 @@ class GLLE(BaseBFGS, BaseDeepLE):
     def _before_train(self):
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
         self._P = tf.cast(rbf_kernel(self._X, gamma=gamma), dtype=tf.float32)
-        
+
         self._nn = NearestNeighbors(n_neighbors=self._n_outputs+1)
         self._nn.fit(self._X)
         graph = self._nn.kneighbors_graph()
@@ -179,7 +180,7 @@ class GLLE(BaseBFGS, BaseDeepLE):
         self._E_optimizer = keras.optimizers.SGD()
 
     def _get_default_model(self):
-        return self.get_2layer_model(self._P.shape[1], self._n_outputs, softmax=False)
+        return self.get_2layer_model(self._P.shape[1], self._n_outputs, activation=None)
 
     def transform(self):
         return keras.activations.softmax(self._call(self._P)).numpy()
@@ -190,7 +191,7 @@ class LEVI(BaseAdam, BaseDeepLE):
 
     See also:
 
-    .. bibliography:: le_references.bib
+    .. bibliography:: bib/le/references.bib
         :filter: False
         :labelprefix: LEVI-
         :keyprefix: levi-
@@ -231,21 +232,12 @@ class LEVI(BaseAdam, BaseDeepLE):
         return tf.reduce_sum((L - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_L)
 
     def _get_default_model(self):
-
-        input_shape = self._n_features + self._n_outputs
-
-        encoder = keras.Sequential([keras.layers.InputLayer(input_shape=input_shape),
-                                    keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                    keras.layers.Dense(self._n_outputs*2, activation=None)])
-
-        decoder_X = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
-                                      keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                      keras.layers.Dense(self._n_features, activation=None)])
-
-        decoder_L = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_outputs),
-                                      keras.layers.Dense(self._n_hidden, activation='softplus'),
-                                      keras.layers.Dense(self._n_outputs, activation=None)])
-
+        encoder = self.get_3layer_model(self._n_features + self._n_outputs, self._n_hidden, self._n_outputs*2,
+                                        hidden_activation='softplus', output_activation=None)
+        decoder_X = self.get_3layer_model(self._n_outputs, self._n_hidden, self._n_features,
+                                          hidden_activation='softplus', output_activation=None)
+        decoder_L = self.get_3layer_model(self._n_outputs, self._n_hidden, self._n_outputs,
+                                          hidden_activation='softplus', output_activation=None)
         return {"encoder": encoder, "decoder_X": decoder_X, "decoder_L": decoder_L}
 
     def transform(self):
@@ -289,24 +281,70 @@ class LIBLE(BaseAdam, BaseDeepLE):
         return rec_L + self._alpha * kl + self._beta * rec_D
 
     def _get_default_model(self):
-
-        encoder = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_features),
-                                    keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                    keras.layers.Dense(self._n_latent*2, activation=None)])
-
-        decoder_g = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                      keras.layers.Dense(1, activation='sigmoid')])
-        
-        decoder_L = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                      keras.layers.Dense(self._n_outputs, activation=None)])
-        
-        decoder_D = keras.Sequential([keras.layers.InputLayer(input_shape=self._n_latent),
-                                      keras.layers.Dense(self._n_hidden, activation='tanh'),
-                                      keras.layers.Dense(self._n_outputs, activation=None)])
-
+        encoder = self.get_3layer_model(self._n_features, self._n_hidden, self._n_latent*2,
+                                        hidden_activation='tanh', output_activation=None)
+        decoder_g = self.get_3layer_model(self._n_latent, self._n_hidden, 1,
+                                          hidden_activation='tanh', output_activation='sigmoid')
+        decoder_L = self.get_3layer_model(self._n_latent, self._n_hidden, self._n_outputs,
+                                          hidden_activation='tanh', output_activation=None)
+        decoder_D = self.get_3layer_model(self._n_latent, self._n_hidden, self._n_outputs,
+                                            hidden_activation='tanh', output_activation=None)
         return {"encoder": encoder, "decoder_g": decoder_g, "decoder_L": decoder_L, "decoder_D": decoder_D}
 
     def transform(self):
         return keras.activations.softmax(self._call(self._X, transform=True)).numpy()
+
+
+class ConLE(BaseGD, BaseDeepLE):
+    """:class:`ConLE <pyldl.algorithms.ConLE>` is proposed in paper :cite:`2023:wang4`.
+    """
+
+    def __init__(self, n_hidden=64, n_latent=64, alpha=1e-3, beta=1e-3,
+                 tau=.5, threshold=.05, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+        self._alpha = alpha
+        self._beta = beta
+        self._tau = tau
+        self._threshold = threshold
+
+    def _call(self, X, L, transform=False):
+        Z = self._model["encoder_Z"](X)
+        Q = self._model["encoder_Q"](L)
+        H = tf.concat((Z, Q), axis=1)
+        D = self._model["decoder"](H)
+        return D if transform else (Z, Q, D)
+
+    @staticmethod
+    @tf.function
+    def _con(X, Y, tau):
+        C = tf.exp(pairwise_cosine(X, Y) / tau)
+        CX = tf.exp((pairwise_cosine(X, X) - tf.eye(X.shape[0])) / tau)
+        n = tf.shape(X)[0]
+        con = 0.
+        for i in range(n):
+            numerator = C[i, i]
+            denominator = tf.reduce_sum(CX[i]) + tf.reduce_sum(C[i]) - C[i, i]
+            con += -tf.math.log(numerator / denominator)
+        return con / tf.cast(n, tf.float32)
+
+    @tf.function
+    def _loss(self, X, L, start, end):
+        Z, Q, D = self._call(X, L)
+        con = self._con(Z, Q, self._tau) + self._con(Q, Z, self._tau)
+        dis = tf.reduce_sum((L - D)**2)
+        thr = tf.reduce_mean(tf.maximum(
+            tf.reduce_max(D * (1 - L), axis=1) - tf.reduce_min(D * L + 1 - L, axis=1) + self._threshold, 0)
+        )
+        return con + self._alpha * dis + self._beta * thr
+
+    def _get_default_model(self):
+        encoder_Z = self.get_3layer_model(self._n_features, self._n_hidden, self._n_latent,
+                                          hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation=None)
+        encoder_Q = self.get_3layer_model(self._n_outputs, self._n_hidden, self._n_latent,
+                                          hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation=None)
+        decoder = self.get_3layer_model(self._n_latent*2, self._n_hidden, self._n_outputs,
+                                        hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation='softmax')
+        return {"encoder_Z": encoder_Z, "encoder_Q": encoder_Q, "decoder": decoder}
+
+    def transform(self):
+        return keras.activations.softmax(self._call(self._X, self._L, transform=True)).numpy()

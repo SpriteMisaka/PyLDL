@@ -15,7 +15,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
 
     See also:
 
-    .. bibliography:: ldl_references.bib
+    .. bibliography:: bib/ldl/references.bib
         :filter: False
         :labelprefix: LDL-SCL-
         :keyprefix: ldl-scl-

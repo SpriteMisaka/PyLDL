@@ -1,3 +1,2 @@
-demo/** -linguist-vendored
 demo/** -linguist-documentation
-*.ipynb linguist-detectable
+docs/** -linguist-documentation

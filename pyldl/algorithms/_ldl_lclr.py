@@ -28,11 +28,11 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         .. math::
 
             \\begin{aligned}
-            \\nabla_\\boldsymbol{W} = & \\boldsymbol{X}^{\\text{T}} \\left(\\hat{\\boldsymbol{D}} - \\boldsymbol{D}\\right) + 2 \\lambda_1 \\boldsymbol{W} -
-            \\boldsymbol{X}^{\\text{T}} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
-            \\boldsymbol{\\Gamma}_1\\right) \\boldsymbol{S}^{\\text{T}} \\\\
-            - & \\rho \\boldsymbol{X}^{\\text{T}} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
-            \\left(\\boldsymbol{D} - \\hat{\\boldsymbol{D}}\\boldsymbol{S} - \\boldsymbol{E}\\right)\\right) \\boldsymbol{S}^{\\text{T}}\\text{,}
+            \\nabla_\\boldsymbol{W} = & \\boldsymbol{X}^{\\top} \\left(\\hat{\\boldsymbol{D}} - \\boldsymbol{D}\\right) + 2 \\lambda_1 \\boldsymbol{W} -
+            \\boldsymbol{X}^{\\top} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
+            \\boldsymbol{\\Gamma}_1\\right) \\boldsymbol{S}^{\\top} \\\\
+            - & \\rho \\boldsymbol{X}^{\\top} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
+            \\left(\\boldsymbol{D} - \\hat{\\boldsymbol{D}}\\boldsymbol{S} - \\boldsymbol{E}\\right)\\right) \\boldsymbol{S}^{\\top}\\text{,}
             \\end{aligned}
 
         where :math:`\\odot` denotes element-wise multiplication.

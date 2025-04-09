@@ -24,9 +24,9 @@ class _LRLDL(BaseADMM, BaseLDL):
 
             \\begin{aligned}
             \\boldsymbol{W} \\leftarrow & \\left(\\left(\\mu \\boldsymbol{G} + \\boldsymbol{\\Gamma}_1 + \\boldsymbol{L}\\right)
-            \\boldsymbol{O}^{\\text{T}} \\boldsymbol{X} + \\boldsymbol{D}\\boldsymbol{X} \\right) \\\\
-            & \\left( \\boldsymbol{X}^{\\text{T}}\\boldsymbol{X} + 2 \\lambda \\boldsymbol{I} +
-            (1+\\mu) \\boldsymbol{X}^{\\text{T}}\\boldsymbol{O}\\boldsymbol{O}^{\\text{T}}\\boldsymbol{X} \\right)^{-1}\\text{,}
+            \\boldsymbol{O}^{\\top} \\boldsymbol{X} + \\boldsymbol{D}\\boldsymbol{X} \\right) \\\\
+            & \\left( \\boldsymbol{X}^{\\top}\\boldsymbol{X} + 2 \\lambda \\boldsymbol{I} +
+            (1+\\mu) \\boldsymbol{X}^{\\top}\\boldsymbol{O}\\boldsymbol{O}^{\\top}\\boldsymbol{X} \\right)^{-1}\\text{,}
             \\end{aligned}
 
         where :math:`\\boldsymbol{I}` is the identity matrix.
@@ -36,9 +36,9 @@ class _LRLDL(BaseADMM, BaseLDL):
         .. math::
 
             \\begin{aligned}
-            \\boldsymbol{O} \\leftarrow & \\left( (1+\\mu) \\boldsymbol{X}\\boldsymbol{W}^{\\text{T}}
-            \\left( \\boldsymbol{X}\\boldsymbol{W}^{\\text{T}} \\right)^{\\text{T}} + 2 \\lambda \\boldsymbol{I} \\right)^{-1} \\\\
-            & \\boldsymbol{X}\\boldsymbol{W}^{\\text{T}} \\left(\\boldsymbol{L} + \\mu \\boldsymbol{G} - \\boldsymbol{\\Gamma}_1\\right)\\text{.}
+            \\boldsymbol{O} \\leftarrow & \\left( (1+\\mu) \\boldsymbol{X}\\boldsymbol{W}^{\\top}
+            \\left( \\boldsymbol{X}\\boldsymbol{W}^{\\top} \\right)^{\\top} + 2 \\lambda \\boldsymbol{I} \\right)^{-1} \\\\
+            & \\boldsymbol{X}\\boldsymbol{W}^{\\top} \\left(\\boldsymbol{L} + \\mu \\boldsymbol{G} - \\boldsymbol{\\Gamma}_1\\right)\\text{.}
             \\end{aligned}
         """
         OTX = self._O.T @ self._X
@@ -62,7 +62,7 @@ class _LRLDL(BaseADMM, BaseLDL):
         .. math::
 
             \\boldsymbol{\\Gamma}_1 \\leftarrow \\boldsymbol{\\Gamma}_1 + \\mu
-            \\left(\\boldsymbol{W}\\boldsymbol{X}^{\\text{T}}\\boldsymbol{O} - \\boldsymbol{G}\\right)\\text{.}
+            \\left(\\boldsymbol{W}\\boldsymbol{X}^{\\top}\\boldsymbol{O} - \\boldsymbol{G}\\right)\\text{.}
         """
         self._V = np.transpose(self._V.T + self._rho * (self._W.T @ self._X.T @ self._O - self._Z.T))
         self._rho *= 1.1

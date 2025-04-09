@@ -5,7 +5,7 @@ import keras
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 
-from pyldl.algorithms.utils import pairwise_euclidean
+from pyldl.algorithms.utils import pairwise_euclidean, pairwise_cosine
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
@@ -63,29 +63,6 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         return 0.5 * (kl(temp1, temp3) + kl(temp2, temp3))
 
     @staticmethod
-    def pairwise_cosine(X: tf.Tensor, Y: tf.Tensor) -> tf.Tensor:
-        """Pairwise cosine similarity.
-
-        :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n_X]`).
-        :type X: tf.Tensor
-        :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n_Y]`).
-        :type Y: tf.Tensor
-        :return: Pairwise cosine similarity (shape: :math:`[m_X,\, m_Y]`).
-        :rtype: tf.Tensor
-        """
-
-        def paired_cosine_distances(X, Y):
-            X_norm = tf.nn.l2_normalize(X, axis=1)
-            Y_norm = tf.nn.l2_normalize(Y, axis=1)
-            return 1 - tf.reduce_sum(tf.multiply(X_norm, Y_norm), axis=1)
-
-        temp1 = tf.repeat(X, Y.shape[0], axis=0)
-        temp2 = tf.tile(Y, [X.shape[0], 1])
-
-        cos = tf.abs(1 - paired_cosine_distances(temp1, temp2))
-        return tf.reshape(cos, (X.shape[0], Y.shape[0]))
-
-    @staticmethod
     def pairwise_label(X, Y):
         """Pairwise label comparison. True if two labels are the same, otherwise False.
 
@@ -98,19 +75,29 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         """
         return tf.repeat(X, Y.shape[0]) == tf.tile(Y, [X.shape[0]])
 
-    def __init__(self, n_hidden=256, n_latent=64, **kwargs):
+    def __init__(self, n_hidden=256, n_latent=64,
+                 alpha : float = 1e-2, beta : float = 1e-2, r : int = 2, margin : Optional[float] = None, **kwargs):
+        """
+        :param alpha: Hyperparameter to control the contrastive alignment loss, defaults to 1e-2.
+        :type alpha: float
+        :param beta: Hyperparameter to control the prototype alignment loss, defaults to 1e-2.
+        :type beta: float
+        :param r: Number of prototypes, defaults to 2.
+        :type r: int
+        :param margin: Margin for the similarity measure, defaults to None. If None, cosine similarity is used; otherwise, max-margin euclidean distance is used.
+        :type margin: float, optional
+        """
         super().__init__(n_hidden, n_latent, **kwargs)
+        self._alpha = alpha
+        self._beta = beta
+        self._r = r
+        self._margin = margin
 
     def _get_default_model(self):
-        encoder = keras.Sequential([keras.layers.InputLayer(input_shape=(self._n_features,)),
-                                    keras.layers.Dense(self._n_hidden, activation=keras.layers.LeakyReLU(alpha=0.01)),
-                                    keras.layers.Dense(self._n_hidden, activation=keras.layers.LeakyReLU(alpha=0.01)),
-                                    keras.layers.Dense(self._n_latent, activation=None)])
-
-        decoder = keras.Sequential([keras.layers.InputLayer(input_shape=(self._n_latent,)),
-                                    keras.layers.Dense(self._n_hidden, activation=keras.layers.LeakyReLU(alpha=0.01)),
-                                    keras.layers.Dense(self._n_outputs, activation='softmax')])
-
+        encoder = self.get_3layer_model(self._n_features, self._n_hidden, self._n_latent,
+                                        hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation=None)
+        decoder = self.get_3layer_model(self._n_latent, self._n_hidden, self._n_outputs,
+                                        hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation='softmax')
         return {'encoder': encoder, 'decoder': decoder}
 
     def _call(self, X, predict=True):
@@ -133,7 +120,7 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         mse += self.loss_function(self._tD, tD_pred)
 
         dis_X = pairwise_euclidean(sfeatures, tfeatures)
-        sim_X = tf.maximum(self._margin - dis_X, 0.) if self._margin else self.pairwise_cosine(sfeatures, tfeatures)
+        sim_X = tf.maximum(self._margin - dis_X, 0.) if self._margin else pairwise_cosine(sfeatures, tfeatures)
 
         con = tf.reduce_sum(self._hw[start:end] * dis_X) / (tf.reduce_sum(self._hmask_D[start:end]) + EPS)
         con += tf.reduce_sum(self._lw[start:end] * sim_X) / (tf.reduce_sum(self._lmask_D[start:end]) + EPS)
@@ -199,8 +186,7 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         return self.loss_function(ty, self._call(tX))
 
     def fit(self, sX: np.ndarray, sD: np.ndarray, tX: np.ndarray, tD: np.ndarray, *, callbacks=None, X_val=None, D_val=None,
-            ft_epochs : int = 1000, ft_optimizer : Optional[keras.optimizers.Optimizer] = None,
-            alpha : float = 1e-2, beta : float = 1e-2, r : int = 2, margin : Optional[float] = None, fine_tune : bool = True, **kwargs):
+            ft_epochs : int = 1000, ft_optimizer : Optional[keras.optimizers.Optimizer] = None, fine_tune : bool = True, **kwargs):
         """Fit the model.
 
         :param sX: Source features.
@@ -215,14 +201,6 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
         :type ft_epochs: int, optional
         :param ft_optimizer: Fine-tuning optimizer, if None, the default optimizer is used, defaults to None.
         :type ft_optimizer: keras.optimizers.Optimizer, optional
-        :param alpha: Hyperparameter to control the contrastive alignment loss, defaults to 1e-2.
-        :type alpha: float
-        :param beta: Hyperparameter to control the prototype alignment loss, defaults to 1e-2.
-        :type beta: float
-        :param r: Number of prototypes, defaults to 2.
-        :type r: int
-        :param margin: Margin for the similarity measure, defaults to None. If None, cosine similarity is used; otherwise, max-margin euclidean distance is used.
-        :type margin: float, optional
         :param fine_tune: Whether to fine-tune the model, defaults to True.
         :type fine_tune: bool, optional
         :return: Fitted model.
@@ -231,11 +209,6 @@ class LDL_DA(BaseAdam, BaseDeepLDL):
 
         self._tX = tf.cast(tX, tf.float32)
         self._tD = tf.cast(tD, tf.float32)
-
-        self._alpha = alpha
-        self._beta = beta
-        self._r = r
-        self._margin = margin
 
         super().fit(sX, sD, callbacks=callbacks, X_val=X_val, D_val=D_val,**kwargs)
 

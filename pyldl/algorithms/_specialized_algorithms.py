@@ -65,7 +65,7 @@ class SA_IIS(_SA):
 
     IIS-LLD is the early version of :class:`SA-IIS <pyldl.algorithms.SA_IIS>`. See also:
 
-    .. bibliography:: ldl_references.bib app_cv_further_reading.bib
+    .. bibliography:: bib/ldl/references.bib bib/app/cv/references.bib
         :filter: False
         :labelprefix: SA-IIS-
         :keyprefix: sa-iis-

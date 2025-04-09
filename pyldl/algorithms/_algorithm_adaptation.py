@@ -5,8 +5,7 @@ import keras
 import tensorflow as tf
 
 from pyldl.algorithms.utils import RProp
-from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD
-from pyldl.algorithms.loss_function_engineering import _CAD, _QFD2, _CJS
+from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
 
 
 class AA_KNN(BaseLDL):
@@ -29,24 +28,6 @@ class AA_BP(BaseGD, BaseDeepLDL):
     pass
 
 
-class CAD(_CAD, AA_BP):
-    """:class:`CAD <pyldl.algorithms.CAD>` is proposed in paper :cite:`2023:wen`.
-    """
-    pass
-
-
-class QFD2(_QFD2, AA_BP):
-    """:class:`QFD2 <pyldl.algorithms.QFD2>` is proposed in paper :cite:`2023:wen`.
-    """
-    pass
-
-
-class CJS(_CJS, AA_BP):
-    """:class:`CJS <pyldl.algorithms.CJS>` is proposed in paper :cite:`2023:wen`.
-    """
-    pass
-
-
 class CPNN(BaseGD, BaseDeepLDL):
     """:class:`CPNN <pyldl.algorithms.CPNN>` is proposed in paper :cite:`2013:geng`.
     """
@@ -65,10 +46,8 @@ class CPNN(BaseGD, BaseDeepLDL):
         return tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
 
     def _get_default_model(self):
-        input_shape = (self._n_features + (1 if self._mode == 'none' else self._n_outputs),)
-        return keras.Sequential([keras.layers.InputLayer(input_shape=input_shape),
-                                 keras.layers.Dense(self._n_hidden, activation='sigmoid'),
-                                 keras.layers.Dense(1, activation=None)])
+        extra = 1 if self._mode == 'none' else self._n_outputs
+        return self.get_3layer_model(self._n_features + extra, self._n_hidden, 1, output_activation=None)
 
     def _get_default_optimizer(self):
         return RProp()
@@ -103,7 +82,7 @@ class BCPNN(CPNN):
 
     :class:`BCPNN <pyldl.algorithms.BCPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
 
-    .. bibliography:: ldl_references.bib
+    .. bibliography:: bib/ldl/references.bib
         :filter: False
         :labelprefix: BCPNN-
         :keyprefix: bcpnn-
@@ -120,7 +99,7 @@ class ACPNN(CPNN):
 
     :class:`ACPNN <pyldl.algorithms.ACPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
 
-    .. bibliography:: ldl_references.bib
+    .. bibliography:: bib/ldl/references.bib
         :filter: False
         :labelprefix: ACPNN-
         :keyprefix: acpnn-
@@ -130,3 +109,120 @@ class ACPNN(CPNN):
 
     def __init__(self, **params):
         super().__init__(mode='augment', **params)
+
+
+class LDLF(BaseAdam, BaseDeepLDL):
+    """:class:`LDLF <pyldl.algorithms.LDLF>` is proposed in paper :cite:`2017:shen`.
+
+    The algorithms employs deep neural decision forests. See also:
+
+    .. bibliography:: bib/ldl/references.bib
+        :filter: False
+        :labelprefix: LDLF-
+        :keyprefix: ldlf-
+
+        2015:kontschieder
+
+    :term:`Adam` is used as the optimizer.
+    """
+
+    def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):
+        super().__init__(n_hidden, n_latent, random_state)
+        self._n_estimators = n_estimators
+        self._n_depth = n_depth
+        self._n_leaves = 2 ** n_depth
+
+    def _call(self, X, i):
+        decisions = tf.gather(self._model(X), self._phi[i], axis=1)
+        decisions = tf.expand_dims(decisions, axis=2)
+        decisions = tf.concat([decisions, 1 - decisions], axis=2)
+        mu = tf.ones([X.shape[0], 1, 1])
+
+        begin_idx = 1
+        end_idx = 2
+
+        for level in range(self._n_depth):
+            mu = tf.reshape(mu, [X.shape[0], -1, 1])
+            mu = tf.tile(mu, (1, 1, 2))
+            level_decisions = decisions[:, begin_idx:end_idx, :]
+            mu = mu * level_decisions
+
+            begin_idx = end_idx
+            end_idx = begin_idx + 2 ** (level + 1)
+
+        mu = tf.reshape(mu, [X.shape[0], self._n_leaves])
+
+        return mu
+
+    def _get_default_model(self):
+        return self.get_3layer_model(self._n_features, self._n_hidden, self._n_latent, output_activation='sigmoid')
+
+    def _before_train(self):
+        self._phi = [np.random.choice(
+            np.arange(self._n_latent), size=self._n_leaves, replace=False
+        ) for _ in range(self._n_estimators)]
+
+        self._pi = [tf.Variable(
+            initial_value = tf.constant_initializer(1 / self.n_outputs)(
+                shape=[self._n_leaves, self._n_outputs]
+            ),
+            dtype="float32", trainable=True,
+        ) for _ in range(self._n_estimators)]
+
+    @tf.function
+    def _loss(self, X, D, start=None, end=None):
+        loss = 0.
+        for i in range(self._n_estimators):
+            _mu = self._call(X, i)
+            _prob = tf.matmul(_mu, self._pi[i])
+
+            loss += tf.math.reduce_mean(keras.losses.kl_divergence(D, _prob))
+
+            _D = tf.expand_dims(D, axis=1)
+            _pi = tf.expand_dims(self._pi[i], axis=0)
+            _mu = tf.expand_dims(_mu, axis=2)
+            _prob = tf.clip_by_value(
+                tf.expand_dims(_prob, axis=1), clip_value_min=1e-7, clip_value_max=1.)
+            _new_pi = tf.multiply(tf.multiply(_D, _pi), _mu) / _prob
+            _new_pi = tf.reduce_sum(_new_pi, axis=0)
+            _new_pi = keras.activations.softmax(_new_pi)
+            self._pi[i].assign(_new_pi)
+
+        loss /= self._n_estimators
+        return loss
+
+    def predict(self, X):
+        res = np.zeros([X.shape[0], self._n_outputs], dtype=np.float32)
+        for i in range(self._n_estimators):
+            res += tf.matmul(self._call(X, i), self._pi[i])
+        return res / self._n_estimators
+
+
+class Duo_LDL(BaseAdam, BaseDeepLDL):
+    """:class:`Duo-LDL <pyldl.algorithms.Duo_LDL>` is proposed in paper :cite:`2021:zychowski`.
+    """
+
+    def __init__(self, n_hidden=40, **kwargs):
+        super().__init__(n_hidden, **kwargs)
+
+    def _get_default_model(self):
+        output_units = self._n_outputs * (self._n_outputs - 1)
+        return self.get_3layer_model(self._n_features, self._n_hidden, output_units, output_activation='tanh')
+
+    @tf.function
+    def _loss(self, X, _, start, end):
+        C_pred = self._call(X)
+        return self.loss_function(self._C[start:end], C_pred)
+
+    def _before_train(self):
+        self._C = tf.concat([self._D - tf.roll(self._D, i, axis=1) for i in range(1, self._n_outputs)], axis=1)
+
+    def predict(self, X):
+        C_pred = self._call(X)
+        shape = (X.shape[0], self._n_outputs - 1, self._n_outputs)
+        C_pred_reshaped = tf.transpose(tf.reshape(C_pred, shape), (0, 2, 1))
+        D_pred = ((tf.reduce_sum(C_pred_reshaped, axis=2) + 1) / self._n_outputs).numpy()
+        return D_pred / np.sum(D_pred, axis=1, keepdims=True)
+
+    def fit(self, X, Y, *, batch_size=50, **kwargs):
+        return super().fit(X, Y, batch_size=batch_size, **kwargs)

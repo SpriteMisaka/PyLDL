@@ -1,4 +1,5 @@
 from typing import Union, Optional
+from functools import wraps
 
 import numpy as np
 
@@ -12,6 +13,7 @@ DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", 
 
 
 def _clip(func):
+    @wraps(func)
     def _wrapper(D, D_pred, **kwargs):
         D = np.clip(D, EPS, 1)
         D_pred = np.clip(D_pred, EPS, 1)
@@ -20,6 +22,7 @@ def _clip(func):
 
 
 def _reduction(func):
+    @wraps(func)
     def _wrapper(*args, reduction=np.average, **kwargs):
         results = func(*args, **kwargs)
         return reduction(results) if reduction is not None else results
@@ -64,8 +67,8 @@ def svt(A: np.ndarray, tau: float) -> np.ndarray:
 
     The solution to the optimization problem 
     :math:`\\mathop{\\arg\\min}_{\\boldsymbol{X}} \\Vert \\boldsymbol{X} - \\boldsymbol{A} \\Vert_\\text{F}^2 + \\tau \\Vert \\boldsymbol{X} \\Vert_{\\ast}` 
-    is given by :math:`\\boldsymbol{U} \\max \\lbrace \\boldsymbol{\\Sigma} - \\tau, 0 \\rbrace \\boldsymbol{V}^\\text{T}`, 
-    where :math:`\\boldsymbol{A} = \\boldsymbol{U} \\boldsymbol{\\Sigma} \\boldsymbol{V}^\\text{T}` is the singular value decomposition of matrix :math:`\\boldsymbol{A}`.
+    is given by :math:`\\boldsymbol{U} \\max \\lbrace \\boldsymbol{\\Sigma} - \\tau, 0 \\rbrace \\boldsymbol{V}^\\top`, 
+    where :math:`\\boldsymbol{A} = \\boldsymbol{U} \\boldsymbol{\\Sigma} \\boldsymbol{V}^\\top` is the singular value decomposition of matrix :math:`\\boldsymbol{A}`.
 
     :param A: Matrix :math:`\\boldsymbol{A}`.
     :type A: np.ndarray
@@ -131,7 +134,7 @@ def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.nda
     :type D: np.ndarray
     :param method: Type of binaryzation method, defaults to 'threshold'. The options are 'threshold' and 'topk', which can refer to:
 
-        .. bibliography:: ldl_references.bib
+        .. bibliography:: bib/ldl/references.bib
             :filter: False
             :labelprefix: BIN-
             :keyprefix: bin-
@@ -173,9 +176,9 @@ def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
                        Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
     """Pairwise Euclidean distance.
 
-    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\\, n_X]`).
+    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\\, n]`).
     :type X: Union[np.ndarray, tf.Tensor]
-    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\\, n_Y]`), if None, :math:`\\boldsymbol{Y} = \\boldsymbol{X}`, defaults to None.
+    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\\, n]`), if None, :math:`\\boldsymbol{Y} = \\boldsymbol{X}`, defaults to None.
     :type Y: Union[np.ndarray, tf.Tensor], optional
     :return: Pairwise Euclidean distance (shape: :math:`[m_X,\\, m_Y]`).
     :rtype: Union[np.ndarray, tf.Tensor]
@@ -187,6 +190,34 @@ def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
         return tf.sqrt(tf.reduce_sum((X[:, tf.newaxis] - Y[tf.newaxis]) ** 2, axis=2))
     else:
         raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
+
+
+def pairwise_cosine(X: Union[np.ndarray, tf.Tensor],
+                    Y: Optional[Union[np.ndarray, tf.Tensor]] = None,
+                    mode: str = 'similarity') -> Union[np.ndarray, tf.Tensor]:
+    """Pairwise cosine distance/similarity.
+
+    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n]`).
+    :type X: tf.Tensor
+    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n]`).
+    :type Y: tf.Tensor
+    :param mode: Defaults to 'similarity'. The options are 'similarity' and 'distance'.
+    :type mode: str
+    :return: Pairwise cosine similarity (shape: :math:`[m_X,\, m_Y]`).
+    :rtype: tf.Tensor
+    """
+    Y = X if Y is None else Y
+    if isinstance(X, np.ndarray):
+        X_norm = X / np.linalg.norm(X, axis=1, keepdims=True)
+        Y_norm = Y / np.linalg.norm(Y, axis=1, keepdims=True)
+        similarity = np.dot(X_norm, Y_norm.T)
+    elif isinstance(X, tf.Tensor):
+        X_norm = tf.nn.l2_normalize(X, axis=1)
+        Y_norm = tf.nn.l2_normalize(Y, axis=1)
+        similarity = tf.matmul(X_norm, Y_norm, transpose_b=True)
+    else:
+        raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
+    return 1 - similarity if mode == 'distance' else similarity
 
 
 class RProp(keras.optimizers.Optimizer):

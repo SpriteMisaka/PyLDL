@@ -33,7 +33,7 @@ class LDLEarlyStopping(keras.callbacks.Callback):
             self._smaller = self._monitor in THE_SMALLER_THE_BETTER
             if self._monitor not in self.model._metrics:
                 self.model._metrics.append(self._monitor)
-        self._best = np.Inf if self._smaller else 0.
+        self._best = np.inf if self._smaller else 0.
         self._best_weights = None
 
     def on_epoch_end(self, epoch, logs=None):
