@@ -1,2 +1,2 @@
 demo/** -linguist-documentation
-docs/** -linguist-documentation
+make_docs/** linguist-documentation

@@ -13,15 +13,16 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Ren et al. 2019a](https://doi.org/10.24963/ijcai.2019/460)) [*IJCAI*]: `LDLSF`.
   + ([Ren et al. 2019b](https://doi.org/10.24963/ijcai.2019/461)) [*IJCAI*]: `LDL_LCLR`$^\dagger$.
   + ([Wang and Geng 2019](https://doi.org/10.24963/ijcai.2019/515)) [*IJCAI*]: `LDL4C`$^{3\dagger}$.
-  + ([Shen et al. 2020](https://dx.doi.org/10.14177/j.cnki.32-1397n.2020.44.06.004)) [*南京理工大学学报* (Chinese)]: `AdaBoostLDL`.
   + ([González et al. 2021a](https://doi.org/10.1016/j.ins.2020.07.071)) [*Inf. Sci.*]: `SSG_LDL`$^{4}$.
   + ([González et al. 2021b](https://doi.org/10.1016/j.inffus.2020.08.024)) [*Inf. Fusion*]: `DF_LDL`.
   + ([Wang and Geng 2021a](https://doi.org/10.24963/ijcai.2021/426)) [*IJCAI*]: `LDL_HR`$^{3^\dagger}$.
   + ([Wang and Geng 2021b](https://proceedings.mlr.press/v139/wang21h.html)) [*ICML*]: `LDLM`$^{3^\dagger}$.
   + ([Jia et al. 2021](https://doi.org/10.1109/TKDE.2019.2943337)) [*TKDE*]: `LDL_SCL`.
+  + ([Żychowski and Mańdziuk 2021](https://doi.org/10.1016/j.asoc.2021.107585)) [*Appl. Soft Comput.*]: `Duo_LDL`.
+  + ([Li et al. 2022](https://doi.org/10.1109/CVPR52688.2022.01986)) [*CVPR*]: `unimodal_loss`$^1$ and `concentrated_loss`$^1$.
   + ([Jia et al. 2023a](https://doi.org/10.1109/TKDE.2021.3099294)) [*TKDE*]: `LDL_LRR`$^\dagger$.
   + ([Jia et al. 2023b](https://doi.org/10.1109/TNNLS.2023.3258976)) [*TNNLS*]: `LDL_DPA`$^\dagger$.
-  + ([Wen et al. 2023](https://doi.org/10.1109/ICCV51070.2023.02146)) [*ICCV*]: `CAD`$^1$, `QFD2`$^1$, and `CJS`$^1$.
+  + ([Wen et al. 2023](https://doi.org/10.1109/ICCV51070.2023.02146)) [*ICCV*]: `cad`$^1$, `qfd2`$^1$, and `cjs`$^1$.
   + ([Li and Chen 2024](https://doi.org/10.24963/ijcai.2024/494)) [*IJCAI*]: `WInLDL`$^2$.
   + ([Kou et al. 2024](https://doi.org/10.24963/ijcai.2024/478)) [*IJCAI*]: `TLRLDL`$^\dagger$ and `TKLRLDL`$^\dagger$.
   + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
@@ -29,6 +30,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://proceedings.mlr.press/v119/xu20g.html)) [*ICML*]: `LEVI`.
   + ([Zheng, Zhu, and Tang 2023](https://doi.org/10.1109/CVPR52729.2023.00724)) [*CVPR*]: `LIBLE`.
+  + ([Wang et al. 2023](https://doi.org/10.24963/ijcai.2023/484)) [*IJCAI*]: `ConLE`.
 + LDL metrics: `chebyshev`, `clark`, `canberra`, `kl_divergence`, `cosine`, `intersection`, etc.
 + Structured LDL datasets: *Human_Gene*, *Movie*, *Natural_Scene*, *s-BU_3DFE*, *s-JAFFE*, *Yeast*, etc.
 + LDL applications:
@@ -130,7 +132,7 @@ The output images are as follows.
 | :----------------------------------------------------------: | :----------------------------------------------------------: |
 |                            `GLLE`                            |                           `LIBLE`                            |
 
-Enjoy! :)
+Refer to the [docs](https://spritemisaka.github.io/PyLDL/) for more detailed information. Enjoy! :)
 
 ## Experiments
 
