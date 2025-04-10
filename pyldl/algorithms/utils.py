@@ -32,6 +32,12 @@ def _reduction(func):
 @_reduction
 @_clip
 def kl_divergence(D, D_pred):
+    """Kullback-Leibler divergence. It is defined as:
+
+    .. math::
+
+        \\text{KLD}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}u_j \\ln \\frac{u_j}{v_j}\\text{.}
+    """
     return np.sum(D * (np.log(D) - np.log(D_pred)), 1)
 
 
@@ -49,7 +55,7 @@ def sort_loss(D, D_pred):
 
 def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     """Soft thresholding operation.
-    It is defined as :math:`\\text{soft}(\\boldsymbol{A}, \\tau) = \\text{sgn}(\\boldsymbol{A}) \\odot \\max\\lbrace \\lvert \\boldsymbol{A} \\rvert - \\tau, 0 \\rbrace`, 
+    It is defined as :math:`\\text{soft}(\\boldsymbol{A}, \\, \\tau) = \\text{sgn}(\\boldsymbol{A}) \\odot \\max\\lbrace \\lvert \\boldsymbol{A} \\rvert - \\tau, 0 \\rbrace`, 
     where :math:`\\odot` denotes element-wise multiplication.
 
     :param A: Matrix :math:`\\boldsymbol{A}`.
@@ -96,7 +102,7 @@ def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
         & \\frac{\\Vert \\vec{a}_{\\bullet j} \\Vert - \\tau}{\\Vert \\vec{a}_{\\bullet j} \\Vert} \\vec{a}_{\\bullet j}, & \\tau \\le \\Vert \\vec{a}_{\\bullet j} \\Vert \\\\
         & 0, & \\text{otherwise}
         \\end{aligned}
-        \\right.
+        \\right.\\text{.}
 
     where :math:`\\vec{x}_{\\bullet j}` is the :math:`j`-th column of matrix :math:`\\boldsymbol{X}`, 
     and :math:`\\vec{a}_{\\bullet j}` is the :math:`j`-th column of matrix :math:`\\boldsymbol{A}`.
@@ -176,11 +182,11 @@ def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
                        Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
     """Pairwise Euclidean distance.
 
-    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\\, n]`).
+    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_{\\boldsymbol{X}},\\, n]`).
     :type X: Union[np.ndarray, tf.Tensor]
-    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\\, n]`), if None, :math:`\\boldsymbol{Y} = \\boldsymbol{X}`, defaults to None.
+    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_{\\boldsymbol{Y}},\\, n]`), if None, :math:`\\boldsymbol{Y} = \\boldsymbol{X}`, defaults to None.
     :type Y: Union[np.ndarray, tf.Tensor], optional
-    :return: Pairwise Euclidean distance (shape: :math:`[m_X,\\, m_Y]`).
+    :return: Pairwise Euclidean distance (shape: :math:`[m_{\\boldsymbol{X}},\\, m_Y]`).
     :rtype: Union[np.ndarray, tf.Tensor]
     """
     Y = X if Y is None else Y
@@ -197,13 +203,13 @@ def pairwise_cosine(X: Union[np.ndarray, tf.Tensor],
                     mode: str = 'similarity') -> Union[np.ndarray, tf.Tensor]:
     """Pairwise cosine distance/similarity.
 
-    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_X,\, n]`).
+    :param X: Matrix :math:`\\boldsymbol{X}` (shape: :math:`[m_{\\boldsymbol{X}},\\, n]`).
     :type X: tf.Tensor
-    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_Y,\, n]`).
+    :param Y: Matrix :math:`\\boldsymbol{Y}` (shape: :math:`[m_{\\boldsymbol{Y}},\\, n]`).
     :type Y: tf.Tensor
     :param mode: Defaults to 'similarity'. The options are 'similarity' and 'distance'.
     :type mode: str
-    :return: Pairwise cosine similarity (shape: :math:`[m_X,\, m_Y]`).
+    :return: Pairwise cosine similarity (shape: :math:`[m_{\\boldsymbol{X}},\\, m_{\\boldsymbol{Y}}]`).
     :rtype: tf.Tensor
     """
     Y = X if Y is None else Y

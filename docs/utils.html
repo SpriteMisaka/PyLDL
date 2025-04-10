@@ -92,7 +92,10 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.kl_divergence">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.utils.kl_divergence" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Kullback-Leibler divergence. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{KLD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="pairwise-cosine">
@@ -104,13 +107,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n]\)</span>).</p></li>
-<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n]\)</span>).</p></li>
+<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, n]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{Y}},\, n]\)</span>).</p></li>
 <li><p><strong>mode</strong> (<em>str</em>) – Defaults to ‘similarity’. The options are ‘similarity’ and ‘distance’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pairwise cosine similarity (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+<dd class="field-even"><p>Pairwise cosine similarity (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, m_{\boldsymbol{Y}}]\)</span>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tf.Tensor</p>
@@ -128,12 +131,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_X,\, n]\)</span>).</p></li>
-<li><p><strong>Y</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em><em>, </em><em>optional</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_Y,\, n]\)</span>), if None, <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \boldsymbol{X}\)</span>, defaults to None.</p></li>
+<li><p><strong>X</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, n]\)</span>).</p></li>
+<li><p><strong>Y</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em><em>, </em><em>optional</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{Y}},\, n]\)</span>), if None, <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \boldsymbol{X}\)</span>, defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pairwise Euclidean distance (shape: <span class="math notranslate nohighlight">\([m_X,\, m_Y]\)</span>).</p>
+<dd class="field-even"><p>Pairwise Euclidean distance (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, m_Y]\)</span>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Union[np.ndarray, tf.Tensor]</p>
@@ -168,7 +171,7 @@
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.soft_thresholding">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">soft_thresholding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.soft_thresholding" title="Link to this definition">¶</a></dt>
 <dd><p>Soft thresholding operation.
-It is defined as <span class="math notranslate nohighlight">\(\text{soft}(\boldsymbol{A}, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace\)</span>,
+It is defined as <span class="math notranslate nohighlight">\(\text{soft}(\boldsymbol{A}, \, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace\)</span>,
 where <span class="math notranslate nohighlight">\(\odot\)</span> denotes element-wise multiplication.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -202,7 +205,7 @@ is given by the following formula:</p>
 &amp; \frac{\Vert \vec{a}_{\bullet j} \Vert - \tau}{\Vert \vec{a}_{\bullet j} \Vert} \vec{a}_{\bullet j}, &amp; \tau \le \Vert \vec{a}_{\bullet j} \Vert \\
 &amp; 0, &amp; \text{otherwise}
 \end{aligned}
-\right.\end{split}\]</div>
+\right.\text{.}\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\vec{x}_{\bullet j}\)</span> is the <span class="math notranslate nohighlight">\(j\)</span>-th column of matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span>,
 and <span class="math notranslate nohighlight">\(\vec{a}_{\bullet j}\)</span> is the <span class="math notranslate nohighlight">\(j\)</span>-th column of matrix <span class="math notranslate nohighlight">\(\boldsymbol{A}\)</span>.</p>
 <dl class="field-list simple">
@@ -318,7 +321,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.canberra">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.canberra" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Canberra distance. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Can.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="chebyshev">
@@ -326,7 +332,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.chebyshev">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.chebyshev" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Chebyshev distance. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Cheby.}(\boldsymbol{u}, \, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="clark">
@@ -334,7 +343,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.clark">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.clark" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Clark distance. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Clark}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="cosine">
@@ -342,7 +354,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.cosine">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.cosine" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Cosine similarity. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Cosine}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}u_j v_j}{\sqrt{\sum^l_{j=1}u_j^2}\sqrt{\sum^l_{j=1}v_j^2}}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="dpa">
@@ -358,7 +373,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.error_probability">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">error_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.error_probability" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Error probability. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="euclidean">
@@ -382,7 +400,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.intersection">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.intersection" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Intersection similarity. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="kendall">
@@ -390,7 +411,10 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.kendall">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.kendall" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Kendall’s rank correlation coefficient. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j &lt; k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}\]</div>
+</dd></dl>
 
 </section>
 <section id="match-m">
@@ -462,7 +486,11 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.spearman">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.spearman" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Spearman’s rank correlation coefficient. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{Spear.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{l} (\rho(u_j) - \rho(v_j))^2 }{l(l^2 - 1)}\text{,}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho\)</span> is the rank of the element in the vector.</p>
+</dd></dl>
 
 </section>
 <section id="specificity">
@@ -502,7 +530,11 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.zero_one_loss">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">zero_one_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.zero_one_loss" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>0/1 loss. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{0/1 loss}(\boldsymbol{u}, \, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \, \arg\max(\boldsymbol{v}))\text{,}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\delta\)</span> is the Kronecker delta function.</p>
+</dd></dl>
 
 </section>
 <section id="references">

@@ -25,18 +25,36 @@ sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 
 @_reduction
 def chebyshev(D, D_pred):
+    """Chebyshev distance. It is defined as:
+
+    .. math::
+
+        \\text{Cheby.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\max_j \\left\\vert u_j - v_j \\right\\vert\\text{.}
+    """
     return np.max(np.abs(D - D_pred), 1)
 
 
 @_reduction
 @_clip
 def clark(D, D_pred):
+    """Clark distance. It is defined as:
+
+    .. math::
+
+        \\text{Clark}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sqrt{\\sum^l_{j=1}\\frac{\\left( u_j - v_j \\right)^2}{\\left( u_j + v_j \\right)^2}}\\text{.}
+    """
     return np.sqrt(np.sum(np.power(D - D_pred, 2) / np.power(D + D_pred, 2), 1))
 
 
 @_reduction
 @_clip
 def canberra(D, D_pred):
+    """Canberra distance. It is defined as:
+
+    .. math::
+
+        \\text{Can.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left\\vert u_j - v_j \\right\\vert}{u_j + v_j}\\text{.}
+    """
     return np.sum(np.abs(D - D_pred) / (D + D_pred), 1)
 
 
@@ -45,12 +63,24 @@ sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
 
 @_reduction
 def cosine(D, D_pred):
+    """Cosine similarity. It is defined as:
+
+    .. math::
+
+        \\text{Cosine}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{\\sum^l_{j=1}u_j v_j}{\\sqrt{\\sum^l_{j=1}u_j^2}\\sqrt{\\sum^l_{j=1}v_j^2}}\\text{.}
+    """
     from sklearn.metrics.pairwise import paired_cosine_distances
     return 1 - paired_cosine_distances(D, D_pred)
 
 
 @_reduction
 def intersection(D, D_pred):
+    """Intersection similarity. It is defined as:
+
+    .. math::
+
+        \\text{Int.}(\\boldsymbol{u}, \, \\boldsymbol{v}) = \\sum^l_{j=1} \\min\\left(u_j, \\, v_j\\right)\\text{.}
+    """
     return 1 - 0.5 * np.sum(np.abs(D - D_pred), 1)
 
 
@@ -81,11 +111,25 @@ sys.modules['pyldl.metrics.sort_loss'] = sort_loss
 
 @_reduction
 def spearman(D, D_pred):
+    """Spearman's rank correlation coefficient. It is defined as:
+
+    .. math::
+
+        \\text{Spear.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = 1 - \\frac{6 \\sum_{j=1}^{l} (\\rho(u_j) - \\rho(v_j))^2 }{l(l^2 - 1)}\\text{,}
+
+    where :math:`\\rho` is the rank of the element in the vector.
+    """
     return np.array([stats.spearmanr(D[i], D_pred[i])[0] for i in range(D.shape[0])])
 
 
 @_reduction
 def kendall(D, D_pred):
+    """Kendall's rank correlation coefficient. It is defined as:
+
+    .. math::
+
+        \\text{Ken.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{2 \\sum_{j < k} \\text{sgn}(u_j - u_k) \\text{sgn}(v_j - v_k) }{l (l-1)}\\text{.}
+    """
     return np.array([stats.kendalltau(D[i], D_pred[i], variant='c')[0] for i in range(D.shape[0])])
 
 
@@ -120,11 +164,25 @@ def mean_squared_error(D, D_pred, mode='macro'):
 
 @_reduction
 def zero_one_loss(D, D_pred):
+    """0/1 loss. It is defined as:
+
+    .. math::
+
+        \\text{0/1 loss}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\delta(\\arg\\max(\\boldsymbol{u}), \\, \\arg\\max(\\boldsymbol{v}))\\text{,}
+
+    where :math:`\\delta` is the Kronecker delta function.
+    """
     return 1 - (np.argmax(D, 1) == np.argmax(D_pred, 1))
 
 
 @_reduction
 def error_probability(D, D_pred):
+    """Error probability. It is defined as:
+
+    .. math::
+
+        \\text{Err. prob.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = 1 - u_{\\arg\\max(\\boldsymbol{v})}\\text{.}
+    """
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
 
 
