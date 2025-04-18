@@ -256,10 +256,8 @@ class _BaseDeep(keras.Model):
     def _l2_reg(model):
         if isinstance(model, keras.Model):
             return tf.reduce_sum([tf.reduce_sum(tf.square(v)) for v in model.trainable_variables]) / 2.
-        elif isinstance(model, tf.Tensor):
-            return tf.reduce_sum(tf.square(model)) / 2.
         else:
-            raise TypeError("Input must be a keras.Model or tf.Tensor.")
+            return tf.reduce_sum(tf.square(model)) / 2.
 
     @staticmethod
     @tf.function
@@ -362,7 +360,7 @@ class BaseDeep(_BaseDeep):
 class BaseGD(BaseDeep):
 
     def _get_default_optimizer(self):
-        return keras.optimizers.Adam(1e-2)
+        return keras.optimizers.SGD(1e-2)
 
     def _calculate_validation_scores(self, X_val, D_val, L_val):
         val = None
@@ -383,6 +381,13 @@ class BaseGD(BaseDeep):
             return score(val, val_pred, metrics=self._metrics, return_dict=True)
         return {}
 
+    def train_step(self, batch, loss, trainable_variables, start, end):
+        with tf.GradientTape() as tape:
+            l = loss(batch[0], batch[1], start, end)
+            self.total_loss += l
+        gradients = tape.gradient(l, trainable_variables)
+        self._optimizer.apply_gradients(zip(gradients, trainable_variables))
+
     def train(self, X, Y, epochs, batch_size, loss, trainable_variables, callbacks=None, X_val=None, D_val=None, L_val=None):
 
         data = tf.data.Dataset.from_tensor_slices((X, Y)).batch(batch_size)
@@ -399,23 +404,19 @@ class BaseGD(BaseDeep):
                 break
             callbacks.on_epoch_begin(epoch)
 
-            total_loss = 0.
+            self.total_loss = 0.
             for step, batch in enumerate(data):
                 start = step * batch_size
                 end = min(start + batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
-                with tf.GradientTape() as tape:
-                    l = loss(batch[0], batch[1], start, end)
-                    total_loss += l
-                gradients = tape.gradient(l, trainable_variables)
-                self._optimizer.apply_gradients(zip(gradients, trainable_variables))
+                self.train_step(batch, loss, trainable_variables, start, end)
                 callbacks.on_train_batch_end(step)
 
             scores = self._calculate_validation_scores(X_val, D_val, L_val)
 
-            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": total_loss})
+            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": self.total_loss})
             if self._verbose != 0:
-                progbar.update(epoch + 1, values=[('loss', total_loss)] + list(scores.items()),
+                progbar.update(epoch + 1, values=[('loss', self.total_loss)] + list(scores.items()),
                                finalize=self.stop_training or epochs == epoch + 1)
 
         callbacks.on_train_end()
@@ -434,7 +435,7 @@ class BaseGD(BaseDeep):
 
 class BaseAdam(BaseGD):
     def _get_default_optimizer(self):
-        return keras.optimizers.Adam()
+        return keras.optimizers.Adam(1e-2)
 
 
 class BaseBFGS(BaseDeep):

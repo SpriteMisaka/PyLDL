@@ -25,6 +25,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Wen et al. 2023](https://doi.org/10.1109/ICCV51070.2023.02146)) [*ICCV*]: `cad`$^1$, `qfd2`$^1$, and `cjs`$^1$.
   + ([Li and Chen 2024](https://doi.org/10.24963/ijcai.2024/494)) [*IJCAI*]: `WInLDL`$^2$.
   + ([Kou et al. 2024](https://doi.org/10.24963/ijcai.2024/478)) [*IJCAI*]: `TLRLDL`$^\dagger$ and `TKLRLDL`$^\dagger$.
+  + ([Lin et al. 2024](https://doi.org/10.1109/TBDATA.2023.3338023)) [*TBD*]: `LDL_HVLC`$^\dagger$.
   + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.

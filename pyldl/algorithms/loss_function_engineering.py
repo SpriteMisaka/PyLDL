@@ -12,14 +12,15 @@ EPS = np.finfo(np.float64).eps
 def cad(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
+    @tf.function
     def _cad(D, D_pred):
         return tf.reduce_mean(tf.abs(
             tf.cumsum(D, axis=1) - tf.cumsum(D_pred, axis=1)
         ), axis=1)
     return tf.math.reduce_sum(
         tf.map_fn(lambda i: _cad(D[:, :i], D_pred[:, :i]),
-                    tf.range(1, D.shape[1] + 1),
-                    fn_output_signature=tf.float32)
+                  tf.range(1, D.shape[1] + 1),
+                  fn_output_signature=tf.float32)
     )
 
 
@@ -39,14 +40,15 @@ def qfd2(D, D_pred):
 def cjs(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
+    @tf.function
     def _cjs(D, D_pred):
         m = 0.5 * (D + D_pred)
         js = 0.5 * (keras.losses.kl_divergence(D, m) + keras.losses.kl_divergence(D_pred, m))
         return tf.reduce_mean(js)
     return tf.math.reduce_sum(
         tf.map_fn(lambda i: _cjs(D[:, :i], D_pred[:, :i]),
-                    tf.range(1, D.shape[1] + 1),
-                    fn_output_signature=tf.float32)
+                  tf.range(1, D.shape[1] + 1),
+                  fn_output_signature=tf.float32)
     )
 
 

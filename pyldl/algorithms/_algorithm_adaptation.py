@@ -30,6 +30,8 @@ class AA_BP(BaseGD, BaseDeepLDL):
 
 class CPNN(BaseGD, BaseDeepLDL):
     """:class:`CPNN <pyldl.algorithms.CPNN>` is proposed in paper :cite:`2013:geng`.
+
+    :term:`RProp` is used as the optimizer.
     """
 
     def __init__(self, mode='none', v=5, n_hidden=64, n_latent=None, random_state=None):
@@ -80,7 +82,9 @@ class CPNN(BaseGD, BaseDeepLDL):
 class BCPNN(CPNN):
     """:class:`BCPNN <pyldl.algorithms.BCPNN>` is proposed in paper :cite:`2017:yang`.
 
-    :class:`BCPNN <pyldl.algorithms.BCPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
+    :term:`RProp` is used as the optimizer.
+
+    This algorithm is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
 
     .. bibliography:: bib/ldl/references.bib
         :filter: False
@@ -97,7 +101,9 @@ class BCPNN(CPNN):
 class ACPNN(CPNN):
     """:class:`ACPNN <pyldl.algorithms.ACPNN>` is proposed in paper :cite:`2017:yang`.
 
-    :class:`ACPNN <pyldl.algorithms.ACPNN>` is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
+    :term:`RProp` is used as the optimizer.
+
+    This algorithm is based on :class:`CPNN <pyldl.algorithms.CPNN>`. See also:
 
     .. bibliography:: bib/ldl/references.bib
         :filter: False
@@ -114,7 +120,9 @@ class ACPNN(CPNN):
 class LDLF(BaseAdam, BaseDeepLDL):
     """:class:`LDLF <pyldl.algorithms.LDLF>` is proposed in paper :cite:`2017:shen`.
 
-    The algorithms employs deep neural decision forests. See also:
+    :term:`Adam` is used as the optimizer.
+
+    This algorithm employs deep neural decision forests. See also:
 
     .. bibliography:: bib/ldl/references.bib
         :filter: False
@@ -122,8 +130,6 @@ class LDLF(BaseAdam, BaseDeepLDL):
         :keyprefix: ldlf-
 
         2015:kontschieder
-
-    :term:`Adam` is used as the optimizer.
     """
 
     def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):

@@ -43,4 +43,4 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
         return kld + self._alpha * rnk + self._beta * self._l2_reg(theta)
 
     def _before_train(self):
-        self._P, self._W = self.preprocessing(self._D)
+        self._P, self._W = LDL_LRR.preprocessing(self._D)

@@ -40,25 +40,31 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         self._W = tf.Variable(tf.random.normal((self._n_clusters, self._n_outputs)),
                               trainable=True)
 
+    @staticmethod
+    @tf.function
+    def scl_loss(D_pred, P, C):
+        corr = tf.math.reduce_mean(C * keras.losses.mean_squared_error(
+            tf.expand_dims(D_pred, 1), tf.expand_dims(P, 0)
+        ))
+        barr = tf.math.reduce_mean(1 / C)
+        return corr, barr
+
     @tf.function
     def _loss(self, X, D, start, end):
         D_pred = keras.activations.softmax(self._model(X) + tf.matmul(self._C[start:end], self._W))
-
         kl = tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
-        corr = tf.math.reduce_mean(self._C[start:end] * keras.losses.mean_squared_error(
-            tf.expand_dims(D_pred, 1), tf.expand_dims(self._P, 0)
-        ))
-        barr = tf.math.reduce_mean(1 / self._C[start:end])
-
+        corr, barr = self.scl_loss(D_pred, self._P, self._C[start:end])
         return kl + self._alpha * corr + self._beta * barr
 
-    def predict(self, X):
-
-        C = np.zeros((X.shape[0], self._n_clusters))
-        for i in range(self._n_clusters):
+    @staticmethod
+    def construct_C(X, old_X, old_C):
+        C = np.zeros((X.shape[0], old_C.shape[1]))
+        for i in range(old_C.shape[1]):
             lr = SVR()
-            lr.fit(self._X.numpy(), self._C.numpy()[:, i].reshape(-1))
+            lr.fit(old_X, old_C.numpy()[:, i].reshape(-1))
             C[:, i] = lr.predict(X).reshape(1, -1)
-        C = tf.cast(C, dtype=tf.float32)
+        return tf.cast(C, dtype=tf.float32)
 
+    def predict(self, X):
+        C = self.construct_C(X, self._X, self._C)
         return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))

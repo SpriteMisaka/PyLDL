@@ -21,6 +21,9 @@ Glossary
    MaxEnt
       The maximum entropy (MaxEnt) model.
 
+   RProp
+      The resilient backpropagation (RProp) algorithm. See :cite:`1993:riedmiller` for details.
+
 References
 ~~~~~~~~~~
 

@@ -38,6 +38,14 @@
 <h1>Utils &amp; Metrics<a class="headerlink" href="#utils-metrics" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<section id="d">
+<h2><cite>_1d</cite><a class="headerlink" href="#d" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils._1d">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.algorithms.utils._1d" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="clip">
 <h2><cite>_clip</cite><a class="headerlink" href="#clip" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -143,6 +151,14 @@
 </dd>
 </dl>
 </dd></dl>
+
+</section>
+<section id="pairwise-pearsonr">
+<h2><cite>pairwise_pearsonr</cite><a class="headerlink" href="#pairwise-pearsonr" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_pearsonr">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_pearsonr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_pearsonr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="proj">
@@ -517,6 +533,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dd></dd></dl>
 
 </section>
+<section id="wave-hedges">
+<h2><cite>wave_hedges</cite><a class="headerlink" href="#wave-hedges" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.wave_hedges">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyldl.metrics.wave_hedges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="youden-index">
 <h2><cite>youden_index</cite><a class="headerlink" href="#youden-index" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -592,12 +616,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
 <li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Utils &amp; Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#d"><cite>_1d</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clip"><cite>_clip</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reduction"><cite>_reduction</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kl-divergence"><cite>kl_divergence</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pairwise-pearsonr"><cite>pairwise_pearsonr</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#proj"><cite>proj</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#soft-thresholding"><cite>soft_thresholding</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#solvel21"><cite>solvel21</cite></a></li>
@@ -632,6 +658,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#specificity"><cite>specificity</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#squared-chi2"><cite>squared_chi2</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#top-k"><cite>top_k</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wave-hedges"><cite>wave_hedges</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#youden-index"><cite>youden_index</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zero-one-loss"><cite>zero_one_loss</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>

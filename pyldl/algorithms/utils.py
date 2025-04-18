@@ -15,8 +15,12 @@ DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", 
 def _clip(func):
     @wraps(func)
     def _wrapper(D, D_pred, **kwargs):
-        D = np.clip(D, EPS, 1)
-        D_pred = np.clip(D_pred, EPS, 1)
+        if isinstance(D, np.ndarray):
+            D = np.clip(D, EPS, 1)
+            D_pred = np.clip(D_pred, EPS, 1)
+        elif isinstance(D, tf.Tensor):
+            D = tf.clip_by_value(D, EPS, 1)
+            D_pred = tf.clip_by_value(D_pred, EPS, 1)
         return func(D, D_pred, **kwargs)
     return _wrapper
 
@@ -29,8 +33,31 @@ def _reduction(func):
     return _wrapper
 
 
+def _1d(func):
+    @wraps(func)
+    def _wrapper(X, Y=None, **kwargs):
+        if X.ndim != 1:
+            return func(X, Y, **kwargs)
+        if isinstance(X, np.ndarray):
+            X = X[np.newaxis, :]
+            if Y is not None:
+                Y = Y[np.newaxis, :]
+        elif isinstance(X, tf.Tensor):
+            X = tf.expand_dims(X, axis=0)
+            if Y is not None:
+                Y = tf.expand_dims(Y, axis=0)
+        results = func(X, Y, **kwargs)
+        if isinstance(X, np.ndarray):
+            return results.ravel()[0]
+        elif isinstance(X, tf.Tensor):
+            return tf.reshape(results, (-1, ))[0]
+
+    return _wrapper
+
+
 @_reduction
 @_clip
+@_1d
 def kl_divergence(D, D_pred):
     """Kullback-Leibler divergence. It is defined as:
 
@@ -42,6 +69,7 @@ def kl_divergence(D, D_pred):
 
 
 @_reduction
+@_1d
 def sort_loss(D, D_pred):
     i = np.argsort(-D)
     h = D_pred[np.arange(D_pred.shape[0])[:, np.newaxis], i]
@@ -178,6 +206,7 @@ def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.nda
         raise ValueError("Invalid method, which should be 'threshold' or 'topk'.")
 
 
+@_1d
 def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
                        Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
     """Pairwise Euclidean distance.
@@ -198,6 +227,7 @@ def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
         raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
 
 
+@_1d
 def pairwise_cosine(X: Union[np.ndarray, tf.Tensor],
                     Y: Optional[Union[np.ndarray, tf.Tensor]] = None,
                     mode: str = 'similarity') -> Union[np.ndarray, tf.Tensor]:
@@ -224,6 +254,21 @@ def pairwise_cosine(X: Union[np.ndarray, tf.Tensor],
     else:
         raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
     return 1 - similarity if mode == 'distance' else similarity
+
+
+@_1d
+def pairwise_pearsonr(X: Union[np.ndarray, tf.Tensor],
+                      Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
+    if isinstance(X, np.ndarray):
+        return np.corrcoef(X) if Y is None else np.corrcoef(X, Y)[:X.shape[0], X.shape[0]:]
+    elif isinstance(X, tf.Tensor):
+        Y = X if Y is None else Y
+        X_centered = X - tf.reduce_mean(X, axis=1, keepdims=True)
+        Y_centered = Y - tf.reduce_mean(Y, axis=1, keepdims=True)
+        cov = tf.matmul(X_centered, Y_centered, transpose_b=True)
+        X_std = tf.sqrt(tf.reduce_sum(tf.square(X_centered), axis=1, keepdims=True))
+        Y_std = tf.sqrt(tf.reduce_sum(tf.square(Y_centered), axis=1))
+        return cov / (X_std * tf.expand_dims(Y_std, 0))
 
 
 class RProp(keras.optimizers.Optimizer):

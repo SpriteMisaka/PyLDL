@@ -4,12 +4,12 @@ import sys
 import numpy as np
 from scipy import stats
 
-from pyldl.algorithms.utils import _clip, _reduction, kl_divergence, sort_loss, DEFAULT_METRICS
+from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
 
 
 THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
-                          "euclidean", "sorensen", "squared_chi2",
+                          "euclidean", "sorensen", "squared_chi2", "wave_hedges",
                           "mean_absolute_error", "mean_squared_error",
                           "sort_loss",
                           "zero_one_loss", "error_probability"]
@@ -24,6 +24,7 @@ sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 
 
 @_reduction
+@_1d
 def chebyshev(D, D_pred):
     """Chebyshev distance. It is defined as:
 
@@ -36,6 +37,7 @@ def chebyshev(D, D_pred):
 
 @_reduction
 @_clip
+@_1d
 def clark(D, D_pred):
     """Clark distance. It is defined as:
 
@@ -48,6 +50,7 @@ def clark(D, D_pred):
 
 @_reduction
 @_clip
+@_1d
 def canberra(D, D_pred):
     """Canberra distance. It is defined as:
 
@@ -62,6 +65,7 @@ sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
 
 
 @_reduction
+@_1d
 def cosine(D, D_pred):
     """Cosine similarity. It is defined as:
 
@@ -74,6 +78,7 @@ def cosine(D, D_pred):
 
 
 @_reduction
+@_1d
 def intersection(D, D_pred):
     """Intersection similarity. It is defined as:
 
@@ -85,31 +90,43 @@ def intersection(D, D_pred):
 
 
 @_reduction
+@_1d
 def euclidean(D, D_pred):
     return np.sqrt(np.sum((D - D_pred) ** 2, 1))
 
 
 @_reduction
 @_clip
+@_1d
 def sorensen(D, D_pred):
     return (np.sum(np.abs(D - D_pred), 1) / np.sum(D + D_pred, 1))
 
 
 @_reduction
 @_clip
+@_1d
 def squared_chi2(D, D_pred):
     return np.sum((D - D_pred) ** 2 / (D + D_pred), 1)
 
 
 @_reduction
-def fidelity(D, D_pred):
-    return np.sum(np.sqrt(D * D_pred), 1)
+@_clip
+@_1d
+def wave_hedges(D, D_pred):
+    return np.sum(np.abs(D - D_pred) / np.maximum(D, D_pred), 1)
 
 
 sys.modules['pyldl.metrics.sort_loss'] = sort_loss
 
 
 @_reduction
+@_1d
+def fidelity(D, D_pred):
+    return np.sum(np.sqrt(D * D_pred), 1)
+
+
+@_reduction
+@_1d
 def spearman(D, D_pred):
     """Spearman's rank correlation coefficient. It is defined as:
 
@@ -123,6 +140,7 @@ def spearman(D, D_pred):
 
 
 @_reduction
+@_1d
 def kendall(D, D_pred):
     """Kendall's rank correlation coefficient. It is defined as:
 
@@ -134,11 +152,13 @@ def kendall(D, D_pred):
 
 
 @_reduction
+@_1d
 def dpa(D, D_pred):
     return np.mean(stats.rankdata(D_pred, axis=1) * D, axis=1)
 
 
 @_reduction
+@_1d
 def mean_absolute_error(D, D_pred, mode='macro'):
     if mode == 'macro':
         if len(D.shape) == 2:
@@ -151,6 +171,7 @@ def mean_absolute_error(D, D_pred, mode='macro'):
 
 
 @_reduction
+@_1d
 def mean_squared_error(D, D_pred, mode='macro'):
     if mode == 'macro':
         if len(D.shape) == 2:
@@ -163,6 +184,7 @@ def mean_squared_error(D, D_pred, mode='macro'):
 
 
 @_reduction
+@_1d
 def zero_one_loss(D, D_pred):
     """0/1 loss. It is defined as:
 
@@ -176,6 +198,7 @@ def zero_one_loss(D, D_pred):
 
 
 @_reduction
+@_1d
 def error_probability(D, D_pred):
     """Error probability. It is defined as:
 

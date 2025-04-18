@@ -22,6 +22,7 @@ from ._ldl_scl import LDL_SCL
 from ._ldl_lrr import LDL_LRR
 from ._ldl_dpa import LDL_DPA
 from ._lrldl import _LRLDL, TLRLDL, TKLRLDL
+from ._ldl_hvlc import LDL_HVLC
 
 from ._ssg_ldl import SSG_LDL
 
@@ -32,9 +33,9 @@ from ._ldl_da import LDL_DA
 
 _ldl__ = [
 # -------------------- 2024 --------------------
-"_LRLDL", "TKLRLDL", "TLRLDL",
+"LDL_HVLC", "_LRLDL", "TKLRLDL", "TLRLDL", "LDL_DPA",
 # -------------------- 2023 --------------------
-"LDL_LRR", "LDL_DPA",
+"LDL_LRR",
 # -------------------- 2021 --------------------
 "DF_LDL", "LDL_SCL", "Duo_LDL",
 # -------------------- 2020 --------------------
