@@ -4,6 +4,13 @@ LDL4C
 .. toctree::
    :maxdepth: 2
 
+`BaseLDLClassifier`
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: pyldl.algorithms.base.BaseLDLClassifier
+   :members:
+   :private-members:
+
 .. jinja:: ldl4c_ctx
 
    {% for class_name in all_ldl4c_algs %}

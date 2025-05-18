@@ -3,20 +3,21 @@ import sys
 
 import numpy as np
 from scipy import stats
+from scipy.integrate import quad
 
 from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
 
 
 THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
-                          "euclidean", "sorensen", "squared_chi2", "wave_hedges",
+                          "euclidean", "sorensen", "chi2", "wave_hedges",
                           "mean_absolute_error", "mean_squared_error",
                           "sort_loss",
                           "zero_one_loss", "error_probability"]
 
 THE_LARGER_THE_BETTER = ["cosine", "intersection",
                          "fidelity",
-                         "spearman", "kendall", "dpa",
+                         "spearman", "kendall", "dpa", "mu",
                          "match_m", "top_k", "max_roc_auc",
                          "precision", "specificity", "sensitivity", "youden_index", "accuracy"]
 
@@ -92,6 +93,12 @@ def intersection(D, D_pred):
 @_reduction
 @_1d
 def euclidean(D, D_pred):
+    """Euclidean distance. It is defined as:
+
+    .. math::
+
+        \\text{Eucl.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sqrt{\\sum^l_{j=1}\\left( u_j - v_j \\right)^2}\\text{.}
+    """
     return np.sqrt(np.sum((D - D_pred) ** 2, 1))
 
 
@@ -99,13 +106,28 @@ def euclidean(D, D_pred):
 @_clip
 @_1d
 def sorensen(D, D_pred):
+    """
+    .. raw:: html
+
+        S&oslash;rensen's distance. It is defined as:
+
+    .. math::
+
+        \\text{S}\phi\\text{ren.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{\\sum^l_{j=1}\\left\\vert u_j - v_j \\right\\vert}{\\sum^l_{j=1}\\left( u_j + v_j \\right)}\\text{.}
+    """
     return (np.sum(np.abs(D - D_pred), 1) / np.sum(D + D_pred, 1))
 
 
 @_reduction
 @_clip
 @_1d
-def squared_chi2(D, D_pred):
+def chi2(D, D_pred):
+    """Chi-squared distance. It is defined as:
+
+    .. math::
+
+        \\chi^2(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left( u_j - v_j \\right)^2}{u_j + v_j}\\text{.}
+    """
     return np.sum((D - D_pred) ** 2 / (D + D_pred), 1)
 
 
@@ -113,6 +135,12 @@ def squared_chi2(D, D_pred):
 @_clip
 @_1d
 def wave_hedges(D, D_pred):
+    """Wave-Hedges distance. It is defined as:
+
+    .. math::
+
+        \\text{WHD}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left| u_j - v_j \\right|}{\\max (u_j, \\, v_j)}\\text{.}
+    """
     return np.sum(np.abs(D - D_pred) / np.maximum(D, D_pred), 1)
 
 
@@ -122,6 +150,12 @@ sys.modules['pyldl.metrics.sort_loss'] = sort_loss
 @_reduction
 @_1d
 def fidelity(D, D_pred):
+    """Fidelity similarity. It is defined as:
+
+    .. math::
+
+            \\text{Fid.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1} \\sqrt{u_j v_j}\\text{.}
+    """
     return np.sum(np.sqrt(D * D_pred), 1)
 
 
@@ -134,7 +168,7 @@ def spearman(D, D_pred):
 
         \\text{Spear.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = 1 - \\frac{6 \\sum_{j=1}^{l} (\\rho(u_j) - \\rho(v_j))^2 }{l(l^2 - 1)}\\text{,}
 
-    where :math:`\\rho` is the rank of the element in the vector.
+    where :math:`\\rho(\\cdot)` is the rank of the element in the vector.
     """
     return np.array([stats.spearmanr(D[i], D_pred[i])[0] for i in range(D.shape[0])])
 
@@ -154,11 +188,36 @@ def kendall(D, D_pred):
 @_reduction
 @_1d
 def dpa(D, D_pred):
+    """Degree percentile average (DPA) is proposed in paper :cite:`2024:jia`. It is defined as:
+
+    .. math::
+
+        \\text{DPA}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{1}{l} \\sum_{j=1}^{l} u + \\rho(v_j)\\text{,}
+
+    where :math:`\\rho(\\cdot)` is the rank of the element in the vector.
+    """
     return np.mean(stats.rankdata(D_pred, axis=1) * D, axis=1)
 
 
-@_reduction
 @_1d
+def mu(D, D_pred, metrics=kl_divergence):
+    u = 1 / D.shape[1] * np.ones_like(D)
+    noise = np.random.normal(0, 1e-7, size=u.shape)
+    u += noise
+    u /= np.sum(u, axis=1, keepdims=True)
+    x0 = metrics(D, u)
+    if np.isnan(x0):
+        x0 = 1.
+    a = metrics(D, D_pred, reduction=None)
+    def func(delta):
+        return (np.sum(a < delta) / len(a))
+    def f(delta):
+        return func(delta) / ((x0 - 0) * 1)
+    auc, _ = quad(f, 0., x0)
+    return auc
+
+
+@_reduction
 def mean_absolute_error(D, D_pred, mode='macro'):
     if mode == 'macro':
         if len(D.shape) == 2:
@@ -171,7 +230,6 @@ def mean_absolute_error(D, D_pred, mode='macro'):
 
 
 @_reduction
-@_1d
 def mean_squared_error(D, D_pred, mode='macro'):
     if mode == 'macro':
         if len(D.shape) == 2:
@@ -192,7 +250,7 @@ def zero_one_loss(D, D_pred):
 
         \\text{0/1 loss}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\delta(\\arg\\max(\\boldsymbol{u}), \\, \\arg\\max(\\boldsymbol{v}))\\text{,}
 
-    where :math:`\\delta` is the Kronecker delta function.
+    where :math:`\\delta(\\cdot, \\, \\cdot)` is the Kronecker delta function.
     """
     return 1 - (np.argmax(D, 1) == np.argmax(D_pred, 1))
 

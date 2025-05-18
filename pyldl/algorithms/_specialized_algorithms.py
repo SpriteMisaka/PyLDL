@@ -6,6 +6,9 @@ from pyldl.algorithms.base import BaseLDL
 from pyldl.algorithms.utils import kl_divergence
 
 
+EPS = np.finfo(np.float32).eps
+
+
 class _SA(BaseLDL):
     """Base class for :class:`pyldl.algorithms.SA_IIS` and :class:`pyldl.algorithms.SA_BFGS`.
 
@@ -21,6 +24,12 @@ class _SA(BaseLDL):
 
     def _call(self, X):
         return softmax(X @ self._W, axis=1)
+
+    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
+        super().fit(X, D)
+        self._max_iterations = max_iterations
+        self._convergence_criterion = convergence_criterion
+        self._W = np.random.random((self._n_features, self._n_outputs))
 
     def predict(self, X):
         return self._call(X)
@@ -47,14 +56,11 @@ class SA_BFGS(_SA):
 
         return loss, grad
 
-    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
-        super().fit(X, D)
-
-        w0 = np.random.random(self._n_features * self._n_outputs)
-        optimize_result = minimize(self._obj_func, w0, method='L-BFGS-B', jac=True,
-                                   options={'gtol': convergence_criterion,
-                                            'disp': False, 'maxiter': max_iterations})
-
+    def fit(self, X, D, **kwargs):
+        super().fit(X, D, **kwargs)
+        optimize_result = minimize(self._obj_func, self._W.reshape(-1,), method='L-BFGS-B', jac=True,
+                                   options={'gtol': self._convergence_criterion, 'disp': False,
+                                            'maxiter': self._max_iterations})
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
 
 
@@ -75,10 +81,8 @@ class SA_IIS(_SA):
         2010:geng
     """
 
-    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
-        super().fit(X, D)
-
-        self._W = np.random.random((self._n_features, self._n_outputs))
+    def fit(self, X, D, **kwargs):
+        super().fit(X, D, **kwargs)
 
         flag = True
         counter = 1
@@ -101,6 +105,56 @@ class SA_IIS(_SA):
             D_pred = self._call(self._X)
             l1 = self._loss_function(self._D, D_pred)
 
-            if l2 - l1 < convergence_criterion or counter >= max_iterations:
+            if l2 - l1 < self._convergence_criterion or counter >= self._max_iterations:
+                flag = False
+            counter += 1
+
+
+class LALOT(_SA):
+    """:class:`LALOT <pyldl.algorithms.LALOT>` is proposed in paper :cite:`2018:zhao`.
+    """
+
+    def __init__(self, alpha=.2, beta=200, **kwargs):
+        super().__init__(**kwargs)
+        self._alpha = alpha
+        self._beta = beta
+
+    def _compute_metric(self, K):
+        diag = np.diag(K)
+        M = diag[:, None] + diag[None, :] - 2 * K
+        M = np.abs(M)
+        M = M / np.max(M)
+        return M
+
+    def fit(self, X, D, sinkhorn_iterations=200, learning_rate=1e-4, **kwargs):
+        super().fit(X, D, **kwargs)
+        K0 = self._D.T @ self._D
+        K1 = K0 / np.max(K0)
+
+        flag = True
+        counter = 1
+        while flag:
+            M = self._compute_metric(K1)
+            K = np.exp(-self._alpha * M - 1)
+            D_pred = self._call(self._X)
+
+            U = np.ones((self._n_outputs, self._n_samples), dtype=np.float32)
+            for _ in range(sinkhorn_iterations):
+                U = D_pred.T / (K @ (self._D.T / (K.T @ U)))
+            V = self._D.T / (K.T @ U)
+            P = K * (U @ V.T)
+            Glh = (np.log(U + EPS) - np.log(U + EPS).mean(axis=0, keepdims=True)) / self._alpha
+            Ghw = (np.eye(self._n_outputs)[None, :, None, :] - self._D[:, None, None, :]) *\
+                self._D[:, :, None, None] * self._X[:, None, :, None]
+            G = (Glh.T[:, None, None, :] * Ghw).sum(axis=(0, 3))
+            self._W -= learning_rate * G.T
+
+            Gfk = -2 * P - np.diag(np.diag(-2*P)) +\
+                np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
+            K1 = K0 - (1 / self._beta) * Gfk
+            Sigma, UK = np.linalg.eig((K1 + K1.T) / 2)
+            K1 = UK @ np.diag(np.maximum(Sigma, 0)) @ UK.T
+
+            if counter >= self._max_iterations:
                 flag = False
             counter += 1

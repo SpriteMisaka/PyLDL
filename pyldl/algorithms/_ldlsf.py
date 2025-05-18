@@ -1,8 +1,47 @@
 import numpy as np
+
+from numba import jit
+
 from scipy.optimize import minimize
 
 from pyldl.algorithms.base import BaseADMM, BaseLDL
 from pyldl.algorithms.utils import soft_thresholding, solvel21
+
+
+@jit(nopython=True)
+def _update_W_numba(X, D, W, W1, W2, V, V2, PR, gamma, rho):
+    XW = X @ W
+    W12 = W - W1 - W2
+    s = (np.sum(XW, axis=1) - 1).reshape(-1, 1)
+    fro = np.linalg.norm(XW - D) ** 2 / 2.
+    con1 = np.linalg.norm(W12) ** 2
+    con2 = np.linalg.norm(s) ** 2
+    con = rho * (con1 + con2) / 2.
+    inn1 = np.sum(V * W12)
+    inn2 = np.sum(V2 * s)
+    inn = inn1 + inn2
+    tr = np.trace(XW @ PR @ XW.T)
+    loss = fro + con + inn + gamma * tr
+    lT = np.ones((1, D.shape[1]))
+    grad = X.T @ (XW - D)
+    grad += V
+    grad += rho * W12
+    grad += X.T @ (V2 + rho * s) @ lT
+    grad += gamma * X.T @ XW @ (PR + PR.T)
+    return loss, grad.reshape(-1, )
+
+
+@jit(nopython=True)
+def _update_V_numba(X, W, W1, W2, V, V2, rho):
+    s = (np.sum(X @ W, axis=1) - 1).reshape(-1, 1)
+    return V + rho * (W - W1 - W2), V2 + rho * s
+
+
+@jit(nopython=True)
+def _calculate_PR_numba(D):
+    R = np.corrcoef(D, rowvar=False)
+    P = np.diag(R @ np.ones((D.shape[1], )))
+    return P - R
 
 
 class LDLSF(BaseADMM, BaseLDL):
@@ -21,52 +60,23 @@ class LDLSF(BaseADMM, BaseLDL):
 
         def _obj_func(w):
             self._W = w.reshape(self._n_features, self._n_outputs)
-            XW = self._X @ self._W
-            s = (np.sum(XW, axis=1) - 1).reshape(-1, 1)
-            lT = np.ones((1, self._n_outputs))
-            W12 = self._W - self._W1 - self._W2
+            return _update_W_numba(self._X, self._D, self._W, self._W1, self._W2,
+                                   self._V, self._V2, self._PR, self._gamma, self._rho)
 
-            def _W_loss():
-                fro = np.linalg.norm(XW - self._D, 'fro') ** 2 / 2.
-                con1 = np.linalg.norm(W12, 'fro') ** 2
-                con2 = np.linalg.norm(s) ** 2
-                con = self._rho * (con1 + con2) / 2.
-                inn1 = np.sum(self._V * (W12))
-                inn2 = np.sum(self._V2 * s)
-                inn = inn1 + inn2
-                tr = np.trace(XW @ self._PR @ XW.T)
-                return fro + con + inn + self._gamma * tr
-
-            def _W_grad():
-                grad = self._X.T @ (XW - self._D)
-                grad += self._V
-                grad += self._rho * (W12)
-                grad += self._X.T @ self._V2 @ lT
-                grad += self._X.T @ (self._rho * s) @ lT
-                grad += self._gamma * self._X.T @ XW @ (self._PR + self._PR.T)
-                return grad.reshape(-1, )
-
-            return _W_loss(), _W_grad()
-
-        w0 = self._W.reshape(-1, ).copy()
-        optimize_result = minimize(_obj_func, w0, method='L-BFGS-B', jac=True)
+        optimize_result = minimize(_obj_func, self._W.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
         self._W1 = soft_thresholding(self._W - self._W2 + self._V / self._rho, self._alpha / self._rho)
         self._W2 = solvel21(self._W - self._W1 + self._V / self._rho, self._beta / self._rho)
 
     def _update_V(self):
-        XW = self._X @ self._W
-        s = (np.sum(XW, axis=1) - 1).reshape(-1, 1)
-        self._V = self._V + self._rho * (self._W - self._W1 - self._W2)
-        self._V2 = self._V2 + self._rho * s
+        self._V, self._V2 = _update_V_numba(self._X, self._W, self._W1, self._W2,
+                                            self._V, self._V2, self._rho)
 
     def _before_train(self):
         self._W1 = .5 * np.eye(self._n_features, self._n_outputs)
         self._W2 = .5 * np.eye(self._n_features, self._n_outputs)
         self._V2 = np.zeros((self._n_samples, 1))
-        R = np.corrcoef(self._D, rowvar=False)
-        P = np.diag(R @ np.ones((self._n_outputs, )))
-        self._PR = P - R
+        self._PR = _calculate_PR_numba(self._D)
 
     def _get_default_model(self):
         _W = np.eye(self._n_features, self._n_outputs)

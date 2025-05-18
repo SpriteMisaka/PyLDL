@@ -9,7 +9,9 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Yang, Sun, and Sun 2017](https://doi.org/10.1609/aaai.v31i1.10485)) [*AAAI*]: `BCPNN` and `ACPNN`.
   + ([Xu and Zhou 2017](https://doi.org/10.24963/ijcai.2017/443)) [*IJCAI*]: `IncomLDL`$^2$.
   + ([Shen et al. 2017](https://papers.nips.cc/paper_files/paper/2017/hash/6e2713a6efee97bacb63e52c54f0ada0-Abstract.html)) [*NeurIPS*]: `LDLF`.
+  + ([Zhao and Zhou 2018](https://doi.org/10.1609/aaai.v32i1.11609)) [*AAAI*]: `LALOT`.
   + ([Jia et al. 2018](https://doi.org/10.1609/aaai.v32i1.11664)) [*AAAI*]: `LDLLC`$^\dagger$.
+  + ([Chen et al. 2018](https://doi.org/10.1016/j.neucom.2018.09.002)) [*Neurocomputing*]: `StructTree` and `StructRF`.
   + ([Ren et al. 2019a](https://doi.org/10.24963/ijcai.2019/460)) [*IJCAI*]: `LDLSF`.
   + ([Ren et al. 2019b](https://doi.org/10.24963/ijcai.2019/461)) [*IJCAI*]: `LDL_LCLR`$^\dagger$.
   + ([Wang and Geng 2019](https://doi.org/10.24963/ijcai.2019/515)) [*IJCAI*]: `LDL4C`$^{3\dagger}$.

@@ -1,11 +1,66 @@
 import numpy as np
+
+from numba import jit
+
 from scipy.optimize import minimize
-from scipy.special import softmax
 
 from sklearn.cluster import KMeans
 
 from pyldl.algorithms.base import BaseADMM, BaseLDL
-from pyldl.algorithms.utils import kl_divergence, svt, solvel21, pairwise_euclidean
+from pyldl.algorithms.utils import svt, solvel21, pairwise_euclidean
+
+
+@jit(nopython=True)
+def _get_D_pred(X, W):
+    XW = X @ W
+    return np.exp(XW) / np.sum(np.exp(XW), axis=1).reshape(-1, 1)
+
+
+@jit(nopython=True)
+def _get_D_pred_DSE(D, S, E, X, W):
+    D_pred = _get_D_pred(X, W)
+    return D_pred, D - D_pred @ S - E
+
+
+@jit(nopython=True)
+def _update_W_numba(X, D, W, S, E, V, alpha, rho):
+    D_pred, DSE = _get_D_pred_DSE(D, S, E, X, W)
+    DD2 = D_pred - D_pred ** 2
+    kl = np.sum(D * (np.log(D) - np.log(D_pred)))
+    inn = np.sum(V * DSE)
+    fro1 = np.linalg.norm(W) ** 2
+    fro2 = rho * np.linalg.norm(DSE) ** 2 / 2.
+    loss = kl + inn + alpha * fro1 + fro2
+    grad = X.T @ (D_pred - D)
+    grad += 2 * alpha * W
+    grad -= X.T @ (DD2 * V) @ S.T
+    grad -= rho * X.T @ (DD2 * DSE) @ S.T
+    return loss, grad.reshape(-1, )
+
+
+@jit(nopython=True)
+def _update_S_numba(X, D, W, S, E, Z, V, V2, P, sumP, n_clusters, delta, rho):
+    D_pred, DSE = _get_D_pred_DSE(D, S, E, X, W)
+    inn1 = np.sum(V * DSE)
+    inn2 = np.sum(V2 * (S - Z))
+    inn = inn1 + inn2
+    fro1 = np.linalg.norm(S - Z) ** 2
+    fro2 = np.linalg.norm(DSE) ** 2
+    fro = rho * (fro1 + fro2) / 2.
+    pairwise = 0.
+    for i in range(n_clusters):
+        pairwise -= np.sum(S * P[i])
+    loss = inn + fro + delta * pairwise
+    grad = - V.T @ D_pred + V2.T
+    grad += rho * (S - Z - D_pred.T @ DSE)
+    grad -= sumP
+    return loss, grad.reshape(-1, )
+
+
+@jit(nopython=True)
+def _update_V_numba(X, D, W, S, E, Z, V, V2, rho):
+    _, DSE = _get_D_pred_DSE(D, S, E, X, W)
+    return V + rho * DSE, V2 + rho * (S - Z)
 
 
 class LDL_LCLR(BaseADMM, BaseLDL):
@@ -40,28 +95,10 @@ class LDL_LCLR(BaseADMM, BaseLDL):
 
         def _obj_func(w):
             self._W = w.reshape(self._n_features, self._n_outputs)
-            D_pred = self._get_D_pred()
-            DSE = self._get_DSE(D_pred)
-            DD2 = D_pred - D_pred ** 2
+            return _update_W_numba(self._X, self._D, self._W, self._S, self._E,
+                                   self._V, self._alpha, self._rho)
 
-            def _W_loss():
-                kl = kl_divergence(self._D, D_pred, reduction=np.sum)
-                inn = np.sum(self._V * (DSE))
-                fro1 = np.linalg.norm(self._W, 'fro') ** 2
-                fro2 = self._rho * np.linalg.norm(DSE, 'fro') ** 2 / 2.
-                return kl + inn + self._alpha * fro1 + fro2
-
-            def _W_grad():
-                grad = self._X.T @ (D_pred - self._D)
-                grad += 2 * self._alpha * self._W
-                grad -= self._X.T @ (DD2 * self._V) @ self._S.T
-                grad -= self._rho * self._X.T @ (DD2 * DSE) @ self._S.T
-                return grad.reshape(-1, )
-
-            return _W_loss(), _W_grad()
-
-        w0 = self._W.reshape(-1, ).copy()
-        optimize_result = minimize(_obj_func, w0, method='L-BFGS-B', jac=True)
+        optimize_result = minimize(_obj_func, self._W.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
         self._update_S()
         self._update_E()
@@ -70,54 +107,27 @@ class LDL_LCLR(BaseADMM, BaseLDL):
 
         def _obj_func(s):
             self._S = s.reshape(self._n_outputs, self._n_outputs)
-            D_pred = self._get_D_pred()
-            DSE = self._get_DSE(D_pred)
+            return _update_S_numba(self._X, self._D, self._W, self._S, self._E, self._Z,
+                                   self._V, self._V2, self._P, self._sumP,
+                                   self._n_clusters, self._delta, self._rho)
 
-            def _S_loss():
-                inn1 = np.sum(self._V * (DSE))
-                inn2 = np.sum(self._V2 * (self._S - self._Z))
-                inn = inn1 + inn2
-                fro1 = np.linalg.norm(self._S - self._Z, 'fro') ** 2
-                fro2 = np.linalg.norm(DSE, 'fro') ** 2
-                fro = self._rho * (fro1 + fro2) / 2.
-                pairwise = 0.
-                for i in range(self._n_clusters):
-                    pairwise -= np.sum(self._S * self._P[i])
-                return inn + fro + self._delta * pairwise
-
-            def _S_grad():
-                grad = - self._V.T @ D_pred + self._V2.T
-                grad += self._rho * (self._S - self._Z - D_pred.T @ DSE)
-                grad -= self._sumP
-                return grad.reshape(-1, )
-
-            return _S_loss(), _S_grad()
-
-        s0 = self._S.reshape(-1, ).copy()
-        optimize_result = minimize(_obj_func, s0, method='L-BFGS-B', jac=True)
+        optimize_result = minimize(_obj_func, self._S.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._S = optimize_result.x.reshape(self._n_outputs, self._n_outputs)
 
     def _update_E(self):
-        self._E = solvel21(self._get_DSE(), self._beta / self._rho)
+        _, DSE = _get_D_pred_DSE(self._D, self._S, self._E, self._X, self._W)
+        self._E = solvel21(DSE, self._beta / self._rho)
 
     def _update_Z(self):
         self._Z = svt(self._S - self._Z, self._gamma / self._rho)
 
     def _update_V(self):
-        self._V = self._V + self._rho * self._get_DSE()
-        self._V2 = self._V2 + self._rho * (self._S - self._Z)
-
-    def _get_DSE(self, D_pred=None):
-        if D_pred is None:
-            D_pred = self._get_D_pred()
-        return self._D - D_pred @ self._S - self._E
-
-    def _get_D_pred(self):
-        return softmax(self._X @ self._W, axis=1)
+        self._V, self._V2 = _update_V_numba(self._X, self._D, self._W, self._S, self._E,
+                                            self._Z, self._V, self._V2, self._rho)
 
     @property
     def constraint(self):
-        D_pred = self._get_D_pred()
+        D_pred = _get_D_pred(self._X, self._W)
         return [[self._E, self._D - D_pred @ self._S],
                 [self._Z, self._S]]
 
@@ -151,4 +161,4 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         return super().fit(X, y, rho=rho, **kwargs)
 
     def predict(self, X):
-        return softmax(X @ self._W, axis=1)
+        return _get_D_pred(X, self._W)

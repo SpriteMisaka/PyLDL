@@ -8,6 +8,9 @@ from pyldl.algorithms.utils import RProp
 from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
 
 
+EPS = np.finfo(np.float32).eps
+
+
 class AA_KNN(BaseLDL):
     """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
     """
@@ -57,7 +60,7 @@ class CPNN(BaseGD, BaseDeepLDL):
     def _before_train(self):
         if self._mode == 'augment':
             n = self._n_samples
-            one_hot = tf.one_hot(tf.math.argmax(self._D, axis=1), self.n_outputs)
+            one_hot = tf.one_hot(tf.math.argmax(self._D, axis=1), self._n_outputs)
             self._X = tf.repeat(self._X, self._v, axis=0)
             self._D = tf.repeat(self._D, self._v, axis=0)
             one_hot = tf.repeat(one_hot, self._v, axis=0)
@@ -69,14 +72,13 @@ class CPNN(BaseGD, BaseDeepLDL):
         if self._mode != 'none':
             temp = tf.one_hot(tf.reshape(temp, (-1, )) - 1, depth=self._n_outputs)
         return tf.concat([tf.cast(tf.repeat(X, self._n_outputs, axis=0), dtype=tf.float32),
-                          tf.cast(temp, dtype=tf.float32)],
-                          axis=1)
+                          tf.cast(temp, dtype=tf.float32)], axis=1)
 
     def _call(self, X):
         inputs = self._make_inputs(X)
         outputs = self._model(inputs)
         results = tf.reshape(outputs, (X.shape[0], self._n_outputs))
-        return tf.math.exp(results - tf.math.reduce_logsumexp(results, axis=1, keepdims=True))
+        return keras.activations.softmax(results)
 
 
 class BCPNN(CPNN):
@@ -228,7 +230,7 @@ class Duo_LDL(BaseAdam, BaseDeepLDL):
         shape = (X.shape[0], self._n_outputs - 1, self._n_outputs)
         C_pred_reshaped = tf.transpose(tf.reshape(C_pred, shape), (0, 2, 1))
         D_pred = ((tf.reduce_sum(C_pred_reshaped, axis=2) + 1) / self._n_outputs).numpy()
-        return D_pred / np.sum(D_pred, axis=1, keepdims=True)
+        return D_pred / (np.sum(D_pred, axis=1, keepdims=True) + EPS)
 
     def fit(self, X, Y, *, batch_size=50, **kwargs):
         return super().fit(X, Y, batch_size=batch_size, **kwargs)

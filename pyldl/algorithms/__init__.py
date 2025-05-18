@@ -9,11 +9,11 @@ tf.get_logger().setLevel(logging.ERROR)
 
 from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR
 from ._algorithm_adaptation import AA_BP, AA_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL
-from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS
+from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, LALOT
 
 from ._incomplete import IncomLDL, WInLDL
 from ._classifier import LDL4C, LDL_HR, LDLM
-from ._ensemble import DF_LDL, AdaBoostLDL
+from ._ensemble import DF_LDL, StructTree, StructRF, AdaBoostLDL
 
 from ._ldllc import LDLLC
 from ._ldlsf import LDLSF
@@ -43,7 +43,7 @@ _ldl__ = [
 # -------------------- 2019 --------------------
 "LDL_LCLR", "LDLSF",
 # -------------------- 2018 --------------------
-"LDLLC",
+"LDLLC", "LALOT", "StructTree", "StructRF",
 # -------------------- 2017 --------------------
 "BCPNN", "ACPNN", "LDLF",
 # -------------------- 2016 --------------------

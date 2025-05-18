@@ -4,6 +4,13 @@ IncomLDL
 .. toctree::
    :maxdepth: 2
 
+`BaseIncomLDL`
+~~~~~~~~~~~~~~
+
+.. autoclass:: pyldl.algorithms.base.BaseIncomLDL
+   :members:
+   :private-members:
+
 .. jinja:: incomldl_ctx
 
    {% for class_name in all_incomldl_algs %}

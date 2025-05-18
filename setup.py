@@ -1,5 +1,8 @@
 import setuptools
 
+import numpy
+from Cython.Build import cythonize
+
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -42,4 +45,6 @@ setuptools.setup(
     ],
 
     python_requires='>=3',
+    ext_modules=cythonize("pyldl/algorithms/_tree.pyx"),
+    include_dirs=[numpy.get_include()],
 )

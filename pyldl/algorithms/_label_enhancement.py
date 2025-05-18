@@ -156,9 +156,13 @@ class GLLE(BaseBFGS, BaseDeepLE):
         lap = tf.linalg.trace(tf.transpose(D) @ self._G @ D)
         return mse + self._alpha * lap + self._beta * self._E_loss(D)
 
+    @staticmethod
+    def _construct_P(X):
+        gamma = 1. / (2. * np.mean(pdist(X)) ** 2)
+        return tf.cast(rbf_kernel(X, gamma=gamma), dtype=tf.float32)
+
     def _before_train(self):
-        gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
-        self._P = tf.cast(rbf_kernel(self._X, gamma=gamma), dtype=tf.float32)
+        self._P = self._construct_P(self._X)
 
         self._nn = NearestNeighbors(n_neighbors=self._n_outputs+1)
         self._nn.fit(self._X)
@@ -182,8 +186,9 @@ class GLLE(BaseBFGS, BaseDeepLE):
     def _get_default_model(self):
         return self.get_2layer_model(self._P.shape[1], self._n_outputs, activation=None)
 
-    def transform(self):
-        return keras.activations.softmax(self._call(self._P)).numpy()
+    def transform(self, X=None, L=None):
+        P = self._P if X is None else self._construct_P(X)
+        return keras.activations.softmax(self._call(P)).numpy()
 
 
 class LEVI(BaseAdam, BaseDeepLE):
@@ -240,8 +245,10 @@ class LEVI(BaseAdam, BaseDeepLE):
                                           hidden_activation='softplus', output_activation=None)
         return {"encoder": encoder, "decoder_X": decoder_X, "decoder_L": decoder_L}
 
-    def transform(self):
-        return keras.activations.softmax(self._call(self._X, self._L, transform=True)).numpy()
+    def transform(self, X=None, L=None):
+        if X is None and L is None:
+            X, L = self._X, self._L
+        return keras.activations.softmax(self._call(X, L, transform=True)).numpy()
 
 
 class LIBLE(BaseAdam, BaseDeepLE):
@@ -291,8 +298,9 @@ class LIBLE(BaseAdam, BaseDeepLE):
                                             hidden_activation='tanh', output_activation=None)
         return {"encoder": encoder, "decoder_g": decoder_g, "decoder_L": decoder_L, "decoder_D": decoder_D}
 
-    def transform(self):
-        return keras.activations.softmax(self._call(self._X, transform=True)).numpy()
+    def transform(self, X=None, L=None):
+        X = self._X if X is None else X
+        return keras.activations.softmax(self._call(X, transform=True)).numpy()
 
 
 class ConLE(BaseGD, BaseDeepLE):
@@ -346,5 +354,7 @@ class ConLE(BaseGD, BaseDeepLE):
                                         hidden_activation=keras.layers.LeakyReLU(alpha=0.01), output_activation='softmax')
         return {"encoder_Z": encoder_Z, "encoder_Q": encoder_Q, "decoder": decoder}
 
-    def transform(self):
-        return keras.activations.softmax(self._call(self._X, self._L, transform=True)).numpy()
+    def transform(self, X=None, L=None):
+        if X is None and L is None:
+            X, L = self._X, self._L
+        return keras.activations.softmax(self._call(X, L, transform=True)).numpy()

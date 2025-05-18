@@ -1,5 +1,8 @@
+import pickle
 import logging
-import functools
+
+from functools import wraps
+from pathlib import Path
 from typing import Optional
 
 import keras
@@ -11,6 +14,16 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 from pyldl.algorithms.utils import proj, DEFAULT_METRICS
+
+
+def _path_suffix(suffix):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, path: str, *args, **kwargs):
+            file = Path(path).with_suffix(suffix)
+            return func(self, file, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class _Base:
@@ -35,6 +48,26 @@ class _Base:
             self._n_outputs = self._D.shape[1]
         return self
 
+    @_path_suffix(".pkl")
+    def dump(self, file: str):
+        """Save the model to a file.
+        """
+        with open(file, 'wb') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    @_path_suffix(".pkl")
+    def load(cls, file: str):
+        """Load the model from a file.
+        """
+        with open(file, 'rb') as f:
+            obj = pickle.load(f)
+            if isinstance(obj, cls):
+                return obj
+            new_obj = cls.__new__(cls)
+            new_obj.__dict__.update(obj.__dict__)
+            return new_obj
+
     def _not_been_fit(self):
         raise ValueError("The model has not yet been fit. "
                          "Try to call 'fit()' first with some training data.")
@@ -58,7 +91,7 @@ class _Base:
 class _BaseLDL(_Base):
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        pass
+        raise NotImplementedError("The 'predict()' method is not implemented.")
 
     def score(self, X: np.ndarray, D: np.ndarray,
               metrics: Optional[list[str]] = None, return_dict: bool = False):
@@ -76,18 +109,18 @@ class _BaseLE(_Base):
         self._n_outputs = self._L.shape[1]
         return self
 
-    def transform(self) -> np.ndarray:
+    def transform(self, X=None, L=None) -> np.ndarray:
         return self._D
 
     def fit_transform(self, X: np.ndarray, L: np.ndarray, **kwargs):
-        return self.fit(X, L, **kwargs).transform()
+        return self.fit(X, L, **kwargs).transform(X, L)
 
-    def score(self, D: np.ndarray,
+    def score(self, D: np.ndarray, X: np.ndarray = None, L: np.ndarray = None,
               metrics: Optional[list[str]] = None, return_dict: bool = False):
         if metrics is None:
             metrics = DEFAULT_METRICS
         from pyldl.metrics import score
-        return score(D, self.transform(), metrics=metrics, return_dict=return_dict)
+        return score(D, self.transform(X, L), metrics=metrics, return_dict=return_dict)
 
 
 class BaseLDL(_BaseLDL, BaseEstimator):
@@ -109,12 +142,12 @@ class BaseLE(_BaseLE, BaseEstimator):
 class Base(_Base):
 
     def fit(self, X, Y, **kwargs):
-        if issubclass(self.__class__, BaseIncomLDL):
+        if isinstance(self, BaseIncomLDL):
             mask = kwargs.pop("mask")
             BaseIncomLDL.fit(self, X, Y, mask, **kwargs)
-        elif issubclass(self.__class__, BaseLDL):
+        elif isinstance(self, BaseLDL):
             BaseLDL.fit(self, X, Y, **kwargs)
-        elif issubclass(self.__class__, BaseLE):
+        elif isinstance(self, BaseLE):
             BaseLE.fit(self, X, Y, **kwargs)
         else:
             raise TypeError("The model must be a subclass of BaseLDL or BaseLE.")
@@ -142,6 +175,7 @@ class BaseADMM(Base):
         pass
 
     def _get_default_model(self):
+        assert self._n_features is not None and self._n_outputs is not None
         _W = np.ones((self._n_features, self._n_outputs))
         _Z = np.ones((self._n_samples, self._n_outputs))
         _V = np.ones((self._n_samples, self._n_outputs))
@@ -171,6 +205,7 @@ class BaseADMM(Base):
         ) for c in self.constraint])
 
     def _dual_eps(self):
+        assert self._n_outputs is not None
         return np.sqrt(self._n_outputs) * self.EPS_ABS + self.EPS_REL * np.array([
             np.linalg.norm(v, 'fro') for v in self.Vs
         ])
@@ -311,7 +346,7 @@ class BaseDeepLDL(BaseLDL, _BaseDeep):
         return self
 
     def predict(self, X):
-        return self._call(X).numpy()
+        return tf.make_ndarray(self._call(X))
 
 
 class BaseDeepLE(BaseLE, _BaseDeep):
@@ -327,14 +362,15 @@ class BaseDeepLE(BaseLE, _BaseDeep):
         _BaseDeep.fit(self, self._X, self._L, **kwargs)
         return self
 
-    def transform(self):
-        return keras.activations.softmax(self._call(self._X)).numpy()
+    def transform(self, X=None, L=None):
+        X = self._X if X is None else X
+        return tf.make_ndarray(keras.activations.softmax(self._call(self._X)))
 
 
-class BaseDeepLDLClassifier(BaseDeepLDL):
+class BaseLDLClassifier(BaseLDL):
 
     def predict_proba(self, X):
-        return self._model(X).numpy()
+        raise NotImplementedError("The 'predict_proba()' method is not implemented.")
 
     def predict(self, X):
         return np.argmax(self.predict_proba(X), axis=1)
@@ -346,7 +382,36 @@ class BaseDeepLDLClassifier(BaseDeepLDL):
         return score(D, self.predict_proba(X), metrics=metrics, return_dict=return_dict)
 
 
+class BaseDeepLDLClassifier(BaseLDLClassifier, BaseDeepLDL):
+
+    def predict_proba(self, X):
+        return tf.make_ndarray(self._call(X))
+
+
 class BaseDeep(_BaseDeep):
+
+    @staticmethod
+    def _inspect_dims(h5_path):
+        import h5py
+        with h5py.File(h5_path, 'r') as f:
+            shapes = []
+            def _func(name, obj):
+                if isinstance(obj, h5py.Dataset):
+                    parse = name.split('/')
+                    p1 = parse[1]
+                    n = int(p1.split('_')[1]) if '_' in p1 else 0
+                    m = -1
+                    if p1.startswith('sequential'):
+                        p3 = parse[3]
+                        m = int(p3.split('_')[1]) if '_' in p3 else 0
+                    elif p1.startswith('dense'):
+                        m = 0
+                    if m >= 0 and len(obj.shape) != 1:
+                        shapes.append((n, m, obj.shape))
+            f.visititems(_func)
+            shapes.sort(key=lambda x: (x[0], x[1]))
+            shapes = [i[2] for i in shapes]
+            return shapes[0][0], shapes[-1][-1]
 
     def fit(self, X, Y, **kwargs):
         if issubclass(self.__class__, BaseDeepLDL):
@@ -355,6 +420,39 @@ class BaseDeep(_BaseDeep):
             BaseDeepLE.fit(self, X, Y, **kwargs)
         else:
             raise TypeError("The model must be a subclass of BaseDeepLDL or BaseDeepLE.")
+
+    @_path_suffix(".weights.h5")
+    def dump(self, file: str):
+        """Save the model to a file.
+        """
+        from pyldl.algorithms._algorithm_adaptation import CPNN, LDLF
+        if issubclass(self.__class__, CPNN) or issubclass(self.__class__, LDLF):
+            self._useless = BaseDeep.get_2layer_model(1, self._n_outputs)
+        self.built = True
+        self.save_weights(file)
+
+    @classmethod
+    @_path_suffix(".weights.h5")
+    def load(cls, file: str, **kwargs):
+        """Load the model from a file.
+        """
+        X = kwargs.pop("X", None)
+        D = kwargs.pop("D", None)
+        if X is None or D is None:
+            from pyldl.algorithms._label_enhancement import LEVI
+            from pyldl.algorithms._algorithm_adaptation import CPNN, BCPNN, ACPNN
+            n_features, n_outputs = cls._inspect_dims(file)
+            if cls is LEVI or cls is BCPNN or cls is ACPNN:
+                n_features -= n_outputs
+            elif cls is CPNN:
+                n_features -= 1
+            X = np.zeros((1, n_features)) if X is None else X
+            D = np.zeros((1, n_outputs)) if D is None else D
+        obj = cls()
+        BaseDeep.fit(obj, X, D, **kwargs)
+        obj.built = True
+        obj.load_weights(file)
+        return obj
 
 
 class BaseGD(BaseDeep):
@@ -374,14 +472,14 @@ class BaseGD(BaseDeep):
         if L_val is not None:
             val = L_val
             if issubclass(self.__class__, BaseDeepLE):
-                val_pred = self.transform()
+                val_pred = self.transform(X_val, L_val)
 
         if val is not None:
             from pyldl.metrics import score
             return score(val, val_pred, metrics=self._metrics, return_dict=True)
         return {}
 
-    def train_step(self, batch, loss, trainable_variables, start, end):
+    def train_step(self, batch, loss, trainable_variables, epoch, epochs, start, end):
         with tf.GradientTape() as tape:
             l = loss(batch[0], batch[1], start, end)
             self.total_loss += l
@@ -409,7 +507,7 @@ class BaseGD(BaseDeep):
                 start = step * batch_size
                 end = min(start + batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
-                self.train_step(batch, loss, trainable_variables, start, end)
+                self.train_step(batch, loss, trainable_variables, epoch, epochs, start, end)
                 callbacks.on_train_batch_end(step)
 
             scores = self._calculate_validation_scores(X_val, D_val, L_val)
@@ -442,7 +540,7 @@ class BaseBFGS(BaseDeep):
 
     @staticmethod
     def make_val_and_grad_fn(value_fn):
-        @functools.wraps(value_fn)
+        @wraps(value_fn)
         def val_and_grad(x):
             return tfp.math.value_and_gradient(value_fn, x)
         return val_and_grad
@@ -478,7 +576,7 @@ class BaseBFGS(BaseDeep):
         self._idx = []
         self._part = []
         for i, shape in enumerate(self._model_shapes):
-            n = np.product(shape)
+            n = np.prod(shape)
             self._idx.append(tf.reshape(tf.range(count, count+n, dtype=tf.int32), shape))
             self._part.extend([i]*n)
             count += n

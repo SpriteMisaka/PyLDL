@@ -3,6 +3,8 @@ from functools import wraps
 
 import numpy as np
 
+from numba import jit
+
 import keras
 import tensorflow as tf
 
@@ -36,13 +38,15 @@ def _reduction(func):
 def _1d(func):
     @wraps(func)
     def _wrapper(X, Y=None, **kwargs):
-        if X.ndim != 1:
-            return func(X, Y, **kwargs)
         if isinstance(X, np.ndarray):
+            if X.ndim != 1:
+                return func(X, Y, **kwargs)
             X = X[np.newaxis, :]
             if Y is not None:
                 Y = Y[np.newaxis, :]
         elif isinstance(X, tf.Tensor):
+            if X.shape.ndims != 1:
+                return func(X, Y, **kwargs)
             X = tf.expand_dims(X, axis=0)
             if Y is not None:
                 Y = tf.expand_dims(Y, axis=0)
@@ -51,7 +55,6 @@ def _1d(func):
             return results.ravel()[0]
         elif isinstance(X, tf.Tensor):
             return tf.reshape(results, (-1, ))[0]
-
     return _wrapper
 
 
@@ -81,6 +84,7 @@ def sort_loss(D, D_pred):
     return res
 
 
+@jit(nopython=True)
 def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     """Soft thresholding operation.
     It is defined as :math:`\\text{soft}(\\boldsymbol{A}, \\, \\tau) = \\text{sgn}(\\boldsymbol{A}) \\odot \\max\\lbrace \\lvert \\boldsymbol{A} \\rvert - \\tau, 0 \\rbrace`, 
@@ -96,6 +100,7 @@ def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     return np.sign(A) * np.maximum(np.abs(A) - tau, 0.)
 
 
+@jit(nopython=True)
 def svt(A: np.ndarray, tau: float) -> np.ndarray:
     """Singular value thresholding (SVT) is proposed in paper :cite:`2010:cai`.
 
@@ -116,6 +121,7 @@ def svt(A: np.ndarray, tau: float) -> np.ndarray:
     return U @ np.diag(S_thresh) @ VT
 
 
+@jit(nopython=True)
 def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
     """This approach is proposed in paper :cite:`2014:chen`.
 
@@ -142,7 +148,7 @@ def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
     :return: The solution to the optimization problem.
     :rtype: np.ndarray
     """
-    norms = np.linalg.norm(A, axis=0, keepdims=True)
+    norms = np.sqrt(np.sum(A**2, axis=0)).reshape(1, -1)
     return np.where(norms > tau, ((norms - tau) / norms) * A, 0.)
 
 

@@ -9,6 +9,7 @@ from pyldl.algorithms.utils import _clip
 EPS = np.finfo(np.float64).eps
 
 
+@tf.function
 def cad(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
@@ -24,6 +25,7 @@ def cad(D, D_pred):
     )
 
 
+@tf.function
 def qfd2(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
@@ -36,6 +38,7 @@ def qfd2(D, D_pred):
     )
 
 
+@tf.function
 @_clip
 def cjs(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
@@ -52,6 +55,7 @@ def cjs(D, D_pred):
     )
 
 
+@tf.function
 def unimodal_loss(y, D_pred):
     """This loss function is proposed in paper :cite:`2022:li`.
     """
@@ -64,6 +68,7 @@ def unimodal_loss(y, D_pred):
     return tf.reduce_mean(tf.reduce_sum(tf.maximum(0, -diff * sgn), axis=1))
 
 
+@tf.function
 @_clip
 def concentrated_loss(y, D_pred):
     """This loss function is proposed in paper :cite:`2022:li`.

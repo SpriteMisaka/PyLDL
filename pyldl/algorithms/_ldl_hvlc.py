@@ -53,9 +53,9 @@ class LDL_HVLC(BaseGD, BaseDeepLDL):
         self._p = tf.convert_to_tensor([pairwise_pearsonr(self._C[i], self._D[i]) for i in range(self._n_samples)], dtype=tf.float32)
         self._P = tf.convert_to_tensor(pairwise_pearsonr(tf.transpose(self._D)) , dtype=tf.float32)
 
-    def train_step(self, batch, loss, _, start, end):
-        super().train_step(batch, loss, self._model.trainable_variables, start, end)
-        super().train_step(batch, loss, [self._M], start, end)
+    def train_step(self, batch, loss, _, epoch, epochs, start, end):
+        super().train_step(batch, loss, self._model.trainable_variables, epoch, epochs, start, end)
+        super().train_step(batch, loss, [self._M], epoch, epochs, start, end)
 
     def predict(self, X):
         return keras.activations.softmax(self._model(X) + self._construct_C(X) @ self._M)
