@@ -1,6 +1,7 @@
 from typing import Union, Optional
 from functools import wraps
 
+import scipy.sparse
 import numpy as np
 
 from numba import jit
@@ -275,6 +276,23 @@ def pairwise_pearsonr(X: Union[np.ndarray, tf.Tensor],
         X_std = tf.sqrt(tf.reduce_sum(tf.square(X_centered), axis=1, keepdims=True))
         Y_std = tf.sqrt(tf.reduce_sum(tf.square(Y_centered), axis=1))
         return cov / (X_std * tf.expand_dims(Y_std, 0))
+
+
+def csr2sparse(A: scipy.sparse.csr_matrix) -> tf.SparseTensor:
+    coo = A.tocoo()
+    indices = np.asmatrix([coo.row, coo.col]).transpose()
+    return tf.sparse.reorder(
+        tf.SparseTensor(indices, coo.data.astype(np.float32), coo.shape)
+    )
+
+
+def kernel(X: tf.Tensor, Y: Optional[tf.Tensor] = None,
+           gamma: Optional[float] = None) -> tf.Tensor:
+    from sklearn.metrics.pairwise import rbf_kernel
+    Y = X if Y is None else Y
+    if gamma is None:
+        gamma = 1. / (2. * tf.reduce_mean(pairwise_euclidean(X, Y)).numpy() ** 2)
+    return tf.cast(rbf_kernel(X, Y, gamma=gamma), dtype=tf.float32)
 
 
 class RProp(keras.optimizers.Optimizer):

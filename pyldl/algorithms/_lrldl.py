@@ -5,7 +5,8 @@ from pyldl.algorithms.base import BaseADMM, BaseLDL
 
 
 class _LRLDL(BaseADMM, BaseLDL):
-    """Base class for :class:`pyldl.algorithms.TLRLDL` and :class:`pyldl.algorithms.TKLRLDL`.
+    """Base class for :class:`pyldl.algorithms.TLRLDL` and :class:`pyldl.algorithms.TKLRLDL`, 
+    which are proposed in paper :cite:`2024:kou`. LR refers to *low-rank*.
 
     :term:`ADMM` is used as optimization algorithm.
     """
@@ -87,9 +88,8 @@ class _LRLDL(BaseADMM, BaseLDL):
 
 
 class TLRLDL(_LRLDL):
-    """:class:`TLRLDL <pyldl.algorithms.TLRLDL>` is proposed in paper :cite:`2024:kou`.
-
-    A threshold-based :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix.
+    """:class:`TLRLDL <pyldl.algorithms.TLRLDL>` is proposed in paper :cite:`2024:kou`. 
+    T refers to *threshold* (a threshold-based :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix).
     """
 
     def __init__(self, **kwargs):
@@ -97,9 +97,8 @@ class TLRLDL(_LRLDL):
 
 
 class TKLRLDL(_LRLDL):
-    """:class:`TKLRLDL <pyldl.algorithms.TKLRLDL>` is proposed in paper :cite:`2024:kou`.
-
-    A top-:math:`k` :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix.
+    """:class:`TKLRLDL <pyldl.algorithms.TKLRLDL>` is proposed in paper :cite:`2024:kou`. 
+    TK refers to *top-*\\ :math:`k` (a top-:math:`k` :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix).
     """
 
     def __init__(self, **kwargs):

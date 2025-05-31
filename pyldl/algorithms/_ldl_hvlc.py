@@ -13,7 +13,8 @@ EPS = np.finfo(np.float32).eps
 
 
 class LDL_HVLC(BaseGD, BaseDeepLDL):
-    """:class:`LDL-HVLC <pyldl.algorithms.LDL_HVLC>` is proposed in paper :cite:`2024:lin`.
+    """:class:`LDL-HVLC <pyldl.algorithms.LDL_HVLC>` is proposed in paper :cite:`2024:lin`. 
+    HVLC refers to *horizontal & vertical label correlation*.
     """
 
     def __init__(self, k=5, alpha=1e-3, beta=1e-3, gamma=1e-5, delta=1e-5, **kwargs):

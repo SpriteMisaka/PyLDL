@@ -10,7 +10,8 @@ EPS = np.finfo(np.float32).eps
 
 
 class LDL_LRR(BaseBFGS, BaseDeepLDL):
-    """:class:`LDL-LRR <pyldl.algorithms.LDL_LRR>` is proposed in paper :cite:`2023:jia`.
+    """:class:`LDL-LRR <pyldl.algorithms.LDL_LRR>` is proposed in paper :cite:`2023:jia`. 
+    LRR refers to *label ranking relation*.
 
     :term:`BFGS` is used as the optimization algorithm.
     """

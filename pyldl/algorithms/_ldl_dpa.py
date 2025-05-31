@@ -7,7 +7,8 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
 class LDL_DPA(BaseBFGS, BaseDeepLDL):
-    """:class:`LDL-DPA <pyldl.algorithms.LDL_DPA>` is proposed in paper :cite:`2024:jia`.
+    """:class:`LDL-DPA <pyldl.algorithms.LDL_DPA>` is proposed in paper :cite:`2024:jia`. 
+    DPA refers to *description-degree percentile average*.
 
     :term:`BFGS` is used as the optimization algorithm.
     """

@@ -33,19 +33,16 @@ class _Base:
     def __init__(self, random_state: Optional[int] = None):
         if random_state is not None:
             np.random.seed(random_state)
-
         self._n_features = None
         self._n_outputs = None
 
-    def fit(self, X: np.ndarray, D: Optional[np.ndarray] = None):
+    def fit(self, X: np.ndarray, Y: np.ndarray):
         """Fit the model.
         """
         self._X = X
-        self._D = D
         self._n_samples = self._X.shape[0]
         self._n_features = self._X.shape[1]
-        if self._D is not None:
-            self._n_outputs = self._D.shape[1]
+        self._n_outputs = Y.shape[1]
         return self
 
     @_path_suffix(".pkl")
@@ -90,8 +87,13 @@ class _Base:
 
 class _BaseLDL(_Base):
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self) -> np.ndarray:
         raise NotImplementedError("The 'predict()' method is not implemented.")
+
+    def fit(self, X: np.ndarray, D: np.ndarray):
+        super().fit(X, D)
+        self._D = D
+        return self
 
     def score(self, X: np.ndarray, D: np.ndarray,
               metrics: Optional[list[str]] = None, return_dict: bool = False):
@@ -103,13 +105,16 @@ class _BaseLDL(_Base):
 
 class _BaseLE(_Base):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._D = None
+
     def fit(self, X: np.ndarray, L: np.ndarray):
-        super().fit(X, None)
+        super().fit(X, L)
         self._L = L
-        self._n_outputs = self._L.shape[1]
         return self
 
-    def transform(self, X=None, L=None) -> np.ndarray:
+    def transform(self, **_) -> np.ndarray:
         return self._D
 
     def fit_transform(self, X: np.ndarray, L: np.ndarray, **kwargs):
@@ -124,19 +129,17 @@ class _BaseLE(_Base):
 
 
 class BaseLDL(_BaseLDL, BaseEstimator):
-    """Let :math:`\\mathcal{X} = \\mathbb{R}^{q}` denote the input space and :math:`\\mathcal{Y} = \\lbrace y_i \\rbrace_{i=1}^{l}` denote the label space. 
-    The description degree of :math:`y \\in \\mathcal{Y}` to :math:`\\boldsymbol{x} \\in \\mathcal{X}` is denoted by :math:`d_{\\boldsymbol{x}}^{y}`. 
-    Then the label distribution of :math:`\\boldsymbol{x}` is defined as :math:`\\boldsymbol{d} = \\lbrace d_{\\boldsymbol{x}}^{y} \\rbrace_{y \\in \\mathcal{Y}}`. 
-    Note that :math:`\\boldsymbol{d}` is under the constraints of probability simplex, i.e., :math:`\\boldsymbol{d} \\in \\Delta^{l-1}`, 
-    where :math:`\\Delta^{l-1} = \\lbrace \\boldsymbol{d} \\in \\mathbb{R}^{l} \\,|\\, \\boldsymbol{d} \\geq 0,\, \\boldsymbol{d}^{\\top} \\boldsymbol{1} = 1 \\rbrace`. 
-    Given a training set of :math:`n` samples :math:`\\mathcal{S} = \\lbrace (\\boldsymbol{x}_i,\, \\boldsymbol{d}_i) \\rbrace_{i=1}^{n}`, 
-    the goal of LDL is to learn a conditional probability mass function :math:`p(\\boldsymbol{d} \,|\, \\boldsymbol{x})`.
+    """Base class for all LDL models in PyLDL.
     """
-    pass
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class BaseLE(_BaseLE, BaseEstimator):
-    pass
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Base(_Base):
@@ -335,8 +338,8 @@ class _BaseDeep(keras.Model):
 class BaseDeepLDL(BaseLDL, _BaseDeep):
 
     def __init__(self, n_hidden=64, n_latent=None, random_state=None):
-        BaseLDL.__init__(self, random_state)
-        _BaseDeep.__init__(self, n_hidden, n_latent, random_state)
+        BaseLDL.__init__(self, random_state=random_state)
+        _BaseDeep.__init__(self, n_hidden, n_latent, random_state=random_state)
 
     def fit(self, X, D, **kwargs):
         BaseLDL.fit(self, X, D)

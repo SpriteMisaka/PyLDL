@@ -15,13 +15,17 @@ class AA_KNN(BaseLDL):
     """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
     """
 
-    def fit(self, X, D, k=5):
+    def __init__(self, *, k: int = 5, **kwargs):
+        super().__init__(**kwargs)
+        self.k = k
+
+    def fit(self, X: np.ndarray, D: np.ndarray):
         super().fit(X, D)
-        self._model = NearestNeighbors(n_neighbors=k).fit(self._X)
+        self._knn = NearestNeighbors(n_neighbors=self.k).fit(self._X)
         return self
 
     def predict(self, X):
-        _, inds = self._model.kneighbors(X)
+        _, inds = self._knn.kneighbors(X)
         return np.average(self._D[inds], axis=1)
 
 

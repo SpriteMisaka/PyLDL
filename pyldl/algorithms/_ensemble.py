@@ -17,11 +17,12 @@ class DF_LDL(BaseEnsemble):
     """:class:`DF-LDL <pyldl.algorithms.DF_LDL>` is proposed in paper :cite:`2021:gonzalez`.
     """
 
-    def __init__(self, estimator=None, random_state=None):
+    def __init__(self, estimator=None, *, k: int = 5, **kwargs):
         from ._specialized_algorithms import SA_BFGS
         if estimator is None:
             estimator = SA_BFGS()
-        super().__init__(estimator, None, random_state)
+        super().__init__(estimator, None, **kwargs)
+        self.k = k
 
     def fit(self, X, y):
         super().fit(X, y)
@@ -51,7 +52,7 @@ class DF_LDL(BaseEnsemble):
         self._estimators = L
 
         from ._algorithm_adaptation import AA_KNN
-        self._knn = AA_KNN()
+        self._knn = AA_KNN(self.k)
         self._knn.fit(self._X, self._D)
 
     def predict(self, X):
