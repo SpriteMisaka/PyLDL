@@ -1,17 +1,18 @@
 LDL
----
+------
 
 LDL refers to *label distribution learning*. Its definition can be as follows:
 
-Let :math:`\mathcal{X} = \mathbb{R}^{q}` denote the input space and :math:`\mathcal{Y} = \lbrace y_i \rbrace_{i=1}^{l}` denote the label space, 
-where :math:`q` is the dimensionality of the input space and :math:`l` is the number of labels. 
-The *description degree* of :math:`y \in \mathcal{Y}` to :math:`\boldsymbol{x} \in \mathcal{X}` is denoted by :math:`d_{\boldsymbol{x}}^{y}`. 
-Then the *label distribution* of :math:`\boldsymbol{x}` is defined as :math:`\boldsymbol{d} = \lbrace d_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}`. 
-It is under the constraints of probability simplex, i.e., :math:`\boldsymbol{d} \in \Delta^{l-1}`, 
-where :math:`\Delta^{l-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{l} \,|\, \boldsymbol{d} \geq 0,\, \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace`.
+   Let :math:`\mathcal{X} = \mathbb{R}^{q}` denote the input space and :math:`\mathcal{Y} = \lbrace y_i \rbrace_{i=1}^{c}` denote the label space, 
+   where :math:`q` is the dimensionality of the input space and :math:`c` is the number of labels. 
+   The *description degree* of :math:`y \in \mathcal{Y}` to :math:`\boldsymbol{x} \in \mathcal{X}` is denoted by :math:`d_{\boldsymbol{x}}^{y}`. 
+   Then the *label distribution* of :math:`\boldsymbol{x}` is denoted by :math:`\boldsymbol{d} = \lbrace d_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}`. 
+   It is under the constraints of probability simplex, i.e., :math:`\boldsymbol{d} \in \Delta^{c-1}`, where
 
-Given a training set of :math:`n` samples :math:`\mathcal{S} = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}`, 
-the goal of LDL is to learn a mapping function :math:`f: \mathcal{X} \to \Delta^{l-1}` such that the predicted label distributions are as close as possible to the true label distributions.
+   .. math:: \Delta^{l-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{l} \,|\, \boldsymbol{d} \geq 0,\, \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace\text{.}
+
+   Given a training set of :math:`n` samples :math:`\mathcal{S} = \lbrace \boldsymbol{X},\, \boldsymbol{D} \rbrace = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}`, 
+   the goal of LDL is to learn a mapping function :math:`f: \mathcal{X} \to \Delta^{c-1}` that minimizes the discrepancy between predicted and true label distributions. The performance of :math:`f` is ultimately evaluated on a test set, typically by distance/similarity measures.
 
 .. toctree::
    :maxdepth: 2

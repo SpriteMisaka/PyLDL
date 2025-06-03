@@ -137,6 +137,8 @@ class BaseLDL(_BaseLDL, BaseEstimator):
 
 
 class BaseLE(_BaseLE, BaseEstimator):
+    """Base class for all LE models in PyLDL.
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -262,6 +264,8 @@ class BaseADMM(Base):
 
 
 class BaseIncomLDL(BaseLDL):
+    """Base class for all IncomLDL models in PyLDL.
+    """
 
     @staticmethod
     def repair(D, mask):
@@ -371,8 +375,10 @@ class BaseDeepLE(BaseLE, _BaseDeep):
 
 
 class BaseLDLClassifier(BaseLDL):
+    """Base class for all LDL4C models in PyLDL.
+    """
 
-    def predict_proba(self, X):
+    def predict_proba(self):
         raise NotImplementedError("The 'predict_proba()' method is not implemented.")
 
     def predict(self, X):
@@ -548,6 +554,11 @@ class BaseBFGS(BaseDeep):
             return tfp.math.value_and_gradient(value_fn, x)
         return val_and_grad
 
+    @staticmethod
+    @tf.function
+    def loss_function(Y, Y_pred):
+        return tf.math.reduce_mean(keras.losses.kl_divergence(Y, Y_pred))
+
     @tf.function
     def _params2model(self, params_1d):
         params = tf.dynamic_partition(params_1d, self._part, self._n_tensors)
@@ -601,9 +612,8 @@ class BaseBFGS(BaseDeep):
 
 class BaseEnsemble(BaseLDL):
 
-    def __init__(self, estimator: BaseLDL, n_estimators: Optional[int] = None,
-                 random_state: Optional[int] = None):
-        super().__init__(random_state)
+    def __init__(self, estimator: BaseLDL, n_estimators: Optional[int] = None, **kwargs):
+        super().__init__(**kwargs)
         self._estimator = estimator
         self._n_estimators = n_estimators
         self._estimators = None

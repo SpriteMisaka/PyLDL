@@ -12,6 +12,7 @@
     <script src="_static/documentation_options.js?v=47de8214"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="IncomLDL" href="incomldl.html" />
@@ -35,6 +36,10 @@
             
   <section id="le">
 <h1>LE<a class="headerlink" href="#le" title="Link to this heading">¶</a></h1>
+<p>LE refers to <em>label enhancement</em>. The key differences between LE and LDL in definition are as follows:</p>
+<blockquote>
+<div><p>The <em>logical label</em> of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> is denoted by <span class="math notranslate nohighlight">\(\boldsymbol{l} = \lbrace l_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}\)</span>, where <span class="math notranslate nohighlight">\(l_{\boldsymbol{x}}^{y} \in \lbrace 0, 1 \rbrace\)</span>. Given a training set of <span class="math notranslate nohighlight">\(n\)</span> samples <span class="math notranslate nohighlight">\(\mathcal{S} = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{l}_i) \rbrace_{i=1}^{n}\)</span>, LE recovers the label distributions from the logical labels. Under the <em>recovery setting</em>, the recovered label distributions are compared with the true label distributions; under the <em>predictive setting</em>, the recovered label distributions are used for LDL model training, and the performance is evaluated on a test set.</p>
+</div></blockquote>
 <div class="toctree-wrapper compound">
 </div>
 <section id="basele">
@@ -42,7 +47,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.base.BaseLE">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseLE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseLE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Base class for all LE models in PyLDL.</p>
+</dd></dl>
 
 </section>
 <section id="lible">

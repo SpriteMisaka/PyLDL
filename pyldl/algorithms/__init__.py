@@ -13,7 +13,7 @@ from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, LALOT
 
 from ._incomplete import IncomLDL, WInLDL
 from ._classifier import LDL4C, LDL_HR, LDLM
-from ._ensemble import DF_LDL, StructTree, StructRF, AdaBoostLDL
+from ._ensemble import RG4LDL, DF_LDL, StructRF, AdaBoostLDL
 
 from ._ldllc import LDLLC
 from ._ldlsf import LDLSF
@@ -34,7 +34,7 @@ from ._ldl_da import LDL_DA
 
 _ldl__ = [
 # -------------------- 2025 --------------------
-"RKNN_LDL",
+"RG4LDL", "RKNN_LDL",
 # -------------------- 2024 --------------------
 "LDL_HVLC", "_LRLDL", "TKLRLDL", "TLRLDL", "LDL_DPA",
 # -------------------- 2023 --------------------
@@ -46,7 +46,7 @@ _ldl__ = [
 # -------------------- 2019 --------------------
 "LDL_LCLR", "LDLSF",
 # -------------------- 2018 --------------------
-"LDLLC", "LALOT", "StructTree", "StructRF",
+"LDLLC", "LALOT", "StructRF",
 # -------------------- 2017 --------------------
 "BCPNN", "ACPNN", "LDLF",
 # -------------------- 2016 --------------------

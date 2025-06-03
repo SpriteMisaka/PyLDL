@@ -1,5 +1,9 @@
 LE
---
+------
+
+LE refers to *label enhancement*. The key differences between LE and LDL in definition are as follows:
+
+   The *logical label* of :math:`\boldsymbol{x}` is denoted by :math:`\boldsymbol{l} = \lbrace l_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}`, where :math:`l_{\boldsymbol{x}}^{y} \in \lbrace 0, 1 \rbrace`. Given a training set of :math:`n` samples :math:`\mathcal{S} = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{l}_i) \rbrace_{i=1}^{n}`, LE recovers the label distributions from the logical labels. Under the *recovery setting*, the recovered label distributions are compared with the true label distributions; under the *predictive setting*, the recovered label distributions are used for LDL model training, and the performance is evaluated on a test set.
 
 .. toctree::
    :maxdepth: 2

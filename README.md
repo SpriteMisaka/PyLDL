@@ -30,6 +30,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Lin et al. 2024](https://doi.org/10.1109/TBDATA.2023.3338023)) [*TBD*]: `LDL_HVLC`$^\dagger$.
   + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
   + ([Wang et al. 2025](https://doi.org/10.1016/j.patcog.2024.111006)) [*Pattern Recognit.*]: `RKNN_LDL`$^\dagger$.
+  + ([Tan et al. 2025](https://doi.org/10.1016/j.knosys.2025.113666)) [*KBS*]: `RG4LDL`.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://proceedings.mlr.press/v119/xu20g.html)) [*ICML*]: `LEVI`.

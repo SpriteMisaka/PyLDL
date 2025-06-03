@@ -1,6 +1,14 @@
 IncomLDL
 --------
 
+IncomLDL refers to *incomplete label distribution learning*. The key differences between IncomLDL and LDL in definition are as follows:
+
+   Let :math:`\Omega = [n] \times [c]` denote the indices of observed entries sampled uniformly at random from the label distribution matrix :math:`\boldsymbol{D}` with an observed rate :math:`\omega`, where :math:`[k] = \lbrace 1,\, 2,\, \dots,\, k \rbrace`. Then, a linear operator :math:`\mathcal{R}_{\Omega}` is defined as
+
+   .. math:: \mathcal{R}_{\Omega}(\boldsymbol{D})_{ij} = \begin{cases} D_{ij} & \text{if } (i, j) \in \Omega \text{,} \\ 0 & \text{otherwise.} \end{cases}
+
+   The given label distribution matrix in the training set is incomplete, i.e., :math:`\tilde{\boldsymbol{D}} = \mathcal{R}_{\Omega}(\boldsymbol{D})`. Under the *incomplete setting*, the performance is evaluated on a test set; under the *transductive setting*, the test data with no supervised information are accompanied by the incomplete training data.
+
 .. toctree::
    :maxdepth: 2
 

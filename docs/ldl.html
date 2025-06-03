@@ -37,14 +37,17 @@
   <section id="ldl">
 <h1>LDL<a class="headerlink" href="#ldl" title="Link to this heading">¶</a></h1>
 <p>LDL refers to <em>label distribution learning</em>. Its definition can be as follows:</p>
-<p>Let <span class="math notranslate nohighlight">\(\mathcal{X} = \mathbb{R}^{q}\)</span> denote the input space and <span class="math notranslate nohighlight">\(\mathcal{Y} = \lbrace y_i \rbrace_{i=1}^{l}\)</span> denote the label space,
-where <span class="math notranslate nohighlight">\(q\)</span> is the dimensionality of the input space and <span class="math notranslate nohighlight">\(l\)</span> is the number of labels.
+<blockquote>
+<div><p>Let <span class="math notranslate nohighlight">\(\mathcal{X} = \mathbb{R}^{q}\)</span> denote the input space and <span class="math notranslate nohighlight">\(\mathcal{Y} = \lbrace y_i \rbrace_{i=1}^{c}\)</span> denote the label space,
+where <span class="math notranslate nohighlight">\(q\)</span> is the dimensionality of the input space and <span class="math notranslate nohighlight">\(c\)</span> is the number of labels.
 The <em>description degree</em> of <span class="math notranslate nohighlight">\(y \in \mathcal{Y}\)</span> to <span class="math notranslate nohighlight">\(\boldsymbol{x} \in \mathcal{X}\)</span> is denoted by <span class="math notranslate nohighlight">\(d_{\boldsymbol{x}}^{y}\)</span>.
-Then the <em>label distribution</em> of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> is defined as <span class="math notranslate nohighlight">\(\boldsymbol{d} = \lbrace d_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}\)</span>.
-It is under the constraints of probability simplex, i.e., <span class="math notranslate nohighlight">\(\boldsymbol{d} \in \Delta^{l-1}\)</span>,
-where <span class="math notranslate nohighlight">\(\Delta^{l-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{l} \,|\, \boldsymbol{d} \geq 0,\, \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace\)</span>.</p>
-<p>Given a training set of <span class="math notranslate nohighlight">\(n\)</span> samples <span class="math notranslate nohighlight">\(\mathcal{S} = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}\)</span>,
-the goal of LDL is to learn a mapping function <span class="math notranslate nohighlight">\(f: \mathcal{X} \to \Delta^{l-1}\)</span> such that the predicted label distributions are as close as possible to the true label distributions.</p>
+Then the <em>label distribution</em> of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> is denoted by <span class="math notranslate nohighlight">\(\boldsymbol{d} = \lbrace d_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}\)</span>.
+It is under the constraints of probability simplex, i.e., <span class="math notranslate nohighlight">\(\boldsymbol{d} \in \Delta^{c-1}\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[\Delta^{l-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{l} \,|\, \boldsymbol{d} \geq 0,\, \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace\text{.}\]</div>
+<p>Given a training set of <span class="math notranslate nohighlight">\(n\)</span> samples <span class="math notranslate nohighlight">\(\mathcal{S} = \lbrace \boldsymbol{X},\, \boldsymbol{D} \rbrace = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}\)</span>,
+the goal of LDL is to learn a mapping function <span class="math notranslate nohighlight">\(f: \mathcal{X} \to \Delta^{c-1}\)</span> that minimizes the discrepancy between predicted and true label distributions. The performance of <span class="math notranslate nohighlight">\(f\)</span> is ultimately evaluated on a test set, typically by distance/similarity measures.</p>
+</div></blockquote>
 <div class="toctree-wrapper compound">
 </div>
 <section id="baseldl">
@@ -56,12 +59,21 @@ the goal of LDL is to learn a mapping function <span class="math notranslate noh
 </dd></dl>
 
 </section>
+<section id="rg4ldl">
+<h2>RG4LDL<a class="headerlink" href="#rg4ldl" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.RG4LDL">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RG4LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RG4LDL" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.RG4LDL" title="pyldl.algorithms.RG4LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RG4LDL</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id247" title="Chao Tan, Sheng Chen, Jiaxi Zhang, Zilong Xu, Xin Geng, and Genlin Ji. RG4LDL: renormalization group for label distribution learning. Knowledge-Based Systems, 320:113666, 2025. URL: https://doi.org/10.1016/j.knosys.2025.113666.">LDL-TCZ+25</a>]</span>.</p>
+</dd></dl>
+
+</section>
 <section id="rknn-ldl">
 <h2>R<span class="math notranslate nohighlight">\(k\)</span>NN-LDL<a class="headerlink" href="#rknn-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.RKNN_LDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RKNN_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RKNN_LDL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.RKNN_LDL" title="pyldl.algorithms.RKNN_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RkNN-LDL</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id242" title="Jing Wang, Fu Feng, Jianhui Lv, and Xin Geng. Residual k-nearest neighbors label distribution learning. Pattern Recognition, 158:111006, 2025. URL: https://doi.org/10.1016/j.patcog.2024.111006.">LDL-WFLG25</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.RKNN_LDL" title="pyldl.algorithms.RKNN_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RkNN-LDL</span></code></a> is proposed in paper <span id="id2">[<a class="reference internal" href="#id249" title="Jing Wang, Fu Feng, Jianhui Lv, and Xin Geng. Residual k-nearest neighbors label distribution learning. Pattern Recognition, 158:111006, 2025. URL: https://doi.org/10.1016/j.patcog.2024.111006.">LDL-WFLG25</a>]</span>.
 R<span class="math notranslate nohighlight">\(k\)</span>NN refers to <em>residual</em> <span class="math notranslate nohighlight">\(k\)</span><em>-nearest neighbor</em>.</p>
 </dd></dl>
 
@@ -71,7 +83,7 @@ R<span class="math notranslate nohighlight">\(k\)</span>NN refers to <em>residua
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_HVLC">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_HVLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_HVLC" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_HVLC" title="pyldl.algorithms.LDL_HVLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-HVLC</span></code></a> is proposed in paper <span id="id2">[<a class="reference internal" href="#id244" title="Yaojin Lin, Yulin Li, Chenxi Wang, Lei Guo, and Jinkun Chen. Label distribution learning based on horizontal and vertical mining of label correlations. IEEE Transactions on Big Data, 10(3):275–287, 2024. URL: https://doi.org/10.1109/TBDATA.2023.3338023.">LDL-LLW+24</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_HVLC" title="pyldl.algorithms.LDL_HVLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-HVLC</span></code></a> is proposed in paper <span id="id3">[<a class="reference internal" href="#id251" title="Yaojin Lin, Yulin Li, Chenxi Wang, Lei Guo, and Jinkun Chen. Label distribution learning based on horizontal and vertical mining of label correlations. IEEE Transactions on Big Data, 10(3):275–287, 2024. URL: https://doi.org/10.1109/TBDATA.2023.3338023.">LDL-LLW+24</a>]</span>.
 HVLC refers to <em>horizontal &amp; vertical label correlation</em>.</p>
 </dd></dl>
 
@@ -82,12 +94,12 @@ HVLC refers to <em>horizontal &amp; vertical label correlation</em>.</p>
 <dt class="sig sig-object py" id="pyldl.algorithms._LRLDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_LRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._LRLDL" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for <a class="reference internal" href="#pyldl.algorithms.TLRLDL" title="pyldl.algorithms.TLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.TLRLDL</span></code></a> and <a class="reference internal" href="#pyldl.algorithms.TKLRLDL" title="pyldl.algorithms.TKLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.TKLRLDL</span></code></a>,
-which are proposed in paper <span id="id3">[<a class="reference internal" href="#id245" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>. LR refers to <em>low-rank</em>.</p>
+which are proposed in paper <span id="id4">[<a class="reference internal" href="#id252" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>. LR refers to <em>low-rank</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as optimization algorithm.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyldl.algorithms._LRLDL._update_V">
 <span class="sig-name descname"><span class="pre">_update_V</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._LRLDL._update_V" title="Link to this definition">¶</a></dt>
-<dd><p>Please note that Eq. (11) in paper <span id="id4">[<a class="reference internal" href="#id245" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span> should be corrected to:</p>
+<dd><p>Please note that Eq. (11) in paper <span id="id5">[<a class="reference internal" href="#id252" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span> should be corrected to:</p>
 <div class="math notranslate nohighlight">
 \[\boldsymbol{\Gamma}_1 \leftarrow \boldsymbol{\Gamma}_1 + \mu
 \left(\boldsymbol{W}\boldsymbol{X}^{\top}\boldsymbol{O} - \boldsymbol{G}\right)\text{.}\]</div>
@@ -96,7 +108,7 @@ which are proposed in paper <span id="id3">[<a class="reference internal" href="
 <dl class="py method">
 <dt class="sig sig-object py" id="pyldl.algorithms._LRLDL._update_W">
 <span class="sig-name descname"><span class="pre">_update_W</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._LRLDL._update_W" title="Link to this definition">¶</a></dt>
-<dd><p>Please note that Eq. (8) in paper <span id="id5">[<a class="reference internal" href="#id245" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span> should be corrected to:</p>
+<dd><p>Please note that Eq. (8) in paper <span id="id6">[<a class="reference internal" href="#id252" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span> should be corrected to:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 \boldsymbol{W} \leftarrow &amp; \left(\left(\mu \boldsymbol{G} + \boldsymbol{\Gamma}_1 + \boldsymbol{L}\right)
@@ -121,7 +133,7 @@ which are proposed in paper <span id="id3">[<a class="reference internal" href="
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.TKLRLDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TKLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TKLRLDL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.TKLRLDL" title="pyldl.algorithms.TKLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TKLRLDL</span></code></a> is proposed in paper <span id="id6">[<a class="reference internal" href="#id245" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.TKLRLDL" title="pyldl.algorithms.TKLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TKLRLDL</span></code></a> is proposed in paper <span id="id7">[<a class="reference internal" href="#id252" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
 TK refers to <em>top-</em><span class="math notranslate nohighlight">\(k\)</span> (a top-<span class="math notranslate nohighlight">\(k\)</span> <a class="reference internal" href="utils.html#pyldl.algorithms.utils.binaryzation" title="pyldl.algorithms.utils.binaryzation"><code class="xref py py-class docutils literal notranslate"><span class="pre">binaryzation</span></code></a> method is used to generate the logical label matrix).</p>
 </dd></dl>
 
@@ -131,7 +143,7 @@ TK refers to <em>top-</em><span class="math notranslate nohighlight">\(k\)</span
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.TLRLDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TLRLDL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.TLRLDL" title="pyldl.algorithms.TLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TLRLDL</span></code></a> is proposed in paper <span id="id7">[<a class="reference internal" href="#id245" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.TLRLDL" title="pyldl.algorithms.TLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TLRLDL</span></code></a> is proposed in paper <span id="id8">[<a class="reference internal" href="#id252" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
 T refers to <em>threshold</em> (a threshold-based <a class="reference internal" href="utils.html#pyldl.algorithms.utils.binaryzation" title="pyldl.algorithms.utils.binaryzation"><code class="xref py py-class docutils literal notranslate"><span class="pre">binaryzation</span></code></a> method is used to generate the logical label matrix).</p>
 </dd></dl>
 
@@ -142,7 +154,7 @@ T refers to <em>threshold</em> (a threshold-based <a class="reference internal" 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_DPA">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DPA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_DPA" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_DPA" title="pyldl.algorithms.LDL_DPA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-DPA</span></code></a> is proposed in paper <span id="id8">[<a class="reference internal" href="#id243" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_DPA" title="pyldl.algorithms.LDL_DPA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-DPA</span></code></a> is proposed in paper <span id="id9">[<a class="reference internal" href="#id250" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>.
 DPA refers to <em>description-degree percentile average</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as the optimization algorithm.</p>
 </dd></dl>
@@ -153,7 +165,7 @@ DPA refers to <em>description-degree percentile average</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_LRR">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LRR" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LRR" title="pyldl.algorithms.LDL_LRR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LRR</span></code></a> is proposed in paper <span id="id9">[<a class="reference internal" href="#id247" title="Xiuyi Jia, Xiaoxia Shen, Weiwei Li, Yunan Lu, and Jihua Zhu. Label distribution learning by maintaining label ranking relation. IEEE Transactions on Knowledge and Data Engineering, 35(2):1695-1707, 2023. URL: https://doi.org/10.1109/TKDE.2021.3099294.">LDL-JSL+23</a>]</span>.
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LRR" title="pyldl.algorithms.LDL_LRR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LRR</span></code></a> is proposed in paper <span id="id10">[<a class="reference internal" href="#id254" title="Xiuyi Jia, Xiaoxia Shen, Weiwei Li, Yunan Lu, and Jihua Zhu. Label distribution learning by maintaining label ranking relation. IEEE Transactions on Knowledge and Data Engineering, 35(2):1695-1707, 2023. URL: https://doi.org/10.1109/TKDE.2021.3099294.">LDL-JSL+23</a>]</span>.
 LRR refers to <em>label ranking relation</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as the optimization algorithm.</p>
 </dd></dl>
@@ -164,7 +176,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.DF_LDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">DF_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.DF_LDL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.DF_LDL" title="pyldl.algorithms.DF_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">DF-LDL</span></code></a> is proposed in paper <span id="id10">[<a class="reference internal" href="#id253" title="Manuel González, Germán González-Almagro, Isaac Triguero, José-Ramón Cano, and Salvador García. Decomposition-fusion for label distribution learning. Information Fusion, 66:64–75, 2021. URL: https://doi.org/10.1016/j.inffus.2020.08.024.">LDL-GGAT+21</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.DF_LDL" title="pyldl.algorithms.DF_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">DF-LDL</span></code></a> is proposed in paper <span id="id11">[<a class="reference internal" href="#id260" title="Manuel González, Germán González-Almagro, Isaac Triguero, José-Ramón Cano, and Salvador García. Decomposition-fusion for label distribution learning. Information Fusion, 66:64–75, 2021. URL: https://doi.org/10.1016/j.inffus.2020.08.024.">LDL-GGAT+21</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -173,12 +185,12 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_SCL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_SCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_SCL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_SCL" title="pyldl.algorithms.LDL_SCL"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-SCL</span></code></a> is proposed in paper <span id="id11">[<a class="reference internal" href="#id267" title="Xiang Zheng, Xiuyi Jia, and Weiwei Li. Label distribution learning by exploiting sample correlations locally. In Proceedings of the AAAI Conference on Artificial Intelligence, 4556–4563. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11693.">LDL-ZJL18</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_SCL" title="pyldl.algorithms.LDL_SCL"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-SCL</span></code></a> is proposed in paper <span id="id12">[<a class="reference internal" href="#id274" title="Xiang Zheng, Xiuyi Jia, and Weiwei Li. Label distribution learning by exploiting sample correlations locally. In Proceedings of the AAAI Conference on Artificial Intelligence, 4556–4563. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11693.">LDL-ZJL18</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-Adam"><span class="xref std std-term">Adam</span></a> is used as optimizer.</p>
 <p>See also:</p>
-<div class="docutils container" id="id12">
+<div class="docutils container" id="id13">
 <div role="list" class="citation-list">
-<div class="citation" id="id26" role="doc-biblioentry">
+<div class="citation" id="id28" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-SCL-JLZ+21<span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Zechao Li, Xiang Zheng, Weiwei Li, and Sheng-Jun Huang. Label distribution learning with label correlations on local samples. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 33(4):1619–1631, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2019.2943337">https://doi.org/10.1109/TKDE.2019.2943337</a>.</p>
 </div>
@@ -192,7 +204,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.Duo_LDL">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Duo_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Duo_LDL" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.Duo_LDL" title="pyldl.algorithms.Duo_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">Duo-LDL</span></code></a> is proposed in paper <span id="id51">[<a class="reference internal" href="#id255" title="Adam Żychowski and Jacek Mańdziuk. Duo-ldl method for label distribution learning based on pairwise class dependencies. Applied Soft Computing, 110:107585, 2021. URL: https://doi.org/10.1016/j.asoc.2021.107585.">LDL-ZM21</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.Duo_LDL" title="pyldl.algorithms.Duo_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">Duo-LDL</span></code></a> is proposed in paper <span id="id53">[<a class="reference internal" href="#id262" title="Adam Żychowski and Jacek Mańdziuk. Duo-ldl method for label distribution learning based on pairwise class dependencies. Applied Soft Computing, 110:107585, 2021. URL: https://doi.org/10.1016/j.asoc.2021.107585.">LDL-ZM21</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -201,12 +213,12 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_LCLR">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LCLR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LCLR" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LCLR" title="pyldl.algorithms.LDL_LCLR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LCLR</span></code></a> is proposed in paper <span id="id52">[<a class="reference internal" href="#id259" title="Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In Proceedings of the International Joint Conference on Artificial Intelligence, 3325–3331. 2019. URL: https://doi.org/10.24963/ijcai.2019/461.">LDL-RJLZ19</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LCLR" title="pyldl.algorithms.LDL_LCLR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LCLR</span></code></a> is proposed in paper <span id="id54">[<a class="reference internal" href="#id266" title="Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In Proceedings of the International Joint Conference on Artificial Intelligence, 3325–3331. 2019. URL: https://doi.org/10.24963/ijcai.2019/461.">LDL-RJLZ19</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as the optimization algorithm.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_LCLR._update_W">
 <span class="sig-name descname"><span class="pre">_update_W</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LCLR._update_W" title="Link to this definition">¶</a></dt>
-<dd><p>Please note that Eq. (9) in paper <span id="id53">[<a class="reference internal" href="#id259" title="Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In Proceedings of the International Joint Conference on Artificial Intelligence, 3325–3331. 2019. URL: https://doi.org/10.24963/ijcai.2019/461.">LDL-RJLZ19</a>]</span> should be corrected to:</p>
+<dd><p>Please note that Eq. (9) in paper <span id="id55">[<a class="reference internal" href="#id266" title="Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In Proceedings of the International Joint Conference on Artificial Intelligence, 3325–3331. 2019. URL: https://doi.org/10.24963/ijcai.2019/461.">LDL-RJLZ19</a>]</span> should be corrected to:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{aligned}
 \nabla_\boldsymbol{W} = &amp; \boldsymbol{X}^{\top} \left(\hat{\boldsymbol{D}} - \boldsymbol{D}\right) + 2 \lambda_1 \boldsymbol{W} -
@@ -226,7 +238,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLSF">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLSF" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLSF" title="pyldl.algorithms.LDLSF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLSF</span></code></a> is proposed in paper <span id="id54">[<a class="reference internal" href="#id258" title="Tingting Ren, Xiuyi Jia, Weiwei Li, Lei Chen, and Zechao Li. Label distribution learning with label-specific features. In Proceedings of the International Joint Conference on Artificial Intelligence, 3318–3324. 2019. URL: https://doi.org/10.24963/ijcai.2019/460.">LDL-RJL+19</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLSF" title="pyldl.algorithms.LDLSF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLSF</span></code></a> is proposed in paper <span id="id56">[<a class="reference internal" href="#id265" title="Tingting Ren, Xiuyi Jia, Weiwei Li, Lei Chen, and Zechao Li. Label distribution learning with label-specific features. In Proceedings of the International Joint Conference on Artificial Intelligence, 3318–3324. 2019. URL: https://doi.org/10.24963/ijcai.2019/460.">LDL-RJL+19</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as optimization algorithm.</p>
 </dd></dl>
 
@@ -236,7 +248,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLLC">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLLC" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLLC" title="pyldl.algorithms.LDLLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLLC</span></code></a> is proposed in paper <span id="id55">[<a class="reference internal" href="#id264" title="Xiuyi Jia, Weiwei Li, Junyu Liu, and Yu Zhang. Label distribution learning by exploiting label correlations. In Proceedings of the AAAI Conference on Artificial Intelligence, 3310–3317. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11664.">LDL-JLLZ18</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLLC" title="pyldl.algorithms.LDLLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLLC</span></code></a> is proposed in paper <span id="id57">[<a class="reference internal" href="#id271" title="Xiuyi Jia, Weiwei Li, Junyu Liu, and Yu Zhang. Label distribution learning by exploiting label correlations. In Proceedings of the AAAI Conference on Artificial Intelligence, 3310–3317. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11664.">LDL-JLLZ18</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as optimization algorithm.</p>
 </dd></dl>
 
@@ -246,16 +258,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LALOT">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LALOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LALOT" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LALOT" title="pyldl.algorithms.LALOT"><code class="xref py py-class docutils literal notranslate"><span class="pre">LALOT</span></code></a> is proposed in paper <span id="id56">[<a class="reference internal" href="#id266" title="Peng Zhao and Zhi-Hua Zhou. Label distribution learning by optimal transport. In Proceedings of the AAAI Conference on Artificial Intelligence, 4506–4513. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11609.">LDL-ZZ18</a>]</span>.</p>
-</dd></dl>
-
-</section>
-<section id="structtree">
-<h2>StructTree<a class="headerlink" href="#structtree" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyldl.algorithms.StructTree">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">StructTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_to_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructTree" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.StructTree" title="pyldl.algorithms.StructTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructTree</span></code></a> is proposed in paper <span id="id57">[<a class="reference internal" href="#id263" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LALOT" title="pyldl.algorithms.LALOT"><code class="xref py py-class docutils literal notranslate"><span class="pre">LALOT</span></code></a> is proposed in paper <span id="id58">[<a class="reference internal" href="#id273" title="Peng Zhao and Zhi-Hua Zhou. Label distribution learning by optimal transport. In Proceedings of the AAAI Conference on Artificial Intelligence, 4506–4513. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11609.">LDL-ZZ18</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -264,7 +267,13 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.StructRF">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">StructRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_to_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.StructRF" title="pyldl.algorithms.StructRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructRF</span></code></a> is proposed in paper <span id="id58">[<a class="reference internal" href="#id263" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.StructRF" title="pyldl.algorithms.StructRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructRF</span></code></a> is proposed in paper <span id="id59">[<a class="reference internal" href="#id270" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.StructRF.StructTree">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StructTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_to_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF.StructTree" title="Link to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">StructTree</span></code> is proposed in paper <span id="id60">[<a class="reference internal" href="#id270" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -273,12 +282,12 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.BCPNN">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">BCPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.BCPNN" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.BCPNN" title="pyldl.algorithms.BCPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">BCPNN</span></code></a> is proposed in paper <span id="id59">[<a class="reference internal" href="#id271" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.BCPNN" title="pyldl.algorithms.BCPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">BCPNN</span></code></a> is proposed in paper <span id="id61">[<a class="reference internal" href="#id278" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 <p>This algorithm is based on <a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a>. See also:</p>
-<div class="docutils container" id="id60">
+<div class="docutils container" id="id62">
 <div role="list" class="citation-list">
-<div class="citation" id="id97" role="doc-biblioentry">
+<div class="citation" id="id100" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>BCPNN-GYZ13<span class="fn-bracket">]</span></span>
 <p>Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 35(10):2401–2412, 2013. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2013.51">https://doi.org/10.1109/TPAMI.2013.51</a>.</p>
 </div>
@@ -292,12 +301,12 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.ACPNN">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">ACPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.ACPNN" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.ACPNN" title="pyldl.algorithms.ACPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACPNN</span></code></a> is proposed in paper <span id="id99">[<a class="reference internal" href="#id271" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.ACPNN" title="pyldl.algorithms.ACPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACPNN</span></code></a> is proposed in paper <span id="id102">[<a class="reference internal" href="#id278" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 <p>This algorithm is based on <a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a>. See also:</p>
-<div class="docutils container" id="id100">
+<div class="docutils container" id="id103">
 <div role="list" class="citation-list">
-<div class="citation" id="id137" role="doc-biblioentry">
+<div class="citation" id="id141" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>ACPNN-GYZ13<span class="fn-bracket">]</span></span>
 <p>Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 35(10):2401–2412, 2013. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2013.51">https://doi.org/10.1109/TPAMI.2013.51</a>.</p>
 </div>
@@ -311,12 +320,12 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLF">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLF" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLF" title="pyldl.algorithms.LDLF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLF</span></code></a> is proposed in paper <span id="id139">[<a class="reference internal" href="#id270" title="Wei Shen, Kai Zhao, Yilu Guo, and Alan Yuille. Label distribution learning forests. In Advances in Neural Information Processing Systems, 834–843. 2017.">LDL-SZGY17</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDLF" title="pyldl.algorithms.LDLF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLF</span></code></a> is proposed in paper <span id="id143">[<a class="reference internal" href="#id277" title="Wei Shen, Kai Zhao, Yilu Guo, and Alan Yuille. Label distribution learning forests. In Advances in Neural Information Processing Systems, 834–843. 2017.">LDL-SZGY17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-Adam"><span class="xref std std-term">Adam</span></a> is used as the optimizer.</p>
 <p>This algorithm employs deep neural decision forests. See also:</p>
-<div class="docutils container" id="id140">
+<div class="docutils container" id="id144">
 <div role="list" class="citation-list">
-<div class="citation" id="id176" role="doc-biblioentry">
+<div class="citation" id="id181" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDLF-KFCB15<span class="fn-bracket">]</span></span>
 <p>Peter Kontschieder, Madalina Fiterau, Antonio Criminisi, and Samuel Rota Bulo. Deep neural decision forests. In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 1467–1475. 2015. URL: <a class="reference external" href="https://doi.org/10.1109/ICCV.2015.172">https://doi.org/10.1109/ICCV.2015.172</a>.</p>
 </div>
@@ -339,7 +348,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.SA_BFGS">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_BFGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_BFGS" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.SA_BFGS" title="pyldl.algorithms.SA_BFGS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-BFGS</span></code></a> is proposed in paper <span id="id179">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.SA_BFGS" title="pyldl.algorithms.SA_BFGS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-BFGS</span></code></a> is proposed in paper <span id="id184">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as optimization algorithm.</p>
 </dd></dl>
 
@@ -349,20 +358,20 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.SA_IIS">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_IIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_IIS" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-IIS</span></code></a> is proposed in paper <span id="id180">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-IIS</span></code></a> is proposed in paper <span id="id185">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-IIS"><span class="xref std std-term">IIS</span></a> is used as optimization algorithm.</p>
 <p>IIS-LLD is the early version of <a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-IIS</span></code></a>. See also:</p>
-<div class="docutils container" id="id181">
+<div class="docutils container" id="id186">
 <div role="list" class="citation-list">
-<div class="citation" id="id218" role="doc-biblioentry">
+<div class="citation" id="id224" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>SA-IIS-GYZ13<span class="fn-bracket">]</span></span>
 <p>Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 35(10):2401–2412, 2013. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2013.51">https://doi.org/10.1109/TPAMI.2013.51</a>.</p>
 </div>
-<div class="citation" id="id219" role="doc-biblioentry">
+<div class="citation" id="id225" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>SA-IIS-GSMZ10<span class="fn-bracket">]</span></span>
 <p>Xin Geng, Kate Smith-Miles, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 451–456. 2010. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v24i1.7657">https://doi.org/10.1609/aaai.v24i1.7657</a>.</p>
 </div>
-<div class="citation" id="id228" role="doc-biblioentry">
+<div class="citation" id="id234" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>SA-IIS-ZWG15<span class="fn-bracket">]</span></span>
 <p>Zhaoxiang Zhang, Mo Wang, and Xin Geng. Crowd counting in public video surveillance by label distribution learning. <em>Neurocomputing</em>, 166:151–163, 2015. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2015.03.083">https://doi.org/10.1016/j.neucom.2015.03.083</a>.</p>
 </div>
@@ -380,7 +389,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.AA_KNN">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_KNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_KNN" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_KNN" title="pyldl.algorithms.AA_KNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-kNN</span></code></a> is proposed in paper <span id="id229">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_KNN" title="pyldl.algorithms.AA_KNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-kNN</span></code></a> is proposed in paper <span id="id235">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -389,7 +398,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.AA_BP">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_BP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_BP" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_BP" title="pyldl.algorithms.AA_BP"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-BP</span></code></a> is proposed in paper <span id="id230">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_BP" title="pyldl.algorithms.AA_BP"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-BP</span></code></a> is proposed in paper <span id="id236">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -408,7 +417,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.PT_Bayes">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_Bayes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_Bayes" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.PT_Bayes" title="pyldl.algorithms.PT_Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-Bayes</span></code></a> is proposed in paper <span id="id231">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.PT_Bayes" title="pyldl.algorithms.PT_Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-Bayes</span></code></a> is proposed in paper <span id="id237">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -417,7 +426,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.PT_SVM">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_SVM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_SVM" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.PT_SVM" title="pyldl.algorithms.PT_SVM"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-SVM</span></code></a> is proposed in paper <span id="id232">[<a class="reference internal" href="#id272" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.PT_SVM" title="pyldl.algorithms.PT_SVM"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-SVM</span></code></a> is proposed in paper <span id="id238">[<a class="reference internal" href="#id279" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -427,7 +436,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDSVR">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDSVR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDSVR" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.LDSVR" title="pyldl.algorithms.LDSVR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDSVR</span></code></a> is proposed in paper <span id="id233">[<a class="reference internal" href="#id275" title="Xin Geng and Peng Hou. Pre-release prediction of crowd opinion on movies by label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 3511–3517. 2015.">LDL-GH15</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.LDSVR" title="pyldl.algorithms.LDSVR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDSVR</span></code></a> is proposed in paper <span id="id239">[<a class="reference internal" href="#id282" title="Xin Geng and Peng Hou. Pre-release prediction of crowd opinion on movies by label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 3511–3517. 2015.">LDL-GH15</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -436,7 +445,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.CPNN">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">CPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.CPNN" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a> is proposed in paper <span id="id234">[<a class="reference internal" href="#id277" title="Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. IEEE Transactions on Pattern Analysis and Machine Intelligence, 35(10):2401–2412, 2013. URL: https://doi.org/10.1109/TPAMI.2013.51.">LDL-GYZ13</a>]</span>.</p>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a> is proposed in paper <span id="id240">[<a class="reference internal" href="#id284" title="Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. IEEE Transactions on Pattern Analysis and Machine Intelligence, 35(10):2401–2412, 2013. URL: https://doi.org/10.1109/TPAMI.2013.51.">LDL-GYZ13</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 </dd></dl>
 
@@ -446,7 +455,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.loss_function_engineering.cad">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.loss_function_engineering.</span></span><span class="sig-name descname"><span class="pre">cad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/loss_function_engineering.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.loss_function_engineering.cad" title="Link to this definition">¶</a></dt>
-<dd><p>This loss function is proposed in paper <span id="id235">[<a class="reference internal" href="#id250" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
+<dd><p>This loss function is proposed in paper <span id="id241">[<a class="reference internal" href="#id257" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -455,7 +464,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.loss_function_engineering.cjs">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.loss_function_engineering.</span></span><span class="sig-name descname"><span class="pre">cjs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/loss_function_engineering.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.loss_function_engineering.cjs" title="Link to this definition">¶</a></dt>
-<dd><p>This loss function is proposed in paper <span id="id236">[<a class="reference internal" href="#id250" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
+<dd><p>This loss function is proposed in paper <span id="id242">[<a class="reference internal" href="#id257" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -464,7 +473,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.loss_function_engineering.concentrated_loss">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.loss_function_engineering.</span></span><span class="sig-name descname"><span class="pre">concentrated_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/loss_function_engineering.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.loss_function_engineering.concentrated_loss" title="Link to this definition">¶</a></dt>
-<dd><p>This loss function is proposed in paper <span id="id237">[<a class="reference internal" href="#id251" title="Qiang Li, Jingjing Wang, Zhaoliang Yao, Yachun Li, Pengju Yang, Jingwei Yan, Chunmao Wang, and Shiliang Pu. Unimodal-concentrated loss: fully adaptive label distribution learning for ordinal regression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 20513–20522. 2022. URL: https://doi.org/10.1109/CVPR52688.2022.01986.">LDL-LWY+22</a>]</span>.</p>
+<dd><p>This loss function is proposed in paper <span id="id243">[<a class="reference internal" href="#id258" title="Qiang Li, Jingjing Wang, Zhaoliang Yao, Yachun Li, Pengju Yang, Jingwei Yan, Chunmao Wang, and Shiliang Pu. Unimodal-concentrated loss: fully adaptive label distribution learning for ordinal regression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 20513–20522. 2022. URL: https://doi.org/10.1109/CVPR52688.2022.01986.">LDL-LWY+22</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -473,7 +482,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.loss_function_engineering.qfd2">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.loss_function_engineering.</span></span><span class="sig-name descname"><span class="pre">qfd2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/loss_function_engineering.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.loss_function_engineering.qfd2" title="Link to this definition">¶</a></dt>
-<dd><p>This loss function is proposed in paper <span id="id238">[<a class="reference internal" href="#id250" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
+<dd><p>This loss function is proposed in paper <span id="id244">[<a class="reference internal" href="#id257" title="Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision, 23481–23491. 2023. URL: https://doi.org/10.1109/ICCV51070.2023.02146.">LDL-WZYY23</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -482,99 +491,103 @@ LRR refers to <em>label ranking relation</em>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.loss_function_engineering.unimodal_loss">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.loss_function_engineering.</span></span><span class="sig-name descname"><span class="pre">unimodal_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/loss_function_engineering.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.loss_function_engineering.unimodal_loss" title="Link to this definition">¶</a></dt>
-<dd><p>This loss function is proposed in paper <span id="id239">[<a class="reference internal" href="#id251" title="Qiang Li, Jingjing Wang, Zhaoliang Yao, Yachun Li, Pengju Yang, Jingwei Yan, Chunmao Wang, and Shiliang Pu. Unimodal-concentrated loss: fully adaptive label distribution learning for ordinal regression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 20513–20522. 2022. URL: https://doi.org/10.1109/CVPR52688.2022.01986.">LDL-LWY+22</a>]</span>.</p>
+<dd><p>This loss function is proposed in paper <span id="id245">[<a class="reference internal" href="#id258" title="Qiang Li, Jingjing Wang, Zhaoliang Yao, Yachun Li, Pengju Yang, Jingwei Yan, Chunmao Wang, and Shiliang Pu. Unimodal-concentrated loss: fully adaptive label distribution learning for ordinal regression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 20513–20522. 2022. URL: https://doi.org/10.1109/CVPR52688.2022.01986.">LDL-LWY+22</a>]</span>.</p>
 </dd></dl>
 
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
-<div class="docutils container" id="id240">
+<div class="docutils container" id="id246">
 <div role="list" class="citation-list">
-<div class="citation" id="id242" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LDL-WFLG25</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id247" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LDL-TCZ+25</a><span class="fn-bracket">]</span></span>
+<p>Chao Tan, Sheng Chen, Jiaxi Zhang, Zilong Xu, Xin Geng, and Genlin Ji. RG4LDL: renormalization group for label distribution learning. <em>Knowledge-Based Systems</em>, 320:113666, 2025. URL: <a class="reference external" href="https://doi.org/10.1016/j.knosys.2025.113666">https://doi.org/10.1016/j.knosys.2025.113666</a>.</p>
+</div>
+<div class="citation" id="id249" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">LDL-WFLG25</a><span class="fn-bracket">]</span></span>
 <p>Jing Wang, Fu Feng, Jianhui Lv, and Xin Geng. Residual k-nearest neighbors label distribution learning. <em>Pattern Recognition</em>, 158:111006, 2025. URL: <a class="reference external" href="https://doi.org/10.1016/j.patcog.2024.111006">https://doi.org/10.1016/j.patcog.2024.111006</a>.</p>
 </div>
-<div class="citation" id="id244" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">LDL-LLW+24</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id251" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">LDL-LLW+24</a><span class="fn-bracket">]</span></span>
 <p>Yaojin Lin, Yulin Li, Chenxi Wang, Lei Guo, and Jinkun Chen. Label distribution learning based on horizontal and vertical mining of label correlations. <em>IEEE Transactions on Big Data</em>, 10(3):275–287, 2024. URL: <a class="reference external" href="https://doi.org/10.1109/TBDATA.2023.3338023">https://doi.org/10.1109/TBDATA.2023.3338023</a>.</p>
 </div>
-<div class="citation" id="id245" role="doc-biblioentry">
+<div class="citation" id="id252" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-KWT+24<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>,<a role="doc-backlink" href="#id5">3</a>,<a role="doc-backlink" href="#id6">4</a>,<a role="doc-backlink" href="#id7">5</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id7">4</a>,<a role="doc-backlink" href="#id8">5</a>)</span>
 <p>Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 4326–4334. 2024. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2024/478">https://doi.org/10.24963/ijcai.2024/478</a>.</p>
 </div>
-<div class="citation" id="id243" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">LDL-JQLL24</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id250" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">LDL-JQLL24</a><span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 35(8):11302–11316, 2024. URL: <a class="reference external" href="https://doi.org/10.1109/TNNLS.2023.3258976">https://doi.org/10.1109/TNNLS.2023.3258976</a>.</p>
 </div>
-<div class="citation" id="id247" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">LDL-JSL+23</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id254" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">LDL-JSL+23</a><span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Xiaoxia Shen, Weiwei Li, Yunan Lu, and Jihua Zhu. Label distribution learning by maintaining label ranking relation. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 35(2):1695–1707, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2021.3099294">https://doi.org/10.1109/TKDE.2021.3099294</a>.</p>
 </div>
-<div class="citation" id="id253" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">LDL-GGAT+21</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id260" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">LDL-GGAT+21</a><span class="fn-bracket">]</span></span>
 <p>Manuel González, Germán González-Almagro, Isaac Triguero, José-Ramón Cano, and Salvador García. Decomposition-fusion for label distribution learning. <em>Information Fusion</em>, 66:64–75, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.inffus.2020.08.024">https://doi.org/10.1016/j.inffus.2020.08.024</a>.</p>
 </div>
-<div class="citation" id="id267" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">LDL-ZJL18</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id274" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">LDL-ZJL18</a><span class="fn-bracket">]</span></span>
 <p>Xiang Zheng, Xiuyi Jia, and Weiwei Li. Label distribution learning by exploiting sample correlations locally. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 4556–4563. 2018. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v32i1.11693">https://doi.org/10.1609/aaai.v32i1.11693</a>.</p>
 </div>
-<div class="citation" id="id255" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id51">LDL-ZM21</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id262" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id53">LDL-ZM21</a><span class="fn-bracket">]</span></span>
 <p>Adam Żychowski and Jacek Mańdziuk. Duo-ldl method for label distribution learning based on pairwise class dependencies. <em>Applied Soft Computing</em>, 110:107585, 2021. URL: <a class="reference external" href="https://doi.org/10.1016/j.asoc.2021.107585">https://doi.org/10.1016/j.asoc.2021.107585</a>.</p>
 </div>
-<div class="citation" id="id259" role="doc-biblioentry">
+<div class="citation" id="id266" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-RJLZ19<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id52">1</a>,<a role="doc-backlink" href="#id53">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id54">1</a>,<a role="doc-backlink" href="#id55">2</a>)</span>
 <p>Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3325–3331. 2019. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2019/461">https://doi.org/10.24963/ijcai.2019/461</a>.</p>
 </div>
-<div class="citation" id="id258" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id54">LDL-RJL+19</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id265" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id56">LDL-RJL+19</a><span class="fn-bracket">]</span></span>
 <p>Tingting Ren, Xiuyi Jia, Weiwei Li, Lei Chen, and Zechao Li. Label distribution learning with label-specific features. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3318–3324. 2019. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2019/460">https://doi.org/10.24963/ijcai.2019/460</a>.</p>
 </div>
-<div class="citation" id="id264" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id55">LDL-JLLZ18</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id271" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id57">LDL-JLLZ18</a><span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Weiwei Li, Junyu Liu, and Yu Zhang. Label distribution learning by exploiting label correlations. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 3310–3317. 2018. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v32i1.11664">https://doi.org/10.1609/aaai.v32i1.11664</a>.</p>
 </div>
-<div class="citation" id="id266" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id56">LDL-ZZ18</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id273" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id58">LDL-ZZ18</a><span class="fn-bracket">]</span></span>
 <p>Peng Zhao and Zhi-Hua Zhou. Label distribution learning by optimal transport. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 4506–4513. 2018. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v32i1.11609">https://doi.org/10.1609/aaai.v32i1.11609</a>.</p>
 </div>
-<div class="citation" id="id263" role="doc-biblioentry">
+<div class="citation" id="id270" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-CWFL18<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id57">1</a>,<a role="doc-backlink" href="#id58">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id59">1</a>,<a role="doc-backlink" href="#id60">2</a>)</span>
 <p>Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. <em>Neurocomputing</em>, 320:171–182, 2018. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2018.09.002">https://doi.org/10.1016/j.neucom.2018.09.002</a>.</p>
 </div>
-<div class="citation" id="id271" role="doc-biblioentry">
+<div class="citation" id="id278" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-YSS17<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id59">1</a>,<a role="doc-backlink" href="#id99">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id61">1</a>,<a role="doc-backlink" href="#id102">2</a>)</span>
 <p>Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 224–230. 2017. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v31i1.10485">https://doi.org/10.1609/aaai.v31i1.10485</a>.</p>
 </div>
-<div class="citation" id="id270" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id139">LDL-SZGY17</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id277" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id143">LDL-SZGY17</a><span class="fn-bracket">]</span></span>
 <p>Wei Shen, Kai Zhao, Yilu Guo, and Alan Yuille. Label distribution learning forests. In <em>Advances in Neural Information Processing Systems</em>, 834–843. 2017.</p>
 </div>
-<div class="citation" id="id272" role="doc-biblioentry">
+<div class="citation" id="id279" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-Gen16<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id179">1</a>,<a role="doc-backlink" href="#id180">2</a>,<a role="doc-backlink" href="#id229">3</a>,<a role="doc-backlink" href="#id230">4</a>,<a role="doc-backlink" href="#id231">5</a>,<a role="doc-backlink" href="#id232">6</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id184">1</a>,<a role="doc-backlink" href="#id185">2</a>,<a role="doc-backlink" href="#id235">3</a>,<a role="doc-backlink" href="#id236">4</a>,<a role="doc-backlink" href="#id237">5</a>,<a role="doc-backlink" href="#id238">6</a>)</span>
 <p>Xin Geng. Label distribution learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 28(7):1734–1748, 2016. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2016.2545658">https://doi.org/10.1109/TKDE.2016.2545658</a>.</p>
 </div>
-<div class="citation" id="id275" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id233">LDL-GH15</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id282" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id239">LDL-GH15</a><span class="fn-bracket">]</span></span>
 <p>Xin Geng and Peng Hou. Pre-release prediction of crowd opinion on movies by label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3511–3517. 2015.</p>
 </div>
-<div class="citation" id="id277" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id234">LDL-GYZ13</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id284" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id240">LDL-GYZ13</a><span class="fn-bracket">]</span></span>
 <p>Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 35(10):2401–2412, 2013. URL: <a class="reference external" href="https://doi.org/10.1109/TPAMI.2013.51">https://doi.org/10.1109/TPAMI.2013.51</a>.</p>
 </div>
-<div class="citation" id="id250" role="doc-biblioentry">
+<div class="citation" id="id257" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WZYY23<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id235">1</a>,<a role="doc-backlink" href="#id236">2</a>,<a role="doc-backlink" href="#id238">3</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id241">1</a>,<a role="doc-backlink" href="#id242">2</a>,<a role="doc-backlink" href="#id244">3</a>)</span>
 <p>Changsong Wen, Xin Zhang, Xingxu Yao, and Jufeng Yang. Ordinal label distribution learning. In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 23481–23491. 2023. URL: <a class="reference external" href="https://doi.org/10.1109/ICCV51070.2023.02146">https://doi.org/10.1109/ICCV51070.2023.02146</a>.</p>
 </div>
-<div class="citation" id="id251" role="doc-biblioentry">
+<div class="citation" id="id258" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-LWY+22<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id237">1</a>,<a role="doc-backlink" href="#id239">2</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id243">1</a>,<a role="doc-backlink" href="#id245">2</a>)</span>
 <p>Qiang Li, Jingjing Wang, Zhaoliang Yao, Yachun Li, Pengju Yang, Jingwei Yan, Chunmao Wang, and Shiliang Pu. Unimodal-concentrated loss: fully adaptive label distribution learning for ordinal regression. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 20513–20522. 2022. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR52688.2022.01986">https://doi.org/10.1109/CVPR52688.2022.01986</a>.</p>
 </div>
 </div>
@@ -582,77 +595,77 @@ LRR refers to <em>label ranking relation</em>.</p>
 </section>
 <section id="further-reading">
 <h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h2>
-<div class="docutils container" id="id279">
+<div class="docutils container" id="id286">
 <div role="list" class="citation-list">
-<div class="citation" id="id280" role="doc-biblioentry">
+<div class="citation" id="id288" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WLG25<span class="fn-bracket">]</span></span>
 <p>Jing Wang, Jianhui Lv, and Xin Geng. Label distribution learning by partitioning label distribution manifold. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 36(2):3786–3796, 2025. URL: <a class="reference external" href="https://doi.org/10.1109/TNNLS.2023.3341807">https://doi.org/10.1109/TNNLS.2023.3341807</a>.</p>
 </div>
-<div class="citation" id="id285" role="doc-biblioentry">
+<div class="citation" id="id293" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-YJ24<span class="fn-bracket">]</span></span>
 <p>Peiqiu Yu and Xiuyi Jia. Exploiting indirect linear correlation for label distribution learning. <em>Neurocomputing</em>, pages 128022, 2024. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2024.128022">https://doi.org/10.1016/j.neucom.2024.128022</a>.</p>
 </div>
-<div class="citation" id="id287" role="doc-biblioentry">
+<div class="citation" id="id295" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-TCGJ23<span class="fn-bracket">]</span></span>
 <p>Chao Tan, Sheng Chen, Xin Geng, and Genlin Ji. A label distribution manifold learning algorithm. <em>Pattern Recognition</em>, 135:109112, 2023. URL: <a class="reference external" href="https://doi.org/10.1016/j.patcog.2022.109112">https://doi.org/10.1016/j.patcog.2022.109112</a>.</p>
 </div>
-<div class="citation" id="id288" role="doc-biblioentry">
+<div class="citation" id="id296" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WG23<span class="fn-bracket">]</span></span>
 <p>Jing Wang and Xin Geng. Label distribution learning by exploiting label distribution manifold. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 34(2):839–852, 2023. URL: <a class="reference external" href="https://doi.org/10.1109/TNNLS.2021.3103178">https://doi.org/10.1109/TNNLS.2021.3103178</a>.</p>
 </div>
-<div class="citation" id="id291" role="doc-biblioentry">
+<div class="citation" id="id299" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-ZMSZ22<span class="fn-bracket">]</span></span>
 <p>Tianyue Zhang, Yingke Mao, Furao Shen, and Jian Zhao. Label distribution learning through exploring nonnegative components. <em>Neurocomputing</em>, 501:212–221, 2022. URL: <a class="reference external" href="https://doi.org/10.1016/j.neucom.2022.06.017">https://doi.org/10.1016/j.neucom.2022.06.017</a>.</p>
 </div>
-<div class="citation" id="id293" role="doc-biblioentry">
+<div class="citation" id="id301" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-JLZ+21<span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Zechao Li, Xiang Zheng, Weiwei Li, and Sheng-Jun Huang. Label distribution learning with label correlations on local samples. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 33(4):1619–1631, 2021. URL: <a class="reference external" href="https://doi.org/10.1109/TKDE.2019.2943337">https://doi.org/10.1109/TKDE.2019.2943337</a>.</p>
 </div>
-<div class="citation" id="id295" role="doc-biblioentry">
+<div class="citation" id="id303" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-XJS+20<span class="fn-bracket">]</span></span>
 <p>Suping Xu, Hengrong Ju, Lin Shang, Witold Pedrycz, Xibei Yang, and Chun Li. Label distribution learning: a local collaborative mechanism. <em>International Journal of Approximate Reasoning</em>, 121:59–84, 2020. URL: <a class="reference external" href="https://doi.org/10.1016/j.ijar.2020.02.003">https://doi.org/10.1016/j.ijar.2020.02.003</a>.</p>
 </div>
-<div class="citation" id="id296" role="doc-biblioentry">
+<div class="citation" id="id304" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-JZL+19<span class="fn-bracket">]</span></span>
 <p>Xiuyi Jia, Xiang Zheng, Weiwei Li, Changqing Zhang, and Zechao Li. Facial emotion distribution learning by exploiting low-rank label correlations locally. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 9841–9850. 2019. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR.2019.01007">https://doi.org/10.1109/CVPR.2019.01007</a>.</p>
 </div>
-<div class="citation" id="id299" role="doc-biblioentry">
+<div class="citation" id="id307" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WG19a<span class="fn-bracket">]</span></span>
 <p>Jing Wang and Xin Geng. Theoretical analysis of label distribution learning. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 5256–5263. 2019. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v33i01.33015256">https://doi.org/10.1609/aaai.v33i01.33015256</a>.</p>
 </div>
-<div class="citation" id="id300" role="doc-biblioentry">
+<div class="citation" id="id308" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WG19b<span class="fn-bracket">]</span></span>
 <p>Ke Wang and Xin Geng. Discrete binary coding based label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3733–3739. 2019. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2019/518">https://doi.org/10.24963/ijcai.2019/518</a>.</p>
 </div>
-<div class="citation" id="id301" role="doc-biblioentry">
+<div class="citation" id="id309" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-XSS19<span class="fn-bracket">]</span></span>
 <p>Suping Xu, Lin Shang, and Furao Shen. Latent semantics encoding for label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3982–3988. 2019. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2019/553">https://doi.org/10.24963/ijcai.2019/553</a>.</p>
 </div>
-<div class="citation" id="id304" role="doc-biblioentry">
+<div class="citation" id="id312" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-WG18<span class="fn-bracket">]</span></span>
 <p>Ke Wang and Xin Geng. Discrete binary coding based label distribution learning. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 3733–3739. 2018. URL: <a class="reference external" href="https://doi.org/10.24963/ijcai.2018/386">https://doi.org/10.24963/ijcai.2018/386</a>.</p>
 </div>
-<div class="citation" id="id307" role="doc-biblioentry">
+<div class="citation" id="id315" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-GXX+17<span class="fn-bracket">]</span></span>
 <p>Bin-Bin Gao, Chao Xing, Chen-Wei Xie, Jianxin Wu, and Xin Geng. Deep label distribution learning with label ambiguity. <em>IEEE Transactions on Image Processing</em>, 26(6):2825–2838, 2017. URL: <a class="reference external" href="https://doi.org/10.1109/TIP.2017.2689998">https://doi.org/10.1109/TIP.2017.2689998</a>.</p>
 </div>
-<div class="citation" id="id308" role="doc-biblioentry">
+<div class="citation" id="id316" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-HGHL17<span class="fn-bracket">]</span></span>
 <p>Peng Hou, Xin Geng, Zeng-Wei Huo, and Jia-Qi Lv. Semi-supervised adaptive label distribution learning for facial age estimation. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 2015–2021. 2017. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v31i1.10822">https://doi.org/10.1609/aaai.v31i1.10822</a>.</p>
 </div>
-<div class="citation" id="id312" role="doc-biblioentry">
+<div class="citation" id="id320" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-XGX16<span class="fn-bracket">]</span></span>
 <p>Chao Xing, Xin Geng, and Hui Xue. Logistic boosting regression for label distribution learning. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 4489–4497. 2016. URL: <a class="reference external" href="https://doi.org/10.1109/CVPR.2016.486">https://doi.org/10.1109/CVPR.2016.486</a>.</p>
 </div>
-<div class="citation" id="id313" role="doc-biblioentry">
+<div class="citation" id="id321" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-YGZ16<span class="fn-bracket">]</span></span>
 <p>Xu Yang, Xin Geng, and Deyu Zhou. Sparsity conditional energy label distribution learning for age estimation. In <em>Proceedings of the International Joint Conference on Artificial Intelligence</em>, 2259–2265. 2016. URL: <a class="reference external" href="https://www.ijcai.org/Abstract/16/322">https://www.ijcai.org/Abstract/16/322</a>.</p>
 </div>
-<div class="citation" id="id315" role="doc-biblioentry">
+<div class="citation" id="id323" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-KFCB15<span class="fn-bracket">]</span></span>
 <p>Peter Kontschieder, Madalina Fiterau, Antonio Criminisi, and Samuel Rota Bulo. Deep neural decision forests. In <em>Proceedings of the IEEE/CVF International Conference on Computer Vision</em>, 1467–1475. 2015. URL: <a class="reference external" href="https://doi.org/10.1109/ICCV.2015.172">https://doi.org/10.1109/ICCV.2015.172</a>.</p>
 </div>
-<div class="citation" id="id317" role="doc-biblioentry">
+<div class="citation" id="id325" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>LDL-GSMZ10<span class="fn-bracket">]</span></span>
 <p>Xin Geng, Kate Smith-Miles, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. In <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 451–456. 2010. URL: <a class="reference external" href="https://doi.org/10.1609/aaai.v24i1.7657">https://doi.org/10.1609/aaai.v24i1.7657</a>.</p>
 </div>
@@ -690,6 +703,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">LDL</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#baseldl"><cite>BaseLDL</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rg4ldl">RG4LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rknn-ldl">R<span class="math notranslate nohighlight">\(k\)</span>NN-LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ldl-hvlc">LDL-HVLC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lrldl">LRLDL</a></li>
@@ -702,7 +716,6 @@ LRR refers to <em>label ranking relation</em>.</p>
 <li class="toctree-l2"><a class="reference internal" href="#ldlsf">LDLSF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ldllc">LDLLC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lalot">LALOT</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#structtree">StructTree</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#structrf">StructRF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bcpnn">BCPNN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#acpnn">ACPNN</a></li>

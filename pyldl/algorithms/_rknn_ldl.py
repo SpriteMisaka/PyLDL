@@ -19,7 +19,7 @@ class RKNN_LDL(BaseGD, BaseDeepLDL):
         self.beta = beta
 
     def _get_default_model(self):
-        return self.get_2layer_model(self._K.shape[1], self._n_outputs)
+        return self.get_2layer_model(self._K.shape[1] if self._kernel else self._n_features, self._n_outputs)
 
     @tf.function
     def _loss(self, X, D, start, end):

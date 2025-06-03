@@ -1,5 +1,9 @@
 LDL4C
------
+------
+
+LDL4C refers to *label distribution learning for classification*. The key differences between LDL4C and LDL in definition are as follows:
+
+   The performance of the learned mapping :math:`f` is evaluated by measures for classification, where the prediction for a given sample :math:`\boldsymbol{x}` is :math:`\mathop{\arg\max}_{y_j \in \mathcal{Y}} f(\boldsymbol{x})_j`, i.e., the highest description degree output.
 
 .. toctree::
    :maxdepth: 2
