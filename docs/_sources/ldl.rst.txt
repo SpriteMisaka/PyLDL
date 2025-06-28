@@ -31,9 +31,11 @@ LDL refers to *label distribution learning*. Its definition can be as follows:
    {% for class_name in all_ldl_algs %}
    {% if class_name == 'AdaBoostLDL' %}
    {% else %}
+
    {% if class_name == 'RKNN_LDL' %}
    R\ :math:`k`\NN-LDL
    ~~~~~~~~~~~~~~~~~~~
+
    {% elif class_name == 'AA_KNN' %}
    AA
    ~~~~~~~~~~~~~~~
@@ -42,9 +44,27 @@ LDL refers to *label distribution learning*. Its definition can be as follows:
 
    AA-:math:`k`\NN
    ^^^^^^^^^^^^^^^
+
    {% elif class_name in ['TLRLDL', 'TKLRLDL', 'SA_BFGS', 'SA_IIS', 'PT_Bayes', 'PT_SVM', 'AA_BP'] %}
    {{ class_name.replace('_', '-').lstrip('-') }}
    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+   {% elif class_name == '_S_LDL' %}
+   :math:`\mathcal{S}`-LDL
+   ~~~~~~~~~~~~~~~~~~~~~~~
+   {% elif class_name == 'Shallow_S_LDL' %}
+   Shallow :math:`\mathcal{S}`-LDL
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   {% elif class_name in ['S_LRR', 'S_SCL', 'S_KLD', 'S_CJS'] %}
+   :math:`\mathcal{S}`-{{ class_name.replace('S_', '').lstrip('-') }}
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   {% elif class_name == 'S_QFD2' %}
+   :math:`\mathcal{S}`-QFD\ :math:`^{2}`
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   {% elif class_name == 'Delta_LDL' %}
+   :math:`\delta`-LDL
+   ~~~~~~~~~~~~~~~~~~
+
    {% else %}
    {{ class_name.replace('_', '-').lstrip('-') }}
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

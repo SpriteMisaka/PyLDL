@@ -41,6 +41,8 @@
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#baseldl"><cite>BaseLDL</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#rg4ldl">RG4LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#rknn-ldl">R<span class="math notranslate nohighlight">\(k\)</span>NN-LDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#mathcal-s-ldl"><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-LDL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldl.html#delta-ldl"><span class="math notranslate nohighlight">\(\delta\)</span>-LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-hvlc">LDL-HVLC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#lrldl">LRLDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ldl.html#ldl-dpa">LDL-DPA</a></li>
@@ -129,7 +131,7 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#csr2sparse"><cite>csr2sparse</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#kernel"><cite>kernel</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#kl-divergence"><cite>kl_divergence</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#kl-divergence-downarrow"><cite>kl_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#pairwise-pearsonr"><cite>pairwise_pearsonr</cite></a></li>
@@ -140,37 +142,39 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#artificial"><cite>artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#download-dataset"><cite>download_dataset</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#emphasize"><cite>emphasize</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#gaussian-noise"><cite>gaussian_noise</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-dataset"><cite>load_dataset</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#make-ldl"><cite>make_ldl</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#plot-artificial"><cite>plot_artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#random-missing"><cite>random_missing</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#accuracy"><cite>accuracy</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#canberra"><cite>canberra</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#chebyshev"><cite>chebyshev</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#chi2"><cite>chi2</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#clark"><cite>clark</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#cosine"><cite>cosine</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#dpa"><cite>dpa</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#error-probability"><cite>error_probability</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#euclidean"><cite>euclidean</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#fidelity"><cite>fidelity</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#intersection"><cite>intersection</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#kendall"><cite>kendall</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#match-m"><cite>match_m</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#max-roc-auc"><cite>max_roc_auc</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#mean-absolute-error"><cite>mean_absolute_error</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#mean-squared-error"><cite>mean_squared_error</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#mu"><cite>mu</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#precision"><cite>precision</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#accuracy-uparrow"><cite>accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#canberra-downarrow"><cite>canberra</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#chebyshev-downarrow"><cite>chebyshev</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#chi2-downarrow"><cite>chi2</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#clark-downarrow"><cite>clark</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#cosine-uparrow"><cite>cosine</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#dpa-uparrow"><cite>dpa</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#error-probability-downarrow"><cite>error_probability</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#euclidean-downarrow"><cite>euclidean</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#fidelity-uparrow"><cite>fidelity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#intersection-uparrow"><cite>intersection</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#kendall-uparrow"><cite>kendall</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#match-m-uparrow"><cite>match_m</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#max-roc-auc-uparrow"><cite>max_roc_auc</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#mean-absolute-error-downarrow"><cite>mean_absolute_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#mean-squared-error-downarrow"><cite>mean_squared_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#mu-uparrow"><cite>mu</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#precision-uparrow"><cite>precision</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#score"><cite>score</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#sensitivity"><cite>sensitivity</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#sorensen"><cite>sorensen</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#spearman"><cite>spearman</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#specificity"><cite>specificity</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#top-k"><cite>top_k</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#wave-hedges"><cite>wave_hedges</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#youden-index"><cite>youden_index</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#zero-one-loss"><cite>zero_one_loss</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#sensitivity-uparrow"><cite>sensitivity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#sorensen-downarrow"><cite>sorensen</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#spearman-uparrow"><cite>spearman</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#specificity-uparrow"><cite>specificity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#top-k-uparrow"><cite>top_k</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#wave-hedges-downarrow"><cite>wave_hedges</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#worst-kl-divergence"><cite>worst_kl_divergence</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#youden-index-uparrow"><cite>youden_index</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#zero-one-loss-downarrow"><cite>zero_one_loss</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#references">References</a></li>
 </ul>
 </li>

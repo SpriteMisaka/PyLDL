@@ -63,11 +63,11 @@ def _1d(func):
 @_clip
 @_1d
 def kl_divergence(D, D_pred):
-    """Kullback-Leibler divergence. It is defined as:
+    r"""Kullback-Leibler divergence. It is defined as:
 
     .. math::
 
-        \\text{KLD}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}u_j \\ln \\frac{u_j}{v_j}\\text{.}
+        \text{KLD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}
     """
     return np.sum(D * (np.log(D) - np.log(D_pred)), 1)
 

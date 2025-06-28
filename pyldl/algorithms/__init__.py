@@ -24,6 +24,8 @@ from ._ldl_dpa import LDL_DPA
 from ._lrldl import _LRLDL, TLRLDL, TKLRLDL
 from ._ldl_hvlc import LDL_HVLC
 from ._rknn_ldl import RKNN_LDL
+from ._s_ldl import _S_LDL, S_LRR, S_SCL, S_KLD, S_QFD2, S_CJS, Shallow_S_LDL
+from ._delta_ldl import Delta_LDL
 
 from ._ssg_ldl import SSG_LDL
 
@@ -34,7 +36,7 @@ from ._ldl_da import LDL_DA
 
 _ldl__ = [
 # -------------------- 2025 --------------------
-"RG4LDL", "RKNN_LDL",
+"RG4LDL", "RKNN_LDL", "_S_LDL", "S_LRR", "S_SCL", "S_KLD", "S_CJS", "S_QFD2", "Shallow_S_LDL", "Delta_LDL",
 # -------------------- 2024 --------------------
 "LDL_HVLC", "_LRLDL", "TKLRLDL", "TLRLDL", "LDL_DPA",
 # -------------------- 2023 --------------------
@@ -86,7 +88,7 @@ _ssg_ldl__ = [
 ]
 
 _ldl_da__ = [
-# -------------------- 2024 --------------------
+# -------------------- 2025 --------------------
 "LDL_DA",
 ]
 

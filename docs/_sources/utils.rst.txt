@@ -6,35 +6,35 @@ Utils & Metrics
 
 .. jinja:: utils_ctx
 
+   {% macro display_func_name(name) %}
+   `{{ name }}`{% if name in the_larger_the_better %}:math:`\uparrow`{% elif name in the_smaller_the_better %}:math:`\downarrow`{% endif %}
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {% endmacro %}
+
    {% for func_name in all_alg_utils %}
    {% if func_name == 'sort_loss' %}
    {% else %}
-   `{{      func_name      }}`
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.algorithms.utils.{{ func_name }}
    {% endif %}
-
    {% endfor %}
 
    {% for func_name in all_utils %}
    {% if func_name in all_alg_utils %}
    {% else %}
-   `{{      func_name      }}`
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.utils.{{ func_name }}
    {% endif %}
-
    {% endfor %}
 
    {% for func_name in all_metrics %}
    {% if func_name in all_alg_utils %}
    {% elif func_name == '_calculate_match_m_top_k' %}
+   {% elif func_name == '_mean' %}
    {% else %}
-   `{{      func_name      }}`
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.metrics.{{ func_name }}
    {% endif %}
-
    {% endfor %}
 
 References

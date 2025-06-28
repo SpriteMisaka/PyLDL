@@ -114,7 +114,7 @@ class _BaseLE(_Base):
         self._L = L
         return self
 
-    def transform(self, **_) -> np.ndarray:
+    def transform(self, *args, **kwargs) -> np.ndarray:
         return self._D
 
     def fit_transform(self, X: np.ndarray, L: np.ndarray, **kwargs):
@@ -353,7 +353,7 @@ class BaseDeepLDL(BaseLDL, _BaseDeep):
         return self
 
     def predict(self, X):
-        return tf.make_ndarray(self._call(X))
+        return self._call(X).numpy()
 
 
 class BaseDeepLE(BaseLE, _BaseDeep):
@@ -371,7 +371,7 @@ class BaseDeepLE(BaseLE, _BaseDeep):
 
     def transform(self, X=None, L=None):
         X = self._X if X is None else X
-        return tf.make_ndarray(keras.activations.softmax(self._call(self._X)))
+        return keras.activations.softmax(self._call(self._X)).numpy()
 
 
 class BaseLDLClassifier(BaseLDL):
@@ -394,7 +394,7 @@ class BaseLDLClassifier(BaseLDL):
 class BaseDeepLDLClassifier(BaseLDLClassifier, BaseDeepLDL):
 
     def predict_proba(self, X):
-        return tf.make_ndarray(self._call(X))
+        return self._call(X).numpy()
 
 
 class BaseDeep(_BaseDeep):
@@ -405,18 +405,20 @@ class BaseDeep(_BaseDeep):
         with h5py.File(h5_path, 'r') as f:
             shapes = []
             def _func(name, obj):
-                if isinstance(obj, h5py.Dataset):
-                    parse = name.split('/')
-                    p1 = parse[1]
-                    n = int(p1.split('_')[1]) if '_' in p1 else 0
-                    m = -1
-                    if p1.startswith('sequential'):
-                        p3 = parse[3]
-                        m = int(p3.split('_')[1]) if '_' in p3 else 0
-                    elif p1.startswith('dense'):
-                        m = 0
-                    if m >= 0 and len(obj.shape) != 1:
-                        shapes.append((n, m, obj.shape))
+                if not isinstance(obj, h5py.Dataset):
+                    return
+                parse = name.split('/')
+                p1 = parse[1]
+                n = int(p1.split('_')[1]) if '_' in p1 else 0
+                m = -1
+                if p1.startswith('sequential'):
+                    p3 = parse[3]
+                    m = int(p3.split('_')[1]) if '_' in p3 else 0
+                elif p1.startswith('dense'):
+                    m = 0
+                if m >= 0 and len(obj.shape) != 1:
+                    shapes.append((n, m, obj.shape))
+
             f.visititems(_func)
             shapes.sort(key=lambda x: (x[0], x[1]))
             shapes = [i[2] for i in shapes]

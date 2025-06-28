@@ -3,7 +3,6 @@ import sys
 
 import numpy as np
 from scipy import stats
-from scipy.integrate import quad
 
 from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
@@ -27,11 +26,11 @@ sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 @_reduction
 @_1d
 def chebyshev(D, D_pred):
-    """Chebyshev distance. It is defined as:
+    r"""Chebyshev distance. It is defined as:
 
     .. math::
 
-        \\text{Cheby.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\max_j \\left\\vert u_j - v_j \\right\\vert\\text{.}
+        \text{Cheby.}(\boldsymbol{u}, \, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}
     """
     return np.max(np.abs(D - D_pred), 1)
 
@@ -40,11 +39,11 @@ def chebyshev(D, D_pred):
 @_clip
 @_1d
 def clark(D, D_pred):
-    """Clark distance. It is defined as:
+    r"""Clark distance. It is defined as:
 
     .. math::
 
-        \\text{Clark}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sqrt{\\sum^l_{j=1}\\frac{\\left( u_j - v_j \\right)^2}{\\left( u_j + v_j \\right)^2}}\\text{.}
+        \text{Clark}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}
     """
     return np.sqrt(np.sum(np.power(D - D_pred, 2) / np.power(D + D_pred, 2), 1))
 
@@ -53,11 +52,11 @@ def clark(D, D_pred):
 @_clip
 @_1d
 def canberra(D, D_pred):
-    """Canberra distance. It is defined as:
+    r"""Canberra distance. It is defined as:
 
     .. math::
 
-        \\text{Can.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left\\vert u_j - v_j \\right\\vert}{u_j + v_j}\\text{.}
+        \text{Can.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}
     """
     return np.sum(np.abs(D - D_pred) / (D + D_pred), 1)
 
@@ -68,11 +67,11 @@ sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
 @_reduction
 @_1d
 def cosine(D, D_pred):
-    """Cosine similarity. It is defined as:
+    r"""Cosine similarity. It is defined as:
 
     .. math::
 
-        \\text{Cosine}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{\\sum^l_{j=1}u_j v_j}{\\sqrt{\\sum^l_{j=1}u_j^2}\\sqrt{\\sum^l_{j=1}v_j^2}}\\text{.}
+        \text{Cosine}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}u_j v_j}{\sqrt{\sum^l_{j=1}u_j^2}\sqrt{\sum^l_{j=1}v_j^2}}\text{.}
     """
     from sklearn.metrics.pairwise import paired_cosine_distances
     return 1 - paired_cosine_distances(D, D_pred)
@@ -81,11 +80,11 @@ def cosine(D, D_pred):
 @_reduction
 @_1d
 def intersection(D, D_pred):
-    """Intersection similarity. It is defined as:
+    r"""Intersection similarity. It is defined as:
 
     .. math::
 
-        \\text{Int.}(\\boldsymbol{u}, \, \\boldsymbol{v}) = \\sum^l_{j=1} \\min\\left(u_j, \\, v_j\\right)\\text{.}
+        \text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}
     """
     return 1 - 0.5 * np.sum(np.abs(D - D_pred), 1)
 
@@ -93,11 +92,11 @@ def intersection(D, D_pred):
 @_reduction
 @_1d
 def euclidean(D, D_pred):
-    """Euclidean distance. It is defined as:
+    r"""Euclidean distance. It is defined as:
 
     .. math::
 
-        \\text{Eucl.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sqrt{\\sum^l_{j=1}\\left( u_j - v_j \\right)^2}\\text{.}
+        \text{Eucl.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\left( u_j - v_j \right)^2}\text{.}
     """
     return np.sqrt(np.sum((D - D_pred) ** 2, 1))
 
@@ -106,14 +105,14 @@ def euclidean(D, D_pred):
 @_clip
 @_1d
 def sorensen(D, D_pred):
-    """
+    r"""
     .. raw:: html
 
         S&oslash;rensen's distance. It is defined as:
 
     .. math::
 
-        \\text{S}\phi\\text{ren.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{\\sum^l_{j=1}\\left\\vert u_j - v_j \\right\\vert}{\\sum^l_{j=1}\\left( u_j + v_j \\right)}\\text{.}
+        \text{S}\phi\text{ren.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}\left\vert u_j - v_j \right\vert}{\sum^l_{j=1}\left( u_j + v_j \right)}\text{.}
     """
     return (np.sum(np.abs(D - D_pred), 1) / np.sum(D + D_pred, 1))
 
@@ -122,11 +121,11 @@ def sorensen(D, D_pred):
 @_clip
 @_1d
 def chi2(D, D_pred):
-    """Chi-squared distance. It is defined as:
+    r"""Chi-squared distance. It is defined as:
 
     .. math::
 
-        \\chi^2(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left( u_j - v_j \\right)^2}{u_j + v_j}\\text{.}
+        \chi^2(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}
     """
     return np.sum((D - D_pred) ** 2 / (D + D_pred), 1)
 
@@ -135,11 +134,11 @@ def chi2(D, D_pred):
 @_clip
 @_1d
 def wave_hedges(D, D_pred):
-    """Wave-Hedges distance. It is defined as:
+    r"""Wave-Hedges distance. It is defined as:
 
     .. math::
 
-        \\text{WHD}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1}\\frac{\\left| u_j - v_j \\right|}{\\max (u_j, \\, v_j)}\\text{.}
+        \text{WHD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, \, v_j)}\text{.}
     """
     return np.sum(np.abs(D - D_pred) / np.maximum(D, D_pred), 1)
 
@@ -150,11 +149,11 @@ sys.modules['pyldl.metrics.sort_loss'] = sort_loss
 @_reduction
 @_1d
 def fidelity(D, D_pred):
-    """Fidelity similarity. It is defined as:
+    r"""Fidelity similarity. It is defined as:
 
     .. math::
 
-            \\text{Fid.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\sum^l_{j=1} \\sqrt{u_j v_j}\\text{.}
+        \text{Fid.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \sqrt{u_j v_j}\text{.}
     """
     return np.sum(np.sqrt(D * D_pred), 1)
 
@@ -162,13 +161,13 @@ def fidelity(D, D_pred):
 @_reduction
 @_1d
 def spearman(D, D_pred):
-    """Spearman's rank correlation coefficient. It is defined as:
+    r"""Spearman's rank correlation coefficient. It is defined as:
 
     .. math::
 
-        \\text{Spear.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = 1 - \\frac{6 \\sum_{j=1}^{l} (\\rho(u_j) - \\rho(v_j))^2 }{l(l^2 - 1)}\\text{,}
+        \text{Spear.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{l} (\rho(u_j) - \rho(v_j))^2 }{l(l^2 - 1)}\text{,}
 
-    where :math:`\\rho(\\cdot)` is the rank of the element in the vector.
+    where :math:`\rho(\cdot)` is the rank of the element in the vector.
     """
     return np.array([stats.spearmanr(D[i], D_pred[i])[0] for i in range(D.shape[0])])
 
@@ -176,11 +175,11 @@ def spearman(D, D_pred):
 @_reduction
 @_1d
 def kendall(D, D_pred):
-    """Kendall's rank correlation coefficient. It is defined as:
+    r"""Kendall's rank correlation coefficient. It is defined as:
 
     .. math::
 
-        \\text{Ken.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{2 \\sum_{j < k} \\text{sgn}(u_j - u_k) \\text{sgn}(v_j - v_k) }{l (l-1)}\\text{.}
+        \text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j < k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}
     """
     return np.array([stats.kendalltau(D[i], D_pred[i], variant='c')[0] for i in range(D.shape[0])])
 
@@ -188,19 +187,20 @@ def kendall(D, D_pred):
 @_reduction
 @_1d
 def dpa(D, D_pred):
-    """Degree percentile average (DPA) is proposed in paper :cite:`2024:jia`. It is defined as:
+    r"""Degree percentile average (DPA) is proposed in paper :cite:`2024:jia`. It is defined as:
 
     .. math::
 
-        \\text{DPA}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\frac{1}{l} \\sum_{j=1}^{l} u + \\rho(v_j)\\text{,}
+        \text{DPA}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{l} \sum_{j=1}^{l} u_j \rho(v_j)\text{,}
 
-    where :math:`\\rho(\\cdot)` is the rank of the element in the vector.
+    where :math:`\rho(\cdot)` is the rank of the element in the vector.
     """
     return np.mean(stats.rankdata(D_pred, axis=1) * D, axis=1)
 
 
 @_1d
 def mu(D, D_pred, metrics=kl_divergence):
+    from scipy.integrate import quad
     u = 1 / D.shape[1] * np.ones_like(D)
     noise = np.random.normal(0, 1e-7, size=u.shape)
     u += noise
@@ -217,40 +217,37 @@ def mu(D, D_pred, metrics=kl_divergence):
     return auc
 
 
-@_reduction
-def mean_absolute_error(D, D_pred, mode='macro'):
+def _mean(D, D_pred, op, mode='macro'):
     if mode == 'macro':
         if len(D.shape) == 2:
             D = np.sum(D * np.arange(1, D.shape[1] + 1), axis=1)
         if len(D_pred.shape) == 2:
             D_pred = np.sum(D_pred * np.arange(1, D_pred.shape[1] + 1), axis=1)
-        return np.abs(D - D_pred)
+        return op(D, D_pred)
     elif mode == 'micro':
-        return np.sum(np.abs(D - D_pred), axis=1)
+        return np.sum(op(D, D_pred), axis=1)
+
+
+@_reduction
+def mean_absolute_error(D, D_pred, mode='macro'):
+    return _mean(D, D_pred, lambda X, Y: np.abs(X - Y), mode=mode)
 
 
 @_reduction
 def mean_squared_error(D, D_pred, mode='macro'):
-    if mode == 'macro':
-        if len(D.shape) == 2:
-            D = np.sum(D * np.arange(1, D.shape[1] + 1), axis=1)
-        if len(D_pred.shape) == 2:
-            D_pred = np.sum(D_pred * np.arange(1, D_pred.shape[1] + 1), axis=1)
-        return (D - D_pred) ** 2
-    elif mode == 'micro':
-        return np.sum((D - D_pred) ** 2, axis=1)
+    return _mean(D, D_pred, lambda X, Y: (X - Y) ** 2, mode=mode)
 
 
 @_reduction
 @_1d
 def zero_one_loss(D, D_pred):
-    """0/1 loss. It is defined as:
+    r"""0/1 loss. It is defined as:
 
     .. math::
 
-        \\text{0/1 loss}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = \\delta(\\arg\\max(\\boldsymbol{u}), \\, \\arg\\max(\\boldsymbol{v}))\\text{,}
+        \text{0/1 loss}(\boldsymbol{u}, \, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \, \arg\max(\boldsymbol{v}))\text{,}
 
-    where :math:`\\delta(\\cdot, \\, \\cdot)` is the Kronecker delta function.
+    where :math:`\delta(\cdot, \, \cdot)` is the Kronecker delta function.
     """
     return 1 - (np.argmax(D, 1) == np.argmax(D_pred, 1))
 
@@ -258,11 +255,11 @@ def zero_one_loss(D, D_pred):
 @_reduction
 @_1d
 def error_probability(D, D_pred):
-    """Error probability. It is defined as:
+    r"""Error probability. It is defined as:
 
     .. math::
 
-        \\text{Err. prob.}(\\boldsymbol{u}, \\, \\boldsymbol{v}) = 1 - u_{\\arg\\max(\\boldsymbol{v})}\\text{.}
+        \text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}
     """
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
 
@@ -340,8 +337,26 @@ def accuracy(y, y_pred):
     return accuracy_score(y, y_pred)
 
 
-def score(target: np.ndarray, pred: np.ndarray,
+def worst_kl_divergence(D: np.ndarray):
+    from scipy.optimize import minimize
+    from scipy.special import gammaln, digamma
+    def dirichlet_log_likelihood(alpha: np.ndarray, A: np.ndarray):
+        diff = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha))
+        return -(A.shape[0] * diff + np.sum((alpha - 1) * np.log(A)))
+    alpha = minimize(
+        dirichlet_log_likelihood, np.ones(D.shape[1]),
+        args=(D,), method="L-BFGS-B", bounds=[(1e-7, None)] * D.shape[1]
+    ).x
+    alpha_sum = np.sum(alpha)
+    return np.sum(
+        alpha * ((digamma(alpha + 1) - digamma(alpha_sum + 1)) + np.log(len(alpha)))
+    ) / alpha_sum
+
+
+def score(target: np.ndarray, pred: Optional[np.ndarray] = None,
           metrics: Optional[list] = None, return_dict: bool = False):
+    if pred is None:
+        pred = np.ones_like(target) * (1 / target.shape[1])
     if metrics is None:
         metrics = DEFAULT_METRICS
     scores = tuple((eval(i)(target, pred) if isinstance(i, str) else i(target, pred) for i in metrics))

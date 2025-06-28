@@ -28,9 +28,11 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Li and Chen 2024](https://doi.org/10.24963/ijcai.2024/494)) [*IJCAI*]: `WInLDL`$^2$.
   + ([Kou et al. 2024](https://doi.org/10.24963/ijcai.2024/478)) [*IJCAI*]: `TLRLDL`$^\dagger$ and `TKLRLDL`$^\dagger$.
   + ([Lin et al. 2024](https://doi.org/10.1109/TBDATA.2023.3338023)) [*TBD*]: `LDL_HVLC`$^\dagger$.
-  + ([Wu, Li, and Jia 2024](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
+  + ([Wu, Li, and Jia 2025](https://doi.org/10.1109/TBDATA.2024.3442562)) [*TBD*]: `LDL_DA`$^5$.
   + ([Wang et al. 2025](https://doi.org/10.1016/j.patcog.2024.111006)) [*Pattern Recognit.*]: `RKNN_LDL`$^\dagger$.
   + ([Tan et al. 2025](https://doi.org/10.1016/j.knosys.2025.113666)) [*KBS*]: `RG4LDL`.
+  + ([Wu, Li, and Jia 2025](https://icml.cc/virtual/2025/poster/44379)) [*ICML*]: `S_LRR`, `S_SCL`, `S_KLD`, `S_CJS` and `S_QFD2`.
+  + ([Li et al. 2025](https://icml.cc/virtual/2025/poster/46395)) [*ICML*]: `Delta_LDL`.
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://proceedings.mlr.press/v119/xu20g.html)) [*ICML*]: `LEVI`.

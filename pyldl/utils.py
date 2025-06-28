@@ -81,7 +81,11 @@ def download_dataset(name, dataset_path):
     logging.info(f'Dataset {name}.mat downloaded successfully.')
 
 
-def random_missing(D, missing_rate=.9, weighted=False):
+def gaussian_noise(D: np.ndarray, mean: float = 0., std: float = .1):
+    return proj(D + np.random.normal(loc=mean, scale=std, size=D.shape))
+
+
+def random_missing(D, missing_rate=.9, weighted=False, return_mask=True):
     if missing_rate <= 0. or missing_rate >= 1.:
         raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
     if weighted:
@@ -95,7 +99,7 @@ def random_missing(D, missing_rate=.9, weighted=False):
     missing_D = D.copy()
     missing_D[missing_mask] = np.nan
     missing_D[np.isnan(missing_D)] = 0.
-    return missing_D, missing_mask
+    return (missing_D, missing_mask) if return_mask else missing_D
 
 
 sys.modules['pyldl.utils.proj'] = proj
@@ -137,7 +141,18 @@ def make_ldl(n_samples=200, **kwargs):
     return X, D
 
 
-def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
+def plot_artificial(n_samples=50, model=None, file_name=None, *,
+                    noise=False, noise_func_args=None, **kwargs):
+
+    if noise:
+        noise_func_args = noise_func_args or [
+            [lambda x: x, {}],
+            [gaussian_noise, {}],
+            [random_missing, {'missing_rate': .5, 'return_mask': False}],
+            [emphasize, {}]
+        ]
+    else:
+        noise_func_args = [[lambda x: x, {}]]
 
     x1 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
     x2 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
@@ -151,24 +166,36 @@ def plot_artificial(n_samples=50, model=None, file_name=None, **kwargs):
 
     X = np.concatenate([bb, cc], axis=1)
 
-    if isinstance(model, BaseLDL):
-        X_train, D_train = make_ldl()
-        model.fit(X_train, D_train)
-        D = model.predict(X)
-    else:
-        D = artificial(X, **kwargs)
-        if isinstance(model, BaseLE):
-            l = binaryzation(D)
-            D = model.fit_transform(X, l)
+    colors = np.zeros((n_samples, n_samples, 3))
 
-    c = MinMaxScaler(feature_range=(1e-7, 1-1e-7)).fit_transform(D)
-    colors = c.reshape(n_samples, n_samples, 3)
+    n_batch = n_samples // len(noise_func_args)
+    for i, n in enumerate(noise_func_args):
+        start = i * n_batch
+        end = (i + 1) * n_batch if i != len(noise_func_args) - 1 else n_samples
+
+        if isinstance(model, BaseLDL):
+            X_train, D_train = make_ldl()
+            D_train = n[0](D_train, **n[1])
+            model.fit(X_train, D_train)
+            D = model.predict(X)
+        else:
+            D = artificial(X, **kwargs)
+            if model is None:
+                D = n[0](D, **n[1])
+            elif isinstance(model, BaseLE):
+                L = binaryzation(D)
+                D = model.fit_transform(X, L)
+
+        c = MinMaxScaler(feature_range=(1e-7, 1-1e-7)).fit_transform(D)
+        colors[start:end,:,:] = c.reshape(n_samples, n_samples, 3)[start:end,:,:]
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
     ax.xaxis._axinfo['grid']['linestyle'] = '--'
     ax.yaxis._axinfo['grid']['linestyle'] = '--'
     ax.zaxis._axinfo['grid']['linestyle'] = '--'
     ax.set_box_aspect(aspect=(1, 1, .2))
+    ax.set_xticks([-1., -.5, 0., .5, 1.])
+    ax.set_yticks([-1., -.5, 0., .5, 1.])
     ax.set_zticks([-1., 0., 1.])
     ax.axes.set_xlim3d((-1-1e-7, 1+1e-7))
     ax.axes.set_ylim3d((-1-1e-7, 1+1e-7))
