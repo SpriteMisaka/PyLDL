@@ -62,6 +62,7 @@ class SA_BFGS(_SA):
                                    options={'gtol': self._convergence_criterion, 'disp': False,
                                             'maxiter': self._max_iterations})
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
+        return self
 
 
 class SA_IIS(_SA):
@@ -108,6 +109,7 @@ class SA_IIS(_SA):
             if l2 - l1 < self._convergence_criterion or counter >= self._max_iterations:
                 flag = False
             counter += 1
+        return self
 
 
 class LALOT(_SA):
@@ -126,35 +128,50 @@ class LALOT(_SA):
         M = M / np.max(M)
         return M
 
+    def _call(self, X):
+        X1 = np.concatenate((X, np.ones((X.shape[0], 1))), axis=1)
+        return softmax(X1 @ self._W, axis=1)
+
     def fit(self, X, D, sinkhorn_iterations=200, learning_rate=1e-4, **kwargs):
         super().fit(X, D, **kwargs)
+        self._W = np.random.random((self._n_features + 1, self._n_outputs))
         K0 = self._D.T @ self._D
         K1 = K0 / np.max(K0)
 
         flag = True
         counter = 1
+        D_pred = self._call(self._X)
         while flag:
             M = self._compute_metric(K1)
             K = np.exp(-self._alpha * M - 1)
-            D_pred = self._call(self._X)
+            P = np.zeros((self._n_outputs, self._n_outputs), dtype=np.float32)
+            G = np.zeros((self._n_outputs, self._n_features + 1), dtype=np.float32)
 
-            U = np.ones((self._n_outputs, self._n_samples), dtype=np.float32)
-            for _ in range(sinkhorn_iterations):
-                U = D_pred.T / (K @ (self._D.T / (K.T @ U)))
-            V = self._D.T / (K.T @ U)
-            P = K * (U @ V.T)
-            Glh = (np.log(U + EPS) - np.log(U + EPS).mean(axis=0, keepdims=True)) / self._alpha
-            Ghw = (np.eye(self._n_outputs)[None, :, None, :] - self._D[:, None, None, :]) *\
-                self._D[:, :, None, None] * self._X[:, None, :, None]
-            G = (Glh.T[:, None, None, :] * Ghw).sum(axis=(0, 3))
+            for i in range(self._n_samples):
+                x = np.concatenate((self._X[i], [1]), axis=0)
+                d = self._D[i]
+                d_pred = D_pred[i]
+                u = np.ones(self._n_outputs, dtype=np.float32)
+                for _ in range(sinkhorn_iterations):
+                    u = d_pred / (K @ (d / (K.T @ u)))
+                v = d / (K.T @ u)
+                P += np.diag(u) @ K @ np.diag(v)
+
+                Glh = np.log(u) / self._alpha - np.log(u).sum() / (self._alpha * self._n_outputs)
+                Gi = ((np.eye(self._n_outputs) - d_pred) @ Glh)[:, None] * d_pred[:, None] * x[None, :]
+                G += Gi
+
+            l2 = self._loss_function(self._D, D_pred)
             self._W -= learning_rate * G.T
+            D_pred = self._call(self._X)
+            l1 = self._loss_function(self._D, D_pred)
 
-            Gfk = -2 * P - np.diag(np.diag(-2*P)) +\
-                np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
+            Gfk = -2 * P - np.diag(np.diag(-2 * P)) + np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
             K1 = K0 - (1 / self._beta) * Gfk
             Sigma, UK = np.linalg.eig((K1 + K1.T) / 2)
             K1 = UK @ np.diag(np.maximum(Sigma, 0)) @ UK.T
 
-            if counter >= self._max_iterations:
+            if l2 - l1 < self._convergence_criterion or counter >= self._max_iterations:
                 flag = False
             counter += 1
+        return self

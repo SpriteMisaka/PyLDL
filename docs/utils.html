@@ -182,7 +182,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.proj">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">proj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.proj" title="Link to this definition">¶</a></dt>
-<dd><p>This approach is proposed in paper <span id="id41">[<a class="reference internal" href="#id46" title="Laurent Condat. Fast projection onto the simplex and the l1 ball. Mathematical Programming, 158(1):575–585, 2016. URL: https://doi.org/10.1007/s10107-015-0946-6.">Con16</a>]</span>.</p>
+<dd><p>This approach is proposed in paper <span id="id42">[<a class="reference internal" href="#id47" title="Laurent Condat. Fast projection onto the simplex and the l1 ball. Mathematical Programming, 158(1):575–585, 2016. URL: https://doi.org/10.1007/s10107-015-0946-6.">Con16</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{D}\)</span>.</p>
@@ -227,7 +227,7 @@ where <span class="math notranslate nohighlight">\(\odot\)</span> denotes elemen
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.solvel21">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">solvel21</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.solvel21" title="Link to this definition">¶</a></dt>
-<dd><p>This approach is proposed in paper <span id="id42">[<a class="reference internal" href="#id47" title="Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. IEEE Transactions on Cybernetics, 44(8):1432–1445, 2014. URL: https://doi.org/10.1109/TCYB.2013.2286106.">CY14</a>]</span>.</p>
+<dd><p>This approach is proposed in paper <span id="id43">[<a class="reference internal" href="#id48" title="Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. IEEE Transactions on Cybernetics, 44(8):1432–1445, 2014. URL: https://doi.org/10.1109/TCYB.2013.2286106.">CY14</a>]</span>.</p>
 <p>The solution to the optimization problem
 <span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,\,1}\)</span>
 is given by the following formula:</p>
@@ -262,7 +262,7 @@ and <span class="math notranslate nohighlight">\(\vec{a}_{\bullet j}\)</span> is
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.svt">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">svt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.svt" title="Link to this definition">¶</a></dt>
-<dd><p>Singular value thresholding (SVT) is proposed in paper <span id="id43">[<a class="reference internal" href="#id48" title="Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. A singular value thresholding algorithm for matrix completion. SIAM Journal on optimization, 20(4):1956–1982, 2010. URL: https://doi.org/10.1137/080738970.">CCS10</a>]</span>.</p>
+<dd><p>Singular value thresholding (SVT) is proposed in paper <span id="id44">[<a class="reference internal" href="#id49" title="Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. A singular value thresholding algorithm for matrix completion. SIAM Journal on optimization, 20(4):1956–1982, 2010. URL: https://doi.org/10.1137/080738970.">CCS10</a>]</span>.</p>
 <p>The solution to the optimization problem
 <span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{\ast}\)</span>
 is given by <span class="math notranslate nohighlight">\(\boldsymbol{U} \max \lbrace \boldsymbol{\Sigma} - \tau, 0 \rbrace \boldsymbol{V}^\top\)</span>,
@@ -348,6 +348,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dd></dd></dl>
 
 </section>
+<section id="d2l">
+<h2><cite>_D2L</cite><a class="headerlink" href="#d2l" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics._D2L">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_D2L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_pred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics._D2L" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="accuracy-uparrow">
 <h2><cite>accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#accuracy-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -416,7 +424,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.dpa">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">dpa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.dpa" title="Link to this definition">¶</a></dt>
-<dd><p>Degree percentile average (DPA) is proposed in paper <span id="id44">[<a class="reference internal" href="ldl.html#id250" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>. It is defined as:</p>
+<dd><p>Degree percentile average (DPA) is proposed in paper <span id="id45">[<a class="reference internal" href="ldl.html#id256" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{DPA}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{l} \sum_{j=1}^{l} u_j \rho(v_j)\text{,}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the rank of the element in the vector.</p>
@@ -456,6 +464,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 </dd></dl>
 
 </section>
+<section id="hamming-downarrow">
+<h2><cite>hamming</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#hamming-downarrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.hamming">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">hamming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.hamming" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="intersection-uparrow">
 <h2><cite>intersection</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#intersection-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -465,6 +481,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <div class="math notranslate nohighlight">
 \[\text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}\]</div>
 </dd></dl>
+
+</section>
+<section id="jaccard-uparrow">
+<h2><cite>jaccard</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#jaccard-uparrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.jaccard">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jaccard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jaccard" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="kendall-uparrow">
@@ -515,6 +539,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.mu">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics=&lt;function</span> <span class="pre">kl_divergence&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.mu" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="one-error-downarrow">
+<h2><cite>one_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#one-error-downarrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.one_error">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">one_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.one_error" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -621,18 +653,18 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
-<div class="docutils container" id="id45">
+<div class="docutils container" id="id46">
 <div role="list" class="citation-list">
-<div class="citation" id="id46" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id41">Con16</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id47" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id42">Con16</a><span class="fn-bracket">]</span></span>
 <p>Laurent Condat. Fast projection onto the simplex and the l1 ball. <em>Mathematical Programming</em>, 158(1):575–585, 2016. URL: <a class="reference external" href="https://doi.org/10.1007/s10107-015-0946-6">https://doi.org/10.1007/s10107-015-0946-6</a>.</p>
 </div>
-<div class="citation" id="id47" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id42">CY14</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id48" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id43">CY14</a><span class="fn-bracket">]</span></span>
 <p>Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. <em>IEEE Transactions on Cybernetics</em>, 44(8):1432–1445, 2014. URL: <a class="reference external" href="https://doi.org/10.1109/TCYB.2013.2286106">https://doi.org/10.1109/TCYB.2013.2286106</a>.</p>
 </div>
-<div class="citation" id="id48" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id43">CCS10</a><span class="fn-bracket">]</span></span>
+<div class="citation" id="id49" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id44">CCS10</a><span class="fn-bracket">]</span></span>
 <p>Jian-Feng Cai, Emmanuel J Candès, and Zuowei Shen. A singular value thresholding algorithm for matrix completion. <em>SIAM Journal on optimization</em>, 20(4):1956–1982, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/080738970">https://doi.org/10.1137/080738970</a>.</p>
 </div>
 </div>
@@ -696,6 +728,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#make-ldl"><cite>make_ldl</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#plot-artificial"><cite>plot_artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#random-missing"><cite>random_missing</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d2l"><cite>_D2L</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#accuracy-uparrow"><cite>accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#canberra-downarrow"><cite>canberra</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#chebyshev-downarrow"><cite>chebyshev</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
@@ -706,13 +739,16 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#error-probability-downarrow"><cite>error_probability</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#euclidean-downarrow"><cite>euclidean</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#fidelity-uparrow"><cite>fidelity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hamming-downarrow"><cite>hamming</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#intersection-uparrow"><cite>intersection</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jaccard-uparrow"><cite>jaccard</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kendall-uparrow"><cite>kendall</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#match-m-uparrow"><cite>match_m</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#max-roc-auc-uparrow"><cite>max_roc_auc</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-absolute-error-downarrow"><cite>mean_absolute_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-squared-error-downarrow"><cite>mean_squared_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mu-uparrow"><cite>mu</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#one-error-downarrow"><cite>one_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#precision-uparrow"><cite>precision</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#score"><cite>score</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sensitivity-uparrow"><cite>sensitivity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>

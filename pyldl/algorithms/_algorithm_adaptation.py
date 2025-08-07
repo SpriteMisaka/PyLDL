@@ -4,7 +4,7 @@ from sklearn.neighbors import NearestNeighbors
 import keras
 import tensorflow as tf
 
-from pyldl.algorithms.utils import RProp
+from pyldl.algorithms.utils import RProp, proj
 from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
 
 
@@ -32,7 +32,9 @@ class AA_KNN(BaseLDL):
 class AA_BP(BaseGD, BaseDeepLDL):
     """:class:`AA-BP <pyldl.algorithms.AA_BP>` is proposed in paper :cite:`2016:geng`.
     """
-    pass
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class CPNN(BaseGD, BaseDeepLDL):
@@ -238,3 +240,25 @@ class Duo_LDL(BaseAdam, BaseDeepLDL):
 
     def fit(self, X, Y, *, batch_size=50, **kwargs):
         return super().fit(X, Y, batch_size=batch_size, **kwargs)
+
+
+class BD_LDL(BaseLDL):
+    """:class:`BD-LDL <pyldl.algorithms.BD_LDL>` is proposed in paper :cite:`2021:liu2`.
+    """
+
+    def __init__(self, alpha=1e-3, beta=1e-2, **kwargs):
+        super().__init__(**kwargs)
+        self.alpha = alpha
+        self.beta = beta
+
+    def fit(self, X, D):
+        from scipy.linalg import solve_sylvester
+        super().fit(X, D)
+        A = self._X.T @ self._X + self.beta * np.eye(self._n_features)
+        B = self.alpha * self._D.T @ self._D
+        C = (1 + self.alpha) * self._X.T @ self._D
+        self._W = solve_sylvester(A, B, C)
+        return self
+
+    def predict(self, X):
+        return proj(X @ self._W)

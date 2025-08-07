@@ -1,10 +1,11 @@
+from functools import wraps
 from typing import Optional
 import sys
 
 import numpy as np
 from scipy import stats
 
-from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS
+from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, binaryzation, DEFAULT_METRICS
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
 
 
@@ -12,11 +13,13 @@ THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
                           "euclidean", "sorensen", "chi2", "wave_hedges",
                           "mean_absolute_error", "mean_squared_error",
                           "sort_loss",
-                          "zero_one_loss", "error_probability"]
+                          "zero_one_loss", "error_probability",
+                          "hamming", "one_error"]
 
 THE_LARGER_THE_BETTER = ["cosine", "intersection",
                          "fidelity",
                          "spearman", "kendall", "dpa", "mu",
+                         "jaccard",
                          "match_m", "top_k", "max_roc_auc",
                          "precision", "specificity", "sensitivity", "youden_index", "accuracy"]
 
@@ -262,6 +265,39 @@ def error_probability(D, D_pred):
         \text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}
     """
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
+
+
+def _D2L(f=None, *, keep_pred=False):
+    def _decorator(func):
+        @wraps(func)
+        def _wrapper(D, D_pred, **kwargs):
+            is_binary = lambda X: np.all((X == 0.) | (X == 1.))
+            L = D if is_binary(D) else binaryzation(D)
+            pred = D_pred if is_binary(D_pred) or keep_pred else binaryzation(D_pred) 
+            return func(L, pred, **kwargs)
+        return _wrapper
+    return _decorator(f) if f is not None and callable(f) else _decorator
+
+
+@_reduction
+@_D2L
+@_1d
+def hamming(L, L_pred):
+    return np.mean(L != L_pred, 1)
+
+
+@_reduction
+@_D2L
+@_1d
+def jaccard(L, L_pred):
+    return np.sum(np.logical_and(L, L_pred), 1) / np.sum(np.logical_or(L, L_pred), 1)
+
+
+@_reduction
+@_D2L(keep_pred=True)
+@_1d
+def one_error(L, D_pred):
+    return 1 - L[np.arange(L.shape[0]), np.argmax(D_pred, 1)]
 
 
 def _calculate_match_m_top_k(D, D_pred, params, mode, top_k_mode='f1_score'):

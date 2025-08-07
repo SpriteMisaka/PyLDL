@@ -8,7 +8,7 @@ import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
 from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR
-from ._algorithm_adaptation import AA_BP, AA_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL
+from ._algorithm_adaptation import AA_BP, AA_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL, BD_LDL
 from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, LALOT
 
 from ._incomplete import IncomLDL, WInLDL
@@ -42,7 +42,7 @@ _ldl__ = [
 # -------------------- 2023 --------------------
 "LDL_LRR",
 # -------------------- 2021 --------------------
-"DF_LDL", "LDL_SCL", "Duo_LDL",
+"DF_LDL", "LDL_SCL", "Duo_LDL", "BD_LDL",
 # -------------------- 2020 --------------------
 "AdaBoostLDL",
 # -------------------- 2019 --------------------

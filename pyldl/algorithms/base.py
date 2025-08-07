@@ -311,13 +311,13 @@ class _BaseDeep(keras.Model):
 
     @staticmethod
     def get_2layer_model(n_features, n_outputs, activation='softmax'):
-        return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
+        return keras.Sequential([keras.layers.InputLayer(shape=(n_features,)),
                                  keras.layers.Dense(n_outputs, activation=activation, use_bias=False)])
 
     @staticmethod
     def get_3layer_model(n_features, n_hidden, n_outputs,
                          hidden_activation='sigmoid', output_activation='softmax'):
-        return keras.Sequential([keras.layers.InputLayer(input_shape=(n_features,)),
+        return keras.Sequential([keras.layers.InputLayer(shape=(n_features,)),
                                  keras.layers.Dense(n_hidden, activation=hidden_activation),
                                  keras.layers.Dense(n_outputs, activation=output_activation)])
 

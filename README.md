@@ -20,6 +20,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Wang and Geng 2021a](https://doi.org/10.24963/ijcai.2021/426)) [*IJCAI*]: `LDL_HR`$^{3^\dagger}$.
   + ([Wang and Geng 2021b](https://proceedings.mlr.press/v139/wang21h.html)) [*ICML*]: `LDLM`$^{3^\dagger}$.
   + ([Jia et al. 2021](https://doi.org/10.1109/TKDE.2019.2943337)) [*TKDE*]: `LDL_SCL`.
+  + ([Liu  et al. 2021](https://doi.org/10.1016/j.knosys.2020.106690)) [*KBS*]: `BD_LDL`.
   + ([Żychowski and Mańdziuk 2021](https://doi.org/10.1016/j.asoc.2021.107585)) [*Appl. Soft Comput.*]: `Duo_LDL`.
   + ([Li et al. 2022](https://doi.org/10.1109/CVPR52688.2022.01986)) [*CVPR*]: `unimodal_loss`$^1$ and `concentrated_loss`$^1$.
   + ([Jia et al. 2023a](https://doi.org/10.1109/TKDE.2021.3099294)) [*TKDE*]: `LDL_LRR`$^\dagger$.
