@@ -25,6 +25,8 @@ THE_LARGER_THE_BETTER = ["cosine", "intersection",
 
 sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 
+EPS = np.finfo(float).eps
+
 
 @_reduction
 @_1d
@@ -184,7 +186,7 @@ def kendall(D, D_pred):
 
         \text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j < k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}
     """
-    return np.array([stats.kendalltau(D[i], D_pred[i], variant='c')[0] for i in range(D.shape[0])])
+    return np.array([stats.kendalltau(D[i], D_pred[i], variant='b')[0] for i in range(D.shape[0])])
 
 
 @_reduction
@@ -290,7 +292,14 @@ def hamming(L, L_pred):
 @_D2L
 @_1d
 def jaccard(L, L_pred):
-    return np.sum(np.logical_and(L, L_pred), 1) / np.sum(np.logical_or(L, L_pred), 1)
+    return np.sum(np.logical_and(L, L_pred), 1) / (np.sum(np.logical_or(L, L_pred), 1) + EPS)
+
+
+@_reduction
+@_D2L
+@_1d
+def subset_accuracy(L, L_pred):
+    return np.all(L == L_pred, 1).astype(float)
 
 
 @_reduction

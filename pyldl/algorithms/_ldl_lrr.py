@@ -18,8 +18,8 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
 
     def __init__(self, alpha=1e-2, beta=0., **kwargs):
         super().__init__(**kwargs)
-        self._alpha = alpha
-        self._beta = beta
+        self.alpha = alpha
+        self.beta = beta
 
     @staticmethod
     @tf.function
@@ -41,7 +41,7 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
         D_pred = keras.activations.softmax(self._X @ theta)
         kld = tf.math.reduce_mean(keras.losses.kl_divergence(self._D, D_pred))
         rnk = self.ranking_loss(D_pred, self._P, self._W) / (2 * self._n_samples)
-        return kld + self._alpha * rnk + self._beta * self._l2_reg(theta)
+        return kld + self.alpha * rnk + self.beta * self._l2_reg(theta)
 
     def _before_train(self):
         self._P, self._W = LDL_LRR.preprocessing(self._D)

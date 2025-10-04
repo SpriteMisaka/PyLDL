@@ -116,10 +116,10 @@ class LALOT(_SA):
     """:class:`LALOT <pyldl.algorithms.LALOT>` is proposed in paper :cite:`2018:zhao`.
     """
 
-    def __init__(self, alpha=.2, beta=200, **kwargs):
+    def __init__(self, *, alpha: float = .2, beta: float = 200., **kwargs):
         super().__init__(**kwargs)
-        self._alpha = alpha
-        self._beta = beta
+        self.alpha = alpha
+        self.beta = beta
 
     def _compute_metric(self, K):
         diag = np.diag(K)
@@ -143,7 +143,7 @@ class LALOT(_SA):
         D_pred = self._call(self._X)
         while flag:
             M = self._compute_metric(K1)
-            K = np.exp(-self._alpha * M - 1)
+            K = np.exp(-self.alpha * M - 1)
             P = np.zeros((self._n_outputs, self._n_outputs), dtype=np.float32)
             G = np.zeros((self._n_outputs, self._n_features + 1), dtype=np.float32)
 
@@ -157,7 +157,7 @@ class LALOT(_SA):
                 v = d / (K.T @ u)
                 P += np.diag(u) @ K @ np.diag(v)
 
-                Glh = np.log(u) / self._alpha - np.log(u).sum() / (self._alpha * self._n_outputs)
+                Glh = np.log(u) / self.alpha - np.log(u).sum() / (self.alpha * self._n_outputs)
                 Gi = ((np.eye(self._n_outputs) - d_pred) @ Glh)[:, None] * d_pred[:, None] * x[None, :]
                 G += Gi
 
@@ -167,7 +167,7 @@ class LALOT(_SA):
             l1 = self._loss_function(self._D, D_pred)
 
             Gfk = -2 * P - np.diag(np.diag(-2 * P)) + np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
-            K1 = K0 - (1 / self._beta) * Gfk
+            K1 = K0 - (1 / self.beta) * Gfk
             Sigma, UK = np.linalg.eig((K1 + K1.T) / 2)
             K1 = UK @ np.diag(np.maximum(Sigma, 0)) @ UK.T
 

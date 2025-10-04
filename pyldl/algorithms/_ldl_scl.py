@@ -26,8 +26,8 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
     def __init__(self, n_clusters=5, alpha=1e-3, beta=1e-6, **kwargs):
         super().__init__(**kwargs)
         self._n_clusters = n_clusters
-        self._alpha = alpha
-        self._beta = beta
+        self.alpha = alpha
+        self.beta = beta
 
     def _get_default_model(self):
         return self.get_2layer_model(self._n_features, self._n_outputs)
@@ -54,7 +54,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         D_pred = keras.activations.softmax(self._model(X) + tf.matmul(self._C[start:end], self._W))
         kl = tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
         corr, barr = self.scl_loss(D_pred, self._P, self._C[start:end])
-        return kl + self._alpha * corr + self._beta * barr
+        return kl + self.alpha * corr + self.beta * barr
 
     @staticmethod
     def construct_C(X, old_X, old_C):
@@ -68,3 +68,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
     def predict(self, X):
         C = self.construct_C(X, self._X, self._C)
         return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))
+
+    @property
+    def n_clusters(self):
+        return self._n_clusters

@@ -2,10 +2,7 @@ import numpy as np
 
 from numba import jit
 
-from scipy.optimize import minimize
-
 from pyldl.algorithms.base import BaseADMM, BaseLDL
-from pyldl.algorithms.utils import soft_thresholding, solvel21
 
 
 @jit(nopython=True)
@@ -45,28 +42,31 @@ def _calculate_PR_numba(D):
 
 
 class LDLSF(BaseADMM, BaseLDL):
-    """:class:`LDLSF <pyldl.algorithms.LDLSF>` is proposed in paper :cite:`2019:ren`.
+    """:class:`LDLSF <pyldl.algorithms.LDLSF>` is proposed in paper :cite:`2019:ren`. 
+    SF refers to *specific features*.
 
     :term:`ADMM` is used as optimization algorithm.
     """
 
-    def __init__(self, alpha=1e-4, beta=1e-2, gamma=1e-3, random_state=None):
-        super().__init__(random_state)
-        self._alpha = alpha
-        self._beta = beta
-        self._gamma = gamma
+    def __init__(self, alpha=1e-4, beta=1e-2, gamma=1e-3, **kwargs):
+        super().__init__(**kwargs)
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
 
     def _update_W(self):
+        from scipy.optimize import minimize
+        from pyldl.algorithms.utils import soft_thresholding, solvel21
 
         def _obj_func(w):
             self._W = w.reshape(self._n_features, self._n_outputs)
             return _update_W_numba(self._X, self._D, self._W, self._W1, self._W2,
-                                   self._V, self._V2, self._PR, self._gamma, self._rho)
+                                   self._V, self._V2, self._PR, self.gamma, self._rho)
 
         optimize_result = minimize(_obj_func, self._W.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
-        self._W1 = soft_thresholding(self._W - self._W2 + self._V / self._rho, self._alpha / self._rho)
-        self._W2 = solvel21(self._W - self._W1 + self._V / self._rho, self._beta / self._rho)
+        self._W1 = soft_thresholding(self._W - self._W2 + self._V / self._rho, self.alpha / self._rho)
+        self._W2 = solvel21(self._W - self._W1 + self._V / self._rho, self.beta / self._rho)
 
     def _update_V(self):
         self._V, self._V2 = _update_V_numba(self._X, self._W, self._W1, self._W2,

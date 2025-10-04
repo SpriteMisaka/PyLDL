@@ -135,7 +135,9 @@ def artificial(X, a=1., b=.5, c=.2, d=1.,
     return D / np.sum(D, axis=1).reshape(-1, 1)
 
 
-def make_ldl(n_samples=200, **kwargs):
+def make_ldl(n_samples=200, random_state=None, **kwargs):
+    if random_state is not None:
+        np.random.seed(random_state)
     X = np.random.uniform(-1, 1, (n_samples, 3))
     D = artificial(X, **kwargs)
     return X, D

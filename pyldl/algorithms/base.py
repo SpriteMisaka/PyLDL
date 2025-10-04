@@ -160,8 +160,8 @@ class Base(_Base):
 
 class BaseADMM(Base):
 
-    def __init__(self, random_state: Optional[int] = None):
-        super().__init__(random_state)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.EPS_ABS = 1e-4
         self.EPS_REL = 1e-3
         self.EPS_ERR = 1e-3
@@ -337,6 +337,14 @@ class _BaseDeep(keras.Model):
         self._metrics = metrics or []
         self._before_train()
         self._model = model or self._get_default_model()
+
+    @property
+    def n_hidden(self):
+        return self._n_hidden
+
+    @property
+    def n_latent(self):
+        return self._n_latent
 
 
 class BaseDeepLDL(BaseLDL, _BaseDeep):

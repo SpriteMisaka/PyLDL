@@ -128,7 +128,7 @@ class DF_LDL(BaseEnsemble):
         self._estimators = L
 
         from ._algorithm_adaptation import AA_KNN
-        self._knn = AA_KNN(self.k)
+        self._knn = AA_KNN(k=self.k)
         self._knn.fit(self._X, self._D)
 
     def predict(self, X):

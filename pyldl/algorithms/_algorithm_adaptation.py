@@ -140,8 +140,8 @@ class LDLF(BaseAdam, BaseDeepLDL):
         2015:kontschieder
     """
 
-    def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+    def __init__(self, n_estimators=5, n_depth=6, n_hidden=64, n_latent=64, **kwargs):
+        super().__init__(n_hidden, n_latent, **kwargs)
         self._n_estimators = n_estimators
         self._n_depth = n_depth
         self._n_leaves = 2 ** n_depth
@@ -211,6 +211,18 @@ class LDLF(BaseAdam, BaseDeepLDL):
             res += tf.matmul(self._call(X, i), self._pi[i])
         return res / self._n_estimators
 
+    @property
+    def n_estimators(self):
+        return self._n_estimators
+
+    @property
+    def n_depth(self):
+        return self._n_depth
+
+    @property
+    def n_leaves(self):
+        return self._n_leaves
+
 
 class Duo_LDL(BaseAdam, BaseDeepLDL):
     """:class:`Duo-LDL <pyldl.algorithms.Duo_LDL>` is proposed in paper :cite:`2021:zychowski`.
@@ -246,7 +258,7 @@ class BD_LDL(BaseLDL):
     """:class:`BD-LDL <pyldl.algorithms.BD_LDL>` is proposed in paper :cite:`2021:liu2`.
     """
 
-    def __init__(self, alpha=1e-3, beta=1e-2, **kwargs):
+    def __init__(self, *, alpha: float = 1e-3, beta: float = 1e-2, **kwargs):
         super().__init__(**kwargs)
         self.alpha = alpha
         self.beta = beta
