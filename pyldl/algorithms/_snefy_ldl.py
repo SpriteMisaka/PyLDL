@@ -44,11 +44,14 @@ class SNEFY_LDL(BaseAdam, BaseDeepLDL):
         self._log_D = tf.math.log(self._D)
         self._encoder = self.get_3layer_model(self._n_features, self._n_hidden, self._n_hidden,
                                               hidden_activation='relu', output_activation=None)
-        self._W = tf.Variable(tf.random.normal((self._n_outputs, self._n_hidden)), trainable=True,
-                              constraint=lambda x: tf.maximum(x, -.495))
+        self._W = tf.Variable(tf.random.normal((self._n_outputs, self._n_hidden)), trainable=True)
         self._V = tf.Variable(tf.random.normal((self._n_latent, self._n_hidden), 0., 1.) *\
                               tf.sqrt(1. / (self._n_latent * self._n_hidden)), trainable=True)
         self._b = tf.Variable(tf.zeros((1, self._n_hidden)), trainable=True)
+
+    def train_step(self, batch, loss, _, epoch, epochs, start, end):
+        super().train_step(batch, loss, _, epoch, epochs, start, end)
+        self._W.assign(tf.maximum(self._W, -.495))
 
     def fit(self, X, Y, *, batch_size=64, **kwargs):
         return super().fit(X, Y, batch_size=batch_size, **kwargs)
