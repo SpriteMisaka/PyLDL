@@ -10,6 +10,8 @@ EPS = np.finfo(np.float32).eps
 
 
 class Delta_LDL(BaseAdam, BaseDeepLDL):
+    r""":class:`Delta-LDL <pyldl.algorithms.Delta_LDL>` is proposed in paper :cite:`2025:li`. 
+    """
 
     def _loss(self, X, D, start, end):
         D_pred = self._model(X)

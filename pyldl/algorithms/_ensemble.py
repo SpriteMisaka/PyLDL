@@ -2,62 +2,17 @@ import copy
 
 import numpy as np
 
-from numba import jit
-
-from scipy.special import expit
+from scipy.special import expit, softmax
 from sklearn.cluster import KMeans
 
 from pyldl.algorithms.base import BaseEnsemble, BaseLDL
 from pyldl.algorithms.utils import sort_loss
 
 from pyldl.algorithms._tree import _Node, best_split
+from pyldl.algorithms._rbm import train_rbm
 
 
 EPS = np.finfo(np.float32).eps
-
-
-@jit(nopython=True)
-def _sigmoid_numba(Z):
-    return 1 / (1 + np.exp(-Z))
-
-
-@jit(nopython=True)
-def _average_diff_numba(Z0, Z1):
-    dZ = np.zeros_like(Z0[0])
-    for i in range(Z0.shape[0]):
-        dZ += (Z0[i] - Z1[i])
-    dZ /= Z0.shape[0]
-    return dZ
-
-
-@jit(nopython=True)
-def _energy_numba(X, H, W, b, c):
-    return -(np.sum(X @ b.reshape(-1, 1)) + np.sum(H @ c.reshape(-1, 1)) + np.sum((X @ W) * H))
-
-
-@jit(nopython=True)
-def _train_rbm_numba(X, W, b, c, iterations, batch_size, lr, init_t, final_t):
-    for iter in range(iterations):
-        for start in range(0, X.shape[0], batch_size):
-            end = min(start + batch_size, X.shape[0])
-
-            X0 = X[start:end]
-            H0 = _sigmoid_numba(X0 @ W + c)
-            H0_sample = (H0 > np.random.rand(*(H0.shape))).astype(np.float64)
-            X1 = _sigmoid_numba(H0_sample @ W.T + b)
-            H1 = _sigmoid_numba(X1 @ W + c)
-            H1_sample = (H1 > np.random.rand(*(H1.shape))).astype(np.float64)
-
-            dE = _energy_numba(X0, H0_sample, W, b, c) - _energy_numba(X1, H1_sample, W, b, c)
-            t = max(final_t, init_t * .7 ** iter)
-            if dE < 0 or np.random.rand() < np.exp(-dE / t):
-                X0 = X1
-
-            W += lr * ((X0.T @ H0_sample - X1.T @ H1_sample) / X0.shape[0])
-            b += lr * _average_diff_numba(X0, X1)
-            c += lr * _average_diff_numba(H0_sample, H1_sample)
-    H = _sigmoid_numba(X @ W + c)
-    return H, W, b, c
 
 
 class RG4LDL(BaseEnsemble):
@@ -69,15 +24,15 @@ class RG4LDL(BaseEnsemble):
         if estimator is None:
             estimator = SA_BFGS()
         super().__init__(estimator, None, **kwargs)
-        self._n_hidden = n_hidden
+        self.n_hidden = n_hidden
 
     def fit(self, X, D, *, rbm_iterations=10, rbm_batch_size=64, rbm_learning_rate=1e-2,
             rbm_init_temperature=1000, rbm_final_temperature=10, **kwargs):
         super().fit(X, D, **kwargs)
-        H, self._W, self._b, self._c = _train_rbm_numba(X,
-            np.random.normal(size=(self._n_features, self._n_hidden)),
+        H, self._W, self._b, self._c = train_rbm(X,
+            np.random.normal(size=(self._n_features, self.n_hidden)),
             np.random.normal(size=(self._n_features,)),
-            np.random.normal(size=(self._n_hidden,)),
+            np.random.normal(size=(self.n_hidden,)),
             rbm_iterations, rbm_batch_size, rbm_learning_rate,
             rbm_init_temperature, rbm_final_temperature
         )
@@ -102,52 +57,33 @@ class DF_LDL(BaseEnsemble):
 
     def fit(self, X, D):
         super().fit(X, D)
-
-        L = {}
-
+        self._estimators = [[None] * self._n_outputs for _ in range(self._n_outputs)]
         for i in range(self._n_outputs):
             for j in range(i + 1, self._n_outputs):
+                ss1 = [k for k in range(self._n_samples) if self._D[k, i] >= self._D[k, j]]
+                ss2 = [k for k in range(self._n_samples) if self._D[k, i] < self._D[k, j]]
 
-                ss1 = []
-                ss2 = []
+                est1 = copy.deepcopy(self._estimator)
+                est1.fit(self._X[ss1], self._D[ss1])
+                self._estimators[i][j] = est1
 
-                for k in range(self._n_samples):
-                    if self._D[k, i] >= self._D[k, j]:
-                        ss1.append(k)
-                    else:
-                        ss2.append(k)
-
-                l1 = copy.deepcopy(self._estimator)
-                l1.fit(self._X[ss1], self._D[ss1])
-                L[f"{str(i)},{str(j)}"] = copy.deepcopy(l1)
-
-                l2 = copy.deepcopy(self._estimator)
-                l2.fit(self._X[ss2], self._D[ss2])
-                L[f"{str(j)},{str(i)}"] = copy.deepcopy(l2)
-
-        self._estimators = L
+                est2 = copy.deepcopy(self._estimator)
+                est2.fit(self._X[ss2], self._D[ss2])
+                self._estimators[j][i] = est2
 
         from ._algorithm_adaptation import AA_KNN
         self._knn = AA_KNN(k=self.k)
         self._knn.fit(self._X, self._D)
 
     def predict(self, X):
-
         m, c = X.shape[0], self._D.shape[1]
         p_knn = self._knn.predict(X)
         p = np.zeros((m, c), dtype=np.float32)
-
         for k in range(m):
             for i in range(c):
                 for j in range(i + 1, c):
-
-                    if p_knn[k, i] >= p_knn[k, j]:
-                        l = self._estimators[f"{str(i)},{str(j)}"]
-                    else:
-                        l = self._estimators[f"{str(j)},{str(i)}"]
-
-                    p[k] += l.predict(X[k].reshape(1, -1)).reshape(-1)
-
+                    est = self._estimators[i][j] if p_knn[k, i] >= p_knn[k, j] else self._estimators[j][i]
+                    p[k] += est.predict(X[k].reshape(1, -1)).reshape(-1)
         return p / (c * (c - 1) / 2)
 
 
@@ -161,10 +97,10 @@ class StructRF(BaseEnsemble):
 
         def __init__(self, max_depth=20, min_to_split=5, alpha=.25, beta=8., **kwargs):
             super().__init__(**kwargs)
-            self._max_depth = max_depth
-            self._min_to_split = min_to_split
-            self._alpha = alpha
-            self._beta = beta
+            self.max_depth = max_depth
+            self.min_to_split = min_to_split
+            self.alpha = alpha
+            self.beta = beta
 
         def fit(self, X, D):
             super().fit(X, D)
@@ -186,32 +122,31 @@ class StructRF(BaseEnsemble):
                 node.prediction = np.mean(self._D[node.indices], axis=0)
                 return
             self._C[node.indices] = KMeans(n_clusters=2).fit_predict(self._D[node.indices])
-            feature, value, left, right = best_split(self._X, self._C, node.indices, self._alpha, self._beta)
+            feature, value, left, right = best_split(self._X, self._C, node.indices, self.alpha, self.beta)
             node.split(feature, value, self._leaf(left), self._leaf(right))
             self._split_recursively(node.left, depth + 1)
             self._split_recursively(node.right, depth + 1)
 
         def _can_split(self, node: _Node, depth: int):
             return (
-                (self._max_depth is None or depth < self._max_depth) and
-                len(node.indices) >= self._min_to_split
+                (self.max_depth is None or depth < self.max_depth) and
+                len(node.indices) >= self.min_to_split
             )
 
         def _leaf(self, indices):
             return _Node(indices)
 
-    def __init__(self, estimator=None, n_estimators=20, sampling_ratio=.8,
-                 max_depth=20, min_to_split=5, alpha=.25, beta=8., **kwargs):
+    def __init__(self, estimator=None, n_estimators=20, sampling_ratio=.8, **kwargs):
         if estimator is None:
-            estimator = self.StructTree(max_depth=max_depth, min_to_split=min_to_split, alpha=alpha, beta=beta)
+            estimator = self.StructTree()
         super().__init__(estimator, n_estimators, **kwargs)
-        self._sampling_ratio = sampling_ratio
+        self.sampling_ratio = sampling_ratio
 
     def fit(self, X, D):
         super().fit(X, D)
         self._estimators = []
         for _ in range(self._n_estimators):
-            select = np.random.choice(self._n_samples, size=int(self._n_samples * self._sampling_ratio), replace=False)
+            select = np.random.choice(self._n_samples, size=int(self._n_samples * self.sampling_ratio), replace=False)
             model = copy.deepcopy(self._estimator)
             model.fit(X[select], D[select])
             self._estimators.append(copy.deepcopy(model))
@@ -221,6 +156,46 @@ class StructRF(BaseEnsemble):
         for model in self._estimators:
             results += model.predict(X) / self._n_estimators
         return results
+
+
+class LDLogitBoost(BaseEnsemble):
+    """:class:`LDLogitBoost` is proposed in paper :cite:`2016:xing`.
+    """
+
+    def __init__(self, estimator=None, n_estimators=100, **kwargs):
+        from sklearn.tree import DecisionTreeRegressor
+        if estimator is None:
+            estimator = DecisionTreeRegressor()
+        super().__init__(estimator, n_estimators, **kwargs)
+
+    def _calculate_Fj(self, f):
+        return self._learning_rate * ((self._n_outputs - 1) / self._n_outputs) * (f - np.mean(f))
+
+    def fit(self, X, D, learning_rate=0.05):
+        super().fit(X, D)
+        self._estimators = []
+        self._learning_rate = learning_rate
+        self._F = np.zeros((self._n_samples, self._n_outputs), dtype=np.float32)
+        for i in range(self._n_estimators):
+            P = softmax(self._F, axis=1)
+            H = P * (1 - P)
+            Z = (self._D - P) / H
+            for j in range(self._n_outputs):
+                model = copy.deepcopy(self._estimator)
+                model.fit(self._X, Z[:, j], sample_weight=H[:, j])
+                f = model.predict(self._X)
+                self._estimators.append([])
+                self._estimators[i].append(copy.deepcopy(model))
+                self._F[:, j] += self._calculate_Fj(f)
+        return self
+
+    def predict(self, X):
+        F = np.zeros((X.shape[0], self._n_outputs), dtype=np.float32)   
+        for i in range(self._n_estimators):
+            for j in range(self._n_outputs):
+                f = self._estimators[i][j].predict(X)
+                F[:, j] += self._calculate_Fj(f)
+        return softmax(F, axis=1)
 
 
 class AdaBoostLDL(BaseEnsemble):

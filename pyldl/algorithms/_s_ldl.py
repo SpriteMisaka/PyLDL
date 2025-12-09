@@ -18,6 +18,9 @@ from pyldl.algorithms.loss_function_engineering import qfd2, cjs
 
 
 class _S_LDL:
+    r"""Base class for :math:`\mathcal{S}`-LDL algorithms, which are proposed in paper :cite:`2025:wu2`. 
+    :math:`\mathcal{S}` refers to *subtasks*.
+    """
 
     @staticmethod
     def nested_len(combi):

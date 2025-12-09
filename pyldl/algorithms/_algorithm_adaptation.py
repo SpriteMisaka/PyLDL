@@ -43,8 +43,8 @@ class CPNN(BaseGD, BaseDeepLDL):
     :term:`RProp` is used as the optimizer.
     """
 
-    def __init__(self, mode='none', v=5, n_hidden=64, n_latent=None, random_state=None):
-        super().__init__(n_hidden, n_latent, random_state)
+    def __init__(self, mode='none', v=5, n_hidden=64, n_latent=None, **kwargs):
+        super().__init__(n_hidden, n_latent, **kwargs)
         if mode in ['none', 'binary', 'augment']:
             self._mode = mode
         else:
@@ -208,7 +208,7 @@ class LDLF(BaseAdam, BaseDeepLDL):
     def predict(self, X):
         res = np.zeros([X.shape[0], self._n_outputs], dtype=np.float32)
         for i in range(self._n_estimators):
-            res += tf.matmul(self._call(X, i), self._pi[i])
+            res += proj(tf.matmul(self._call(X, i), self._pi[i]).numpy())
         return res / self._n_estimators
 
     @property
@@ -274,3 +274,52 @@ class BD_LDL(BaseLDL):
 
     def predict(self, X):
         return proj(X @ self._W)
+
+
+class TrustedReweighting(BaseLDL):
+
+    def __init__(self, alpha=1e-2, beta=1e-2, rho=1e-2, **kwargs):
+        super().__init__(**kwargs)
+        self.alpha = alpha
+        self.beta = beta
+        self.rho = rho
+
+    @staticmethod
+    def get_prototypes(D: np.ndarray):
+        mask = (D > (1. / D.shape[1])).astype(np.float32)
+        counts = np.transpose(mask.sum(axis=0, keepdims=True))
+        weighted = mask[:, :, None] * D[:, None, :]
+        return weighted.sum(axis=0) / (counts + EPS)
+
+    @staticmethod
+    def clean_dataset(X, D):
+        from sklearn.neighbors import NearestNeighbors
+        prototypes = TrustedReweighting.get_prototypes(D)
+        knn = NearestNeighbors(n_neighbors=1).fit(prototypes)
+        _, inds = knn.kneighbors(D)
+        virtual = np.argmax(prototypes[np.ravel(inds)], axis=1)
+        pseudo = np.argmax(D, axis=1)
+        mask = (virtual == pseudo)
+        return X[mask], D[mask]
+
+    def _loss(self, w):
+        from pyldl.algorithms.utils import kernel, non_diagonal
+        W = np.reshape(w, self._W_shape)
+        B = np.transpose(self._clean_X) @ W @ self._X
+        BBT = B @ np.transpose(B)
+        KBBT = kernel(B) @ np.transpose(kernel(B))
+        sum = np.sum(non_diagonal(BBT), axis=1)
+        sumK = np.sum(non_diagonal(KBBT), axis=1)
+        temp = np.linalg.norm(sum - self.rho, ord=2)
+        tempK = np.linalg.norm(sumK - self.rho, ord=2)
+        return temp + self.alpha * tempK + self.beta * np.linalg.norm(W, ord=1)
+
+    def fit_transform(self, X, D):
+        from scipy.optimize import minimize
+        super().fit(X, D)
+        self._clean_X, self._clean_D = self.clean_dataset(self._X, self._D)
+        self._W_shape = (np.shape(self._clean_X)[0], self._n_samples)
+        W_init = np.random.rand(*self._W_shape)
+        result = minimize(self._loss, W_init.flatten(), method='L-BFGS-B', jac=None)
+        self._W = np.reshape(result.x, self._W_shape)
+        return np.transpose(np.transpose(self._clean_X) @ self._W), self._D

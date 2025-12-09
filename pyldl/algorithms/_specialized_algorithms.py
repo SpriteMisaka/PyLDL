@@ -59,7 +59,7 @@ class SA_BFGS(_SA):
     def fit(self, X, D, **kwargs):
         super().fit(X, D, **kwargs)
         optimize_result = minimize(self._obj_func, self._W.reshape(-1,), method='L-BFGS-B', jac=True,
-                                   options={'gtol': self._convergence_criterion, 'disp': False,
+                                   options={'gtol': self._convergence_criterion,
                                             'maxiter': self._max_iterations})
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
         return self

@@ -24,13 +24,17 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
         top2 = tf.gather(D_pred, self._top2, axis=1, batch_dims=1)
-        margin = tf.reduce_sum(tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho))
+        margin = tf.reduce_sum(
+            tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho)
+        )
         mae = keras.losses.mean_absolute_error(self._D, D_pred)
         return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(theta)
 
     def _before_train(self):
         self._top2 = tf.math.top_k(self._D, k=2)[1]
-        self._entropy = tf.cast(-tf.reduce_sum(self._D * tf.math.log(self._D) + EPS, axis=1), dtype=tf.float32)
+        self._entropy = tf.cast(
+            -tf.reduce_sum(self._D * tf.math.log(self._D) + EPS, axis=1),
+            dtype=tf.float32)
 
 
 class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
@@ -51,10 +55,14 @@ class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
 
         highest = tf.gather(D_pred, self._highest, axis=1, batch_dims=1)
         rest = tf.gather(D_pred, self._rest, axis=1, batch_dims=1)
-        margin = tf.reduce_sum(tf.maximum(0., 1. - (highest - rest) / self._rho))
+        margin = tf.reduce_sum(
+            tf.maximum(0., 1. - (highest - rest) / self._rho)
+        )
 
         real_rest = tf.gather(self._D, self._rest, axis=1, batch_dims=1)
-        rest_mae = tf.reduce_sum(keras.losses.mean_absolute_error(real_rest, rest))
+        rest_mae = tf.reduce_sum(
+            keras.losses.mean_absolute_error(real_rest, rest)
+        )
 
         mae = tf.reduce_sum(keras.losses.mean_absolute_error(self._L, D_pred))
 
@@ -82,27 +90,42 @@ class LDLM(BaseGD, BaseDeepLDLClassifier):
     def _loss(self, X, D, start, end):
         D_pred = self._model(X)
 
-        pred_margin = tf.reduce_sum(tf.clip_by_value(
-            tf.reduce_sum(tf.abs(self._L[start:end] - D_pred), axis=1) - self._rho,
-            0., float('inf')))
+        pred_margin = tf.reduce_sum(
+            tf.clip_by_value(
+                tf.reduce_sum(
+                    tf.abs(self._L[start:end] - D_pred), axis=1
+                ) - self._rho, 0., float('inf')
+            )
+        )
 
-        highest = tf.gather(D_pred, self._highest[start:end], axis=1, batch_dims=1)
+        highest = tf.gather(
+            D_pred, self._highest[start:end], axis=1, batch_dims=1
+        )
         rest = tf.gather(D_pred, self._rest[start:end], axis=1, batch_dims=1)
-        label_margin = tf.reduce_sum(tf.maximum(0., 1. - (highest - rest) / self._rho))
+        label_margin = tf.reduce_sum(
+            tf.maximum(0., 1. - (highest - rest) / self._rho)
+        )
 
-        second_margin = tf.reduce_sum(tf.clip_by_value(
-            tf.reduce_sum(tf.abs((D - D_pred) * self._neg_L[start:end]), axis=1) - self._second_margin[start:end],
-            0., float('inf')))
+        second_margin = tf.reduce_sum(
+            tf.clip_by_value(
+                tf.reduce_sum(
+                    tf.abs((D - D_pred) * self._neg_L[start:end]), axis=1
+                ) - self._second_margin[start:end], 0., float('inf')
+            )
+        )
 
         return pred_margin + self._alpha * label_margin + \
-            self._beta * second_margin + self._gamma * self._l2_reg(self._model)
+            self._beta * second_margin + \
+            self._gamma * self._l2_reg(self._model)
 
     def _before_train(self):
         temp = tf.math.top_k(self._D, k=self._n_outputs)[1]
         self._highest = temp[:, 0:1]
         self._rest = temp[:, 1:]
 
-        temp = tf.math.top_k(tf.gather(self._D, self._rest, axis=1, batch_dims=1), k=2)[0]
+        temp = tf.math.top_k(
+            tf.gather(self._D, self._rest, axis=1, batch_dims=1), k=2
+        )[0]
         self._second_margin = temp[:, 0] - temp[:, 1]
 
         self._L = tf.one_hot(tf.reshape(self._highest, -1), self._n_outputs)

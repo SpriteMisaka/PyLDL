@@ -311,13 +311,13 @@ class _BaseDeep(keras.Model):
 
     @staticmethod
     def get_2layer_model(n_features, n_outputs, activation='softmax'):
-        return keras.Sequential([keras.layers.InputLayer(shape=(n_features,)),
+        return keras.Sequential([keras.layers.InputLayer((n_features,)),
                                  keras.layers.Dense(n_outputs, activation=activation, use_bias=False)])
 
     @staticmethod
     def get_3layer_model(n_features, n_hidden, n_outputs,
                          hidden_activation='sigmoid', output_activation='softmax'):
-        return keras.Sequential([keras.layers.InputLayer(shape=(n_features,)),
+        return keras.Sequential([keras.layers.InputLayer((n_features,)),
                                  keras.layers.Dense(n_hidden, activation=hidden_activation),
                                  keras.layers.Dense(n_outputs, activation=output_activation)])
 
@@ -477,7 +477,7 @@ class BaseDeep(_BaseDeep):
 class BaseGD(BaseDeep):
 
     def _get_default_optimizer(self):
-        return keras.optimizers.SGD(1e-2)
+        return keras.optimizers.SGD(1e-3)
 
     def _calculate_validation_scores(self, X_val, D_val, L_val):
         val = None
@@ -531,7 +531,7 @@ class BaseGD(BaseDeep):
 
             scores = self._calculate_validation_scores(X_val, D_val, L_val)
 
-            callbacks.on_epoch_end(epoch + 1, {"scores": scores, "loss": self.total_loss})
+            callbacks.on_epoch_end(epoch + 1, {**scores, "loss": self.total_loss})
             if self._verbose != 0:
                 progbar.update(epoch + 1, values=[('loss', self.total_loss)] + list(scores.items()),
                                finalize=self.stop_training or epochs == epoch + 1)
@@ -552,7 +552,7 @@ class BaseGD(BaseDeep):
 
 class BaseAdam(BaseGD):
     def _get_default_optimizer(self):
-        return keras.optimizers.Adam(1e-2)
+        return keras.optimizers.Adam(1e-3)
 
 
 class BaseBFGS(BaseDeep):
@@ -636,3 +636,11 @@ class BaseEnsemble(BaseLDL):
 
     def __iter__(self):
         return iter(self._estimators)
+
+    @property
+    def estimator(self):
+        return self._estimator
+
+    @property
+    def n_estimators(self):
+        return self._n_estimators

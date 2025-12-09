@@ -1,7 +1,4 @@
-# cython: language_level=3
-
-cimport cython
-
+# cython: boundscheck=False, wraparound=False, cdivision=True, initializedcheck=False
 import numpy as np
 cimport numpy as cnp
 
@@ -33,9 +30,6 @@ cdef class _Node:
         self.right = right
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.cdivision(True)
 cdef double entropy(
     const cnp.int32_t[:] C,
     const cnp.int32_t[:] indices
@@ -62,9 +56,6 @@ cdef double entropy(
     return entropy
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.cdivision(True)
 cpdef tuple best_split(
     cnp.ndarray[double, ndim=2] X,
     cnp.ndarray[cnp.int32_t, ndim=1] C,

@@ -35,7 +35,9 @@ class _PT(BaseLDL):
         return Xr[select], Yr[select]
 
     def _get_default_model(self) -> _PTModel:
-        raise NotImplementedError("The '_get_default_model()' method is not implemented.")
+        raise NotImplementedError(
+            "The '_get_default_model()' method is not implemented."
+        )
 
     def fit(self, X, D):
         super().fit(X, D)

@@ -5,7 +5,7 @@ from pyldl.algorithms.base import BaseADMM, BaseLDL
 
 
 class _LRLDL(BaseADMM, BaseLDL):
-    """Base class for :class:`pyldl.algorithms.TLRLDL` and :class:`pyldl.algorithms.TKLRLDL`, 
+    r"""Base class for :class:`pyldl.algorithms.TLRLDL` and :class:`pyldl.algorithms.TKLRLDL`, 
     which are proposed in paper :cite:`2024:kou`. LR refers to *low-rank*.
 
     :term:`ADMM` is used as optimization algorithm.
@@ -19,16 +19,16 @@ class _LRLDL(BaseADMM, BaseLDL):
         self._beta = beta
 
     def _update_W(self):
-        """Please note that Eq. (8) in paper :cite:`2024:kou` should be corrected to:
+        r"""Please note that Eq. (8) in paper :cite:`2024:kou` should be corrected to:
 
         .. math::
 
-            \\begin{aligned}
-            \\boldsymbol{W} \\leftarrow & \\left(\\left(\\mu \\boldsymbol{G} + \\boldsymbol{\\Gamma}_1 + \\boldsymbol{L}\\right)
-            \\boldsymbol{O}^{\\top} \\boldsymbol{X} + \\boldsymbol{D}\\boldsymbol{X} \\right) \\\\
-            & \\left( \\boldsymbol{X}^{\\top}\\boldsymbol{X} + 2 \\lambda \\boldsymbol{I} +
-            (1+\\mu) \\boldsymbol{X}^{\\top}\\boldsymbol{O}\\boldsymbol{O}^{\\top}\\boldsymbol{X} \\right)^{-1}\\text{,}
-            \\end{aligned}
+            \begin{aligned}
+            \boldsymbol{W} \leftarrow & \left(\left(\mu \boldsymbol{G} + \boldsymbol{\Gamma}_1 + \boldsymbol{L}\right)
+            \boldsymbol{O}^{\top} \boldsymbol{X} + \boldsymbol{D}\boldsymbol{X} \right) \\
+            & \left( \boldsymbol{X}^{\top}\boldsymbol{X} + 2 \lambda \boldsymbol{I} +
+            (1+\mu) \boldsymbol{X}^{\top}\boldsymbol{O}\boldsymbol{O}^{\top}\boldsymbol{X} \right)^{-1}\text{,}
+            \end{aligned}
 
         where :math:`\\boldsymbol{I}` is the identity matrix.
 
@@ -36,11 +36,11 @@ class _LRLDL(BaseADMM, BaseLDL):
 
         .. math::
 
-            \\begin{aligned}
-            \\boldsymbol{O} \\leftarrow & \\left( (1+\\mu) \\boldsymbol{X}\\boldsymbol{W}^{\\top}
-            \\left( \\boldsymbol{X}\\boldsymbol{W}^{\\top} \\right)^{\\top} + 2 \\lambda \\boldsymbol{I} \\right)^{-1} \\\\
-            & \\boldsymbol{X}\\boldsymbol{W}^{\\top} \\left(\\boldsymbol{L} + \\mu \\boldsymbol{G} - \\boldsymbol{\\Gamma}_1\\right)\\text{.}
-            \\end{aligned}
+            \begin{aligned}
+            \boldsymbol{O} \leftarrow & \left( (1+\mu) \boldsymbol{X}\boldsymbol{W}^{\top}
+            \left( \boldsymbol{X}\boldsymbol{W}^{\top} \right)^{\top} + 2 \lambda \boldsymbol{I} \right)^{-1} \\
+            & \boldsymbol{X}\boldsymbol{W}^{\top} \left(\boldsymbol{L} + \mu \boldsymbol{G} - \boldsymbol{\Gamma}_1\right)\text{.}
+            \end{aligned}
         """
         OTX = self._O.T @ self._X
         temp1 = (self._rho * self._Z.T - self._V.T + self._L.T) @ OTX + self._D.T @ self._X
@@ -58,12 +58,12 @@ class _LRLDL(BaseADMM, BaseLDL):
         self._Z = np.transpose(svt(A, tau))
 
     def _update_V(self):
-        """Please note that Eq. (11) in paper :cite:`2024:kou` should be corrected to:
+        r"""Please note that Eq. (11) in paper :cite:`2024:kou` should be corrected to:
 
         .. math::
 
-            \\boldsymbol{\\Gamma}_1 \\leftarrow \\boldsymbol{\\Gamma}_1 + \\mu
-            \\left(\\boldsymbol{W}\\boldsymbol{X}^{\\top}\\boldsymbol{O} - \\boldsymbol{G}\\right)\\text{.}
+            \boldsymbol{\Gamma}_1 \leftarrow \boldsymbol{\Gamma}_1 + \mu
+            \left(\boldsymbol{W}\boldsymbol{X}^{\top}\boldsymbol{O} - \boldsymbol{G}\right)\text{.}
         """
         self._V = np.transpose(self._V.T + self._rho * (self._W.T @ self._X.T @ self._O - self._Z.T))
         self._rho *= 1.1
@@ -88,7 +88,7 @@ class _LRLDL(BaseADMM, BaseLDL):
 
 
 class TLRLDL(_LRLDL):
-    """:class:`TLRLDL <pyldl.algorithms.TLRLDL>` is proposed in paper :cite:`2024:kou`. 
+    r""":class:`TLRLDL <pyldl.algorithms.TLRLDL>` is proposed in paper :cite:`2024:kou`. 
     T refers to *threshold* (a threshold-based :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix).
     """
 
@@ -97,8 +97,8 @@ class TLRLDL(_LRLDL):
 
 
 class TKLRLDL(_LRLDL):
-    """:class:`TKLRLDL <pyldl.algorithms.TKLRLDL>` is proposed in paper :cite:`2024:kou`. 
-    TK refers to *top-*\\ :math:`k` (a top-:math:`k` :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix).
+    r""":class:`TKLRLDL <pyldl.algorithms.TKLRLDL>` is proposed in paper :cite:`2024:kou`. 
+    TK refers to *top-*\ :math:`k` (a top-:math:`k` :class:`binaryzation <pyldl.algorithms.utils.binaryzation>` method is used to generate the logical label matrix).
     """
 
     def __init__(self, **kwargs):

@@ -8,8 +8,8 @@ from pyldl.algorithms.utils import csr2sparse, kernel
 
 
 class RKNN_LDL(BaseGD, BaseDeepLDL):
-    """:class:`RkNN-LDL <pyldl.algorithms.RKNN_LDL>` is proposed in paper :cite:`2025:wang`. 
-    R\\ :math:`k`\\NN refers to *residual* :math:`k`\\ *-nearest neighbor*.
+    r""":class:`RkNN-LDL <pyldl.algorithms.RKNN_LDL>` is proposed in paper :cite:`2025:wang`. 
+    R\ :math:`k`\NN refers to *residual* :math:`k`\ *-nearest neighbor*.
     """
 
     def __init__(self, *, k: int = 20, alpha: float = 1e-3, beta: float = 1e-6, **kwargs):

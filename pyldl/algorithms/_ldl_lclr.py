@@ -71,11 +71,11 @@ class LDL_LCLR(BaseADMM, BaseLDL):
 
     def __init__(self, n_clusters=4, alpha=1e-4, beta=1e-4, gamma=1e-4, delta=1e-4, **kwargs):
         super().__init__(**kwargs)
-        self._n_clusters = n_clusters
-        self._alpha = alpha
-        self._beta = beta
-        self._gamma = gamma
-        self._delta = delta
+        self.n_clusters = n_clusters
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.delta = delta
 
     def _update_W(self):
         """Please note that Eq. (9) in paper :cite:`2019:ren2` should be corrected to:
@@ -96,7 +96,7 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         def _obj_func(w):
             self._W = w.reshape(self._n_features, self._n_outputs)
             return _update_W_numba(self._X, self._D, self._W, self._S, self._E,
-                                   self._V, self._alpha, self._rho)
+                                   self._V, self.alpha, self._rho)
 
         optimize_result = minimize(_obj_func, self._W.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
@@ -109,17 +109,17 @@ class LDL_LCLR(BaseADMM, BaseLDL):
             self._S = s.reshape(self._n_outputs, self._n_outputs)
             return _update_S_numba(self._X, self._D, self._W, self._S, self._E, self._Z,
                                    self._V, self._V2, self._P, self._sumP,
-                                   self._n_clusters, self._delta, self._rho)
+                                   self.n_clusters, self.delta, self._rho)
 
         optimize_result = minimize(_obj_func, self._S.reshape(-1, ), method='L-BFGS-B', jac=True)
         self._S = optimize_result.x.reshape(self._n_outputs, self._n_outputs)
 
     def _update_E(self):
         _, DSE = _get_D_pred_DSE(self._D, self._S, self._E, self._X, self._W)
-        self._E = solvel21(DSE, self._beta / self._rho)
+        self._E = solvel21(DSE, self.beta / self._rho)
 
     def _update_Z(self):
-        self._Z = svt(self._S - self._Z, self._gamma / self._rho)
+        self._Z = svt(self._S - self._Z, self.gamma / self._rho)
 
     def _update_V(self):
         self._V, self._V2 = _update_V_numba(self._X, self._D, self._W, self._S, self._E,
@@ -146,18 +146,18 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         return _W, _Z, _V
 
     def _before_train(self):
-        c = KMeans(n_clusters=self._n_clusters).fit_predict(self._D)
+        c = KMeans(n_clusters=self.n_clusters).fit_predict(self._D)
         self._P = []
         self._sumP = 0.
-        for i in range(self._n_clusters):
+        for i in range(self.n_clusters):
             temp = pairwise_euclidean(self._D[c == i].T)
-            self._sumP += self._delta * np.sum(temp)
+            self._sumP += self.delta * np.sum(temp)
             self._P.append(temp)
         self._S = np.eye(self._n_outputs)
         self._E = np.zeros((self._n_samples, self._n_outputs))
         self._V2 = np.zeros((self._n_outputs, self._n_outputs))
 
-    def fit(self, X, y,  rho=1e-4, **kwargs):
+    def fit(self, X, y, rho=1e-4, **kwargs):
         return super().fit(X, y, rho=rho, **kwargs)
 
     def predict(self, X):

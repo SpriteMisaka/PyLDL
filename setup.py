@@ -1,5 +1,6 @@
 import setuptools
 
+import glob
 import numpy
 from Cython.Build import cythonize
 
@@ -45,6 +46,6 @@ setuptools.setup(
     ],
 
     python_requires='>=3',
-    ext_modules=cythonize("pyldl/algorithms/_tree.pyx"),
+    ext_modules=cythonize(glob.glob("pyldl/algorithms/*.pyx"), annotate=True),
     include_dirs=[numpy.get_include()],
 )

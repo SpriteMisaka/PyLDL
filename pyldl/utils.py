@@ -37,7 +37,7 @@ class LDLEarlyStopping(keras.callbacks.Callback):
         self._best_weights = None
 
     def on_epoch_end(self, epoch, logs=None):
-        current = logs.get("loss") if self._monitor == 'loss' else logs.get("scores").get(self._monitor)
+        current = logs.get("loss") if self._monitor == 'loss' else logs.get(self._monitor)
         condition = np.less(current, self._best)
         if not self._smaller:
             condition = not condition

@@ -4,8 +4,6 @@ from functools import wraps
 import scipy.sparse
 import numpy as np
 
-from numba import jit
-
 import keras
 import tensorflow as tf
 
@@ -85,7 +83,6 @@ def sort_loss(D, D_pred):
     return res
 
 
-@jit(nopython=True)
 def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     """Soft thresholding operation.
     It is defined as :math:`\\text{soft}(\\boldsymbol{A}, \\, \\tau) = \\text{sgn}(\\boldsymbol{A}) \\odot \\max\\lbrace \\lvert \\boldsymbol{A} \\rvert - \\tau, 0 \\rbrace`, 
@@ -101,7 +98,6 @@ def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     return np.sign(A) * np.maximum(np.abs(A) - tau, 0.)
 
 
-@jit(nopython=True)
 def svt(A: np.ndarray, tau: float) -> np.ndarray:
     """Singular value thresholding (SVT) is proposed in paper :cite:`2010:cai`.
 
@@ -122,7 +118,6 @@ def svt(A: np.ndarray, tau: float) -> np.ndarray:
     return U @ np.diag(S_thresh) @ VT
 
 
-@jit(nopython=True)
 def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
     """This approach is proposed in paper :cite:`2014:chen`.
 
@@ -286,13 +281,25 @@ def csr2sparse(A: scipy.sparse.csr_matrix) -> tf.SparseTensor:
     )
 
 
-def kernel(X: tf.Tensor, Y: Optional[tf.Tensor] = None,
-           gamma: Optional[float] = None) -> tf.Tensor:
+def kernel(X: Union[np.ndarray, tf.Tensor],
+           Y: Optional[Union[np.ndarray, tf.Tensor]] = None,
+           gamma: Optional[float] = None) -> Union[np.ndarray, tf.Tensor]:
     from sklearn.metrics.pairwise import rbf_kernel
     Y = X if Y is None else Y
     if gamma is None:
-        gamma = 1. / (2. * tf.reduce_mean(pairwise_euclidean(X, Y)).numpy() ** 2)
-    return tf.cast(rbf_kernel(X, Y, gamma=gamma), dtype=tf.float32)
+        gamma = 1. / (2. * np.mean(pairwise_euclidean(X, Y)) ** 2)
+    K = rbf_kernel(X, Y, gamma=gamma)
+    if isinstance(X, np.ndarray):
+        return K
+    elif isinstance(X, tf.Tensor):
+        return tf.cast(K, dtype=tf.float32)
+
+
+def non_diagonal(X: Union[np.ndarray, tf.Tensor]) -> Union[np.ndarray, tf.Tensor]:
+    if isinstance(X, np.ndarray):
+        return X - np.diag(np.diag(X))
+    elif isinstance(X, tf.Tensor):
+        return X - tf.linalg.diag(tf.linalg.diag_part(X))
 
 
 class RProp(keras.optimizers.Optimizer):

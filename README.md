@@ -171,14 +171,15 @@ Results of the original MATLAB implementation ([Geng 2016](https://doi.org/10.11
 ## Requirements
 
 ```
-matplotlib>=3.6.1
-numpy>=1.22.3
-qpsolvers>=4.0.0
-quadprog>=0.1.11
-scikit-fuzzy>=0.4.2
-scikit-learn>=1.0.2
-scipy>=1.8.0
-tensorflow>=2.8.0
-tensorflow-probability>=0.16.0
+Cython
+matplotlib
+numba
+numpy
+qpsolvers
+quadprog
+scikit-fuzzy
+scikit-learn
+scipy
+tensorflow
+tensorflow-probability
 ```
-
