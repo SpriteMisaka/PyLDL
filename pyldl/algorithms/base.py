@@ -498,16 +498,16 @@ class BaseGD(BaseDeep):
             return score(val, val_pred, metrics=self._metrics, return_dict=True)
         return {}
 
-    def train_step(self, batch, loss, trainable_variables, epoch, epochs, start, end):
+    def train_step(self, batch, loss, trainable_variables, optimizer, epoch, epochs, start, end):
         with tf.GradientTape() as tape:
             l = loss(batch[0], batch[1], start, end)
             self.total_loss += l
         gradients = tape.gradient(l, trainable_variables)
-        self._optimizer.apply_gradients(zip(gradients, trainable_variables))
+        optimizer.apply_gradients(zip(gradients, trainable_variables))
 
-    def train(self, X, Y, epochs, batch_size, loss, trainable_variables, callbacks=None, X_val=None, D_val=None, L_val=None):
+    def train(self, X, Y, epochs, callbacks, X_val, D_val, L_val):
 
-        data = tf.data.Dataset.from_tensor_slices((X, Y)).batch(batch_size)
+        data = tf.data.Dataset.from_tensor_slices((X, Y)).batch(self._batch_size)
 
         if not isinstance(callbacks, keras.callbacks.CallbackList):
             callbacks = keras.callbacks.CallbackList(callbacks, model=self)
@@ -523,10 +523,10 @@ class BaseGD(BaseDeep):
 
             self.total_loss = 0.
             for step, batch in enumerate(data):
-                start = step * batch_size
-                end = min(start + batch_size, X.shape[0])
+                start = step * self._batch_size
+                end = min(start + self._batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
-                self.train_step(batch, loss, trainable_variables, epoch, epochs, start, end)
+                self.train_step(batch, self._loss, self.trainable_variables, self._optimizer, epoch, epochs, start, end)
                 callbacks.on_train_batch_end(step)
 
             scores = self._calculate_validation_scores(X_val, D_val, L_val)
@@ -545,7 +545,7 @@ class BaseGD(BaseDeep):
         self._batch_size = batch_size or self._n_samples
         self._optimizer = optimizer or self._get_default_optimizer()
         self.train(self._X, self._D if issubclass(self.__class__, BaseDeepLDL) else self._L,
-                   epochs, self._batch_size, self._loss, self.trainable_variables, callbacks, X_val, D_val, L_val)
+                   epochs, callbacks, X_val, D_val, L_val)
 
         return self
 

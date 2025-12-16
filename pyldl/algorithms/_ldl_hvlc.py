@@ -19,11 +19,11 @@ class LDL_HVLC(BaseGD, BaseDeepLDL):
 
     def __init__(self, k=5, alpha=1e-3, beta=1e-3, gamma=1e-5, delta=1e-5, **kwargs):
         super().__init__(**kwargs)
-        self._k = k
-        self._alpha = alpha
-        self._beta = beta
-        self._gamma = gamma
-        self._delta = delta
+        self.k = k
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.delta = delta
 
     def _get_default_model(self):
         return self.get_2layer_model(self._n_features, self._n_outputs, activation=None)
@@ -39,8 +39,8 @@ class LDL_HVLC(BaseGD, BaseDeepLDL):
         diff = tf.expand_dims(D_pred, axis=2) - tf.expand_dims(D_pred, axis=1)
         vertical = tf.reduce_sum(tf.expand_dims(self._P, axis=0) * diff**2)
         kl = tf.reduce_sum(keras.losses.kl_divergence(D, D_pred))
-        hv = self._alpha * horizontal + self._beta * vertical
-        reg = self._gamma * self._l2_reg(self._model.trainable_variables) + self._delta * self._l2_reg(self._M)
+        hv = self.alpha * horizontal + self.beta * vertical
+        reg = self.gamma * self._l2_reg(self._model.trainable_variables) + self.delta * self._l2_reg(self._M)
         return kl + hv + reg
 
     def _construct_C(self, X, self_include=True):
@@ -49,14 +49,18 @@ class LDL_HVLC(BaseGD, BaseDeepLDL):
 
     def _before_train(self):
         self._M = tf.Variable(tf.random.normal((self._n_outputs, self._n_outputs)), trainable=True)
-        self._knn = NearestNeighbors(n_neighbors=self._k+1).fit(self._X)
+        self._knn = NearestNeighbors(n_neighbors=self.k+1).fit(self._X)
         self._C = self._construct_C(self._X, self_include=False)
         self._p = tf.convert_to_tensor([pairwise_pearsonr(self._C[i], self._D[i]) for i in range(self._n_samples)], dtype=tf.float32)
         self._P = tf.convert_to_tensor(pairwise_pearsonr(tf.transpose(self._D)) , dtype=tf.float32)
 
-    def train_step(self, batch, loss, _, epoch, epochs, start, end):
-        super().train_step(batch, loss, self._model.trainable_variables, epoch, epochs, start, end)
-        super().train_step(batch, loss, [self._M], epoch, epochs, start, end)
+    def train_step(self, batch, loss, _, __, epoch, epochs, start, end):
+        super().train_step(batch, loss, self._model.trainable_variables, self._optimizer, epoch, epochs, start, end)
+        super().train_step(batch, loss, [self._M], self._M_optimizer, epoch, epochs, start, end)
+
+    def fit(self, X, D, *, M_optimizer=None, **kwargs):
+        self._M_optimizer = M_optimizer or self._get_default_optimizer()
+        return super().fit(X, D, **kwargs)
 
     def predict(self, X):
         return keras.activations.softmax(self._model(X) + self._construct_C(X) @ self._M)

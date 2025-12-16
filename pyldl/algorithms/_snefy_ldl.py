@@ -49,8 +49,8 @@ class SNEFY_LDL(BaseAdam, BaseDeepLDL):
                               tf.sqrt(1. / (self._n_latent * self._n_hidden)), trainable=True)
         self._b = tf.Variable(tf.zeros((1, self._n_hidden)), trainable=True)
 
-    def train_step(self, batch, loss, _, epoch, epochs, start, end):
-        super().train_step(batch, loss, _, epoch, epochs, start, end)
+    def train_step(self, batch, loss, trainable_variables, optimizer, epoch, epochs, start, end):
+        super().train_step(batch, loss, trainable_variables, optimizer, epoch, epochs, start, end)
         self._W.assign(tf.maximum(self._W, -.495))
 
     def fit(self, X, Y, *, batch_size=64, **kwargs):

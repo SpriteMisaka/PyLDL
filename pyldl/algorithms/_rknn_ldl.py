@@ -105,9 +105,9 @@ class RKNN_LDL(BaseGD, BaseDeepLDL):
         denominator = reduce_sum(C_inv, axis=[1, 2])[:, None]
         self._Z.assign(tf.transpose(tf.where(self._G_dense != 0, numerator / denominator, 0.)))
 
-    def train_step(self, batch, loss, _, epoch, epochs, start, end):
-        super().train_step(batch, loss, self._model.trainable_variables, epoch, epochs, start, end)
-        super().train_step(batch, loss, [self._rho], epoch, epochs, start, end)
+    def train_step(self, batch, loss, _, __, epoch, epochs, start, end):
+        super().train_step(batch, loss, self._model.trainable_variables, self._optimizer, epoch, epochs, start, end)
+        super().train_step(batch, loss, [self._rho], self._rho_optimizer, epoch, epochs, start, end)
         self._rho.assign(tf.clip_by_value(self._rho, 0., 1.))
         self._update_Z()
 
@@ -119,9 +119,10 @@ class RKNN_LDL(BaseGD, BaseDeepLDL):
             X = kernel(X, self._X)
         return rho * D_aaknn + (1 - rho) * self._call(X).numpy()
 
-    def fit(self, X, D, *, sparse=True, kernel=True, **kwargs):
+    def fit(self, X, D, *, sparse=True, kernel=True, rho_optimizer=None, **kwargs):
         if kwargs.pop('batch_size', None) is not None:
             raise ValueError("RKNN_LDL does not support 'batch_size'.")
+        self._rho_optimizer = rho_optimizer or self._get_default_optimizer()
         self._sparse = sparse
         self._kernel = kernel
         return super().fit(X, D, **kwargs)

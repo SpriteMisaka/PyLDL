@@ -85,21 +85,43 @@ def gaussian_noise(D: np.ndarray, mean: float = 0., std: float = .1):
     return proj(D + np.random.normal(loc=mean, scale=std, size=D.shape))
 
 
-def random_missing(D, missing_rate=.9, weighted=False, return_mask=True):
-    if missing_rate <= 0. or missing_rate >= 1.:
-        raise ValueError("Invalid missing rate, which should be in the range (0, 1).")
+def _random_mask(D, rate, weighted):
+    if rate <= 0. or rate >= 1.:
+        raise ValueError("Invalid rate, which should be in the range (0, 1).")
     if weighted:
-        missing_mask = np.zeros_like(D, dtype=bool)
         p = 1 - D
         p /= np.sum(p).flatten()
-        select = np.random.choice(D.size, size=int(D.size * missing_rate), replace=False, p=p)
-        missing_mask.flat[select] = True
+        select = np.random.choice(D.size, size=int(D.size * rate), replace=False, p=p)
+        mask = np.zeros_like(D, dtype=bool)
+        mask.flat[select] = True
     else:
-        missing_mask = np.random.rand(*D.shape) < missing_rate
-    missing_D = D.copy()
-    missing_D[missing_mask] = np.nan
-    missing_D[np.isnan(missing_D)] = 0.
-    return (missing_D, missing_mask) if return_mask else missing_D
+        mask = np.random.rand(*D.shape) < rate
+    return mask
+
+
+def random_missing(D, rate=.8, weighted=False, return_mask=True):
+    mask = _random_mask(D, rate, weighted)
+    missing = D.copy()
+    missing[mask] = .0
+    return (missing, mask) if return_mask else missing
+
+
+def random_exchange(D, rate=.2, weighted=False, return_mask=True):
+    mask = _random_mask(D, rate, weighted)
+    rows = np.where(np.sum(mask, axis=1) > 0)[0]
+    exchanged = D.copy()
+    for i in rows:
+        idx = np.where(mask[i])[0]
+        if len(idx) == 1:
+            j = idx[0]
+            k = np.random.choice([x for x in range(D.shape[1]) if x != j])
+            exchanged[i, [j, k]] = exchanged[i, [k, j]]
+        else:
+            perm = idx.copy()
+            while np.all(perm == idx):
+                np.random.shuffle(perm)
+            exchanged[i, idx] = exchanged[i, perm]
+    return (exchanged, mask) if return_mask else exchanged
 
 
 sys.modules['pyldl.utils.proj'] = proj
@@ -150,7 +172,7 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
         noise_func_args = noise_func_args or [
             [lambda x: x, {}],
             [gaussian_noise, {}],
-            [random_missing, {'missing_rate': .5, 'return_mask': False}],
+            [random_missing, {'rate': .5, 'return_mask': False}],
             [emphasize, {}]
         ]
     else:

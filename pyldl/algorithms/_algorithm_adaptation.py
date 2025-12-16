@@ -5,7 +5,7 @@ import keras
 import tensorflow as tf
 
 from pyldl.algorithms.utils import RProp, proj
-from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseGD, BaseAdam
+from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseBFGS, BaseGD, BaseAdam
 
 
 EPS = np.finfo(np.float32).eps
@@ -276,13 +276,13 @@ class BD_LDL(BaseLDL):
         return proj(X @ self._W)
 
 
-class TrustedReweighting(BaseLDL):
+class TrustedReweighting(BaseBFGS, BaseDeepLDL):
 
     def __init__(self, alpha=1e-2, beta=1e-2, rho=1e-2, **kwargs):
         super().__init__(**kwargs)
-        self.alpha = alpha
-        self.beta = beta
-        self.rho = rho
+        self._weight_learner = TrustedReweighting._WeightLearner(
+            alpha=alpha, beta=beta, rho=rho
+        )
 
     @staticmethod
     def get_prototypes(D: np.ndarray):
@@ -292,7 +292,7 @@ class TrustedReweighting(BaseLDL):
         return weighted.sum(axis=0) / (counts + EPS)
 
     @staticmethod
-    def clean_dataset(X, D):
+    def clean_dataset(X, D, return_mask=False):
         from sklearn.neighbors import NearestNeighbors
         prototypes = TrustedReweighting.get_prototypes(D)
         knn = NearestNeighbors(n_neighbors=1).fit(prototypes)
@@ -300,26 +300,56 @@ class TrustedReweighting(BaseLDL):
         virtual = np.argmax(prototypes[np.ravel(inds)], axis=1)
         pseudo = np.argmax(D, axis=1)
         mask = (virtual == pseudo)
+        if return_mask:
+            return X[mask], D[mask], mask
         return X[mask], D[mask]
 
-    def _loss(self, w):
-        from pyldl.algorithms.utils import kernel, non_diagonal
-        W = np.reshape(w, self._W_shape)
-        B = np.transpose(self._clean_X) @ W @ self._X
-        BBT = B @ np.transpose(B)
-        KBBT = kernel(B) @ np.transpose(kernel(B))
-        sum = np.sum(non_diagonal(BBT), axis=1)
-        sumK = np.sum(non_diagonal(KBBT), axis=1)
-        temp = np.linalg.norm(sum - self.rho, ord=2)
-        tempK = np.linalg.norm(sumK - self.rho, ord=2)
-        return temp + self.alpha * tempK + self.beta * np.linalg.norm(W, ord=1)
+    @tf.function
+    def _loss(self, params_1d):
+        theta = self._params2model(params_1d)[0]
+        D_pred = keras.activations.softmax(self._X @ theta)
+        w = tf.reshape(self._sample_weights, (-1, 1))
+        weighted_kl = tf.math.reduce_sum(keras.losses.kl_divergence(self._D, D_pred) * w)
+        return weighted_kl
 
-    def fit_transform(self, X, D):
-        from scipy.optimize import minimize
-        super().fit(X, D)
-        self._clean_X, self._clean_D = self.clean_dataset(self._X, self._D)
-        self._W_shape = (np.shape(self._clean_X)[0], self._n_samples)
-        W_init = np.random.rand(*self._W_shape)
-        result = minimize(self._loss, W_init.flatten(), method='L-BFGS-B', jac=None)
-        self._W = np.reshape(result.x, self._W_shape)
-        return np.transpose(np.transpose(self._clean_X) @ self._W), self._D
+    def _before_train(self):
+        self._sample_weights = self._weight_learner.fit_transform(
+            self._X, self._D
+        ).astype(np.float32)
+
+    class _WeightLearner(BaseAdam, BaseDeepLDL):
+
+        def __init__(self, alpha, beta, rho, **kwargs):
+            super().__init__(**kwargs)
+            self.alpha = alpha
+            self.beta = beta
+            self.rho = rho
+
+        def _loss(self, X, D, start, end):
+            from pyldl.algorithms.utils import kernel, non_diagonal
+            W = self.trainable_variables[0]
+            B = tf.transpose(self._clean_X) @ W @ X
+            BBT = B @ tf.transpose(B)
+            KBBT = kernel(B) @ kernel(tf.transpose(B))
+            nd = tf.reduce_sum(non_diagonal(BBT), axis=1)
+            temp = tf.linalg.norm(nd - self.rho, ord=2)
+            ndK = tf.reduce_sum(non_diagonal(KBBT), axis=1)
+            tempK = tf.linalg.norm(tf.reduce_sum(ndK) - self.rho, ord=2)
+            return temp + self.alpha * tempK + self.beta * tf.linalg.norm(W, ord=1)
+
+        def _get_default_model(self):
+            return self.get_2layer_model(
+                self._n_clean_samples, self._n_samples, activation=None
+            )
+
+        def _before_train(self):
+            self._clean_X, _, self._mask = TrustedReweighting.clean_dataset(
+                self._X.numpy(), self._D.numpy(), return_mask=True
+            )
+            self._n_clean_samples = np.shape(self._clean_X)[0]
+
+        def fit_transform(self, X, D):
+            super().fit(X, D)
+            sample_weights = np.linalg.norm(self.trainable_variables[0].numpy(), ord=2, axis=0)
+            sample_weights[~self._mask] = 1e-2 * np.abs(np.random.randn(self._n_samples - self._n_clean_samples))
+            return sample_weights
