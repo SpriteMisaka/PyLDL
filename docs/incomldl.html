@@ -10,9 +10,9 @@
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
     <script src="_static/documentation_options.js?v=47de8214"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="LDL4C" href="ldl4c.html" />
@@ -49,7 +49,7 @@
 <h2><cite>BaseIncomLDL</cite><a class="headerlink" href="#baseincomldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.base.BaseIncomLDL">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseIncomLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseIncomLDL" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseIncomLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseIncomLDL" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for all IncomLDL models in PyLDL.</p>
 </dd></dl>
 
@@ -58,7 +58,7 @@
 <h2>WInLDL<a class="headerlink" href="#winldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.WInLDL">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">WInLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.WInLDL" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">WInLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.WInLDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.WInLDL" title="pyldl.algorithms.WInLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">WInLDL</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id6" title="Xiang Li and Songcan Chen. No regularization is needed: efficient and effective incomplete label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4470–4478. 2024. URL: https://doi.org/10.24963/ijcai.2024/494.">INCOM-LDL-LC24</a>]</span>.</p>
 </dd></dl>
 
@@ -67,7 +67,7 @@
 <h2>IncomLDL<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.IncomLDL">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">IncomLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.IncomLDL" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">IncomLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.IncomLDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.IncomLDL" title="pyldl.algorithms.IncomLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">IncomLDL</span></code></a> is proposed in paper <span id="id3">[<a class="reference internal" href="#id8" title="Miao Xu and Zhi-Hua Zhou. Incomplete label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 3175–3181. 2017. URL: https://doi.org/10.24963/ijcai.2017/443.">INCOM-LDL-XZ17</a>]</span>.</p>
 </dd></dl>
 
@@ -173,7 +173,7 @@
       &#169;2024, SpriteMisaka.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |

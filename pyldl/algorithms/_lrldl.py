@@ -11,8 +11,8 @@ class _LRLDL(BaseADMM, BaseLDL):
     :term:`ADMM` is used as optimization algorithm.
     """
 
-    def __init__(self, mode='threshold', param=None, alpha=1e-3, beta=1e-3, random_state=None):
-        super().__init__(random_state)
+    def __init__(self, mode='threshold', param=None, alpha=1e-3, beta=1e-3, random_state=None, **kwargs):
+        super().__init__(random_state, **kwargs)
         self._mode = mode
         self._param = param
         self._alpha = alpha
@@ -30,7 +30,7 @@ class _LRLDL(BaseADMM, BaseLDL):
             (1+\mu) \boldsymbol{X}^{\top}\boldsymbol{O}\boldsymbol{O}^{\top}\boldsymbol{X} \right)^{-1}\text{,}
             \end{aligned}
 
-        where :math:`\\boldsymbol{I}` is the identity matrix.
+        where :math:`\boldsymbol{I}` is the identity matrix.
 
         And Eq. (10) should be corrected to:
 

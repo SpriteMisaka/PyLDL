@@ -9,7 +9,8 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
 class LDL_SCL(BaseAdam, BaseDeepLDL):
-    """:class:`LDL-SCL <pyldl.algorithms.LDL_SCL>` is proposed in paper :cite:`2018:zheng`.
+    """:class:`LDL-SCL <pyldl.algorithms.LDL_SCL>` is proposed in paper :cite:`2018:zheng`. 
+    SCL refers to (exploiting) *sample correlations locally*.
 
     :term:`Adam` is used as optimizer.
 

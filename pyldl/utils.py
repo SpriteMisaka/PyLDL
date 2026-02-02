@@ -14,12 +14,12 @@ from sklearn.preprocessing import MinMaxScaler
 
 from pyldl.metrics import THE_SMALLER_THE_BETTER
 from pyldl.algorithms.base import BaseLDL, BaseLE
-from pyldl.algorithms.utils import proj, binaryzation
+from pyldl.algorithms.utils import normalize, proj, softmax, binaryzation
 
 
 class LDLEarlyStopping(keras.callbacks.Callback):
 
-    def __init__(self, monitor='kl_divergence', patience=10):
+    def __init__(self, monitor='kl_divergence', patience=None):
         super().__init__()
         self._monitor = monitor
         self._patience = patience
@@ -124,7 +124,9 @@ def random_exchange(D, rate=.2, weighted=False, return_mask=True):
     return (exchanged, mask) if return_mask else exchanged
 
 
+sys.modules['pyldl.utils.normalize'] = normalize
 sys.modules['pyldl.utils.proj'] = proj
+sys.modules['pyldl.utils.softmax'] = softmax
 sys.modules['pyldl.utils.binaryzation'] = binaryzation
 
 
@@ -235,3 +237,12 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
         fig.savefig(f'{file_name}.pdf', bbox_inches='tight')
     else:
         raise ValueError("Invalid file name, which should be a string.")
+
+
+def regressor2ldl(regressor) -> BaseLDL:
+    from pyldl.algorithms._problem_transformation import _Reg2LDL
+    class Reg2LDL(_Reg2LDL):
+        def _get_default_model(self):
+            from sklearn.multioutput import MultiOutputRegressor
+            return MultiOutputRegressor(regressor)
+    return Reg2LDL()

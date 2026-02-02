@@ -16,7 +16,8 @@ EPS = np.finfo(np.float32).eps
 
 
 class RG4LDL(BaseEnsemble):
-    """:class:`RG4LDL <pyldl.algorithms.RG4LDL>` is proposed in paper :cite:`2025:tan`.
+    """:class:`RG4LDL <pyldl.algorithms.RG4LDL>` is proposed in paper :cite:`2025:tan`. 
+    RG refers to *renormalization group*.
     """
 
     def __init__(self, estimator=None, *, n_hidden: int = 64, **kwargs):
@@ -45,7 +46,8 @@ class RG4LDL(BaseEnsemble):
 
 
 class DF_LDL(BaseEnsemble):
-    """:class:`DF-LDL <pyldl.algorithms.DF_LDL>` is proposed in paper :cite:`2021:gonzalez`.
+    """:class:`DF-LDL <pyldl.algorithms.DF_LDL>` is proposed in paper :cite:`2021:gonzalez`. 
+    DF refers to *decomposition & fusion*.
     """
 
     def __init__(self, estimator=None, *, k: int = 5, **kwargs):
@@ -88,7 +90,8 @@ class DF_LDL(BaseEnsemble):
 
 
 class StructRF(BaseEnsemble):
-    """:class:`StructRF` is proposed in paper :cite:`2018:chen`.
+    """:class:`StructRF` is proposed in paper :cite:`2018:chen`. 
+    StructRF refers to *structured random forest*.
     """
 
     class StructTree(BaseLDL):

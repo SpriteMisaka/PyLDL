@@ -19,7 +19,7 @@ THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
 THE_LARGER_THE_BETTER = ["cosine", "intersection",
                          "fidelity",
                          "spearman", "kendall", "dpa", "mu",
-                         "jaccard",
+                         "jaccard", "subset_accuracy",
                          "match_m", "top_k", "max_roc_auc",
                          "precision", "specificity", "sensitivity", "youden_index", "accuracy"]
 
@@ -205,6 +205,14 @@ def dpa(D, D_pred):
 
 @_1d
 def mu(D, D_pred, metrics=kl_divergence):
+    r"""The :math:`\mu` metric is proposed in paper :cite:`2025:li`. Its KL-divergence-based form is defined as:
+
+    .. math::
+
+        \mu(\boldsymbol{U}, \, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}
+
+    where :math:`\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{c})]` and :math:`\boldsymbol{c}` is a uniform vector.
+    """
     from scipy.integrate import quad
     u = 1 / D.shape[1] * np.ones_like(D)
     noise = np.random.normal(0, 1e-7, size=u.shape)

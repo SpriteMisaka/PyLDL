@@ -65,7 +65,8 @@ def _update_V_numba(X, D, W, S, E, Z, V, V2, rho):
 
 
 class LDL_LCLR(BaseADMM, BaseLDL):
-    """:class:`LDL-LCLR <pyldl.algorithms.LDL_LCLR>` is proposed in paper :cite:`2019:ren2`.
+    """:class:`LDL-LCLR <pyldl.algorithms.LDL_LCLR>` is proposed in paper :cite:`2019:ren2`. 
+    LC and LR refer to *label correlation* and *low-rank*, respectively.
 
     :term:`ADMM` is used as the optimization algorithm.
     """

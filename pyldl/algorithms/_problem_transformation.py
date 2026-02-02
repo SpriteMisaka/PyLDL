@@ -2,13 +2,6 @@ from typing import Protocol
 
 import numpy as np
 
-from scipy.spatial.distance import pdist
-
-from sklearn.svm import LinearSVC, SVR
-from sklearn.naive_bayes import GaussianNB
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.calibration import CalibratedClassifierCV
-
 from pyldl.algorithms.base import BaseLDL
 
 
@@ -27,11 +20,11 @@ class _PT(BaseLDL):
         def predict_proba(self, X: np.ndarray) -> np.ndarray: ...
 
     def _preprocessing(self, X: np.ndarray, D: np.ndarray):
-        m, c = D.shape[0], D.shape[1]
+        n, c = D.shape[0], D.shape[1]
         Xr = np.repeat(X, c, axis=0)
-        Yr = np.tile(np.arange(c), m)
+        Yr = np.tile(np.arange(c), n)
         p = D.reshape(-1) / np.sum(D)
-        select = np.random.choice(m*c, size=m*c, p=p)
+        select = np.random.choice(n*c, size=n*c, p=p)
         return Xr[select], Yr[select]
 
     def _get_default_model(self) -> _PTModel:
@@ -59,6 +52,7 @@ class PT_Bayes(_PT):
         self.var_smoothing = var_smoothing
 
     def _get_default_model(self):
+        from sklearn.naive_bayes import GaussianNB
         priors = np.bincount(self._Yr) / len(self._Yr)
         return GaussianNB(priors=priors, var_smoothing=self.var_smoothing)
 
@@ -68,21 +62,30 @@ class PT_SVM(_PT):
     """
 
     def _get_default_model(self):
+        from sklearn.svm import LinearSVC
+        from sklearn.calibration import CalibratedClassifierCV
         return CalibratedClassifierCV(LinearSVC())
 
 
-class LDSVR(_PT):
-    """:class:`LDSVR <pyldl.algorithms.LDSVR>` is proposed in paper :cite:`2015:geng`.
-    """
+class _Reg2LDL(_PT):
 
     def _preprocessing(self, X: np.ndarray, D: np.ndarray):
         D = -np.log((1. + EPS) / np.clip(D, EPS, 1.) - 1.)
         return X, D
 
+    def predict(self, X: np.ndarray):
+        from pyldl.algorithms.utils import normalize
+        D_pred = 1. / (1. + np.exp(-self._model.predict(X)))
+        return normalize(D_pred)
+
+
+class LDSVR(_Reg2LDL):
+    """:class:`LDSVR <pyldl.algorithms.LDSVR>` is proposed in paper :cite:`2015:geng`.
+    """
+
     def _get_default_model(self):
+        from sklearn.svm import SVR
+        from sklearn.multioutput import MultiOutputRegressor
+        from scipy.spatial.distance import pdist
         gamma = 1. / (2. * np.mean(pdist(self._X)) ** 2)
         return MultiOutputRegressor(SVR(tol=1e-7, gamma=gamma))
-
-    def predict(self, X: np.ndarray):
-        D_pred = 1. / (1. + np.exp(-self._model.predict(X)))
-        return D_pred / np.sum(D_pred, axis=1, keepdims=True)

@@ -9,7 +9,7 @@ LDL refers to *label distribution learning*. Its definition can be as follows:
    Then the *label distribution* of :math:`\boldsymbol{x}` is denoted by :math:`\boldsymbol{d} = \lbrace d_{\boldsymbol{x}}^{y} \rbrace_{y \in \mathcal{Y}}`. 
    It is under the constraints of probability simplex, i.e., :math:`\boldsymbol{d} \in \Delta^{c-1}`, where
 
-   .. math:: \Delta^{l-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{l} \,|\, \boldsymbol{d} \geq 0,\, \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace\text{.}
+   .. math:: \Delta^{c-1} = \lbrace \boldsymbol{d} \in \mathbb{R}^{c}_{+} : \boldsymbol{d}^{\top} \boldsymbol{1} = 1 \rbrace\text{.}
 
    Given a training set of :math:`n` samples :math:`\mathcal{S} = \lbrace \boldsymbol{X},\, \boldsymbol{D} \rbrace = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}`, 
    the goal of LDL is to learn a mapping function :math:`f: \mathcal{X} \to \Delta^{c-1}` that minimizes the discrepancy between predicted and true label distributions. The performance of :math:`f` is ultimately evaluated on a test set, typically by distance/similarity measures.
