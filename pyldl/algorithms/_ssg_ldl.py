@@ -8,8 +8,8 @@ class SSG_LDL(BaseLDL):
     """:class:`SSG-LDL <pyldl.algorithms.SSG_LDL>` is proposed in paper :cite:`2021:gonzalez2`.
     """
 
-    def __init__(self, n=300, k=5, fx=0.5, fy=0.5, random_state=None):
-        super().__init__(random_state)
+    def __init__(self, n=300, k=5, fx=0.5, fy=0.5, **kwargs):
+        super().__init__(**kwargs)
 
         self._n = n
         self._k = k

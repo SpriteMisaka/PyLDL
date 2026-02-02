@@ -9,6 +9,7 @@ from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 EPS = np.finfo(np.float32).eps
 
 
+@keras.saving.register_keras_serializable()
 class LDL_LRR(BaseBFGS, BaseDeepLDL):
     """:class:`LDL-LRR <pyldl.algorithms.LDL_LRR>` is proposed in paper :cite:`2023:jia`. 
     LRR refers to *label ranking relation*.

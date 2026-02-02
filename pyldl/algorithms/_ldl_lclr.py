@@ -3,6 +3,7 @@ import numpy as np
 from numba import jit
 
 from scipy.optimize import minimize
+from scipy.special import softmax
 
 from sklearn.cluster import KMeans
 
@@ -12,8 +13,8 @@ from pyldl.algorithms.utils import svt, solvel21, pairwise_euclidean
 
 @jit(nopython=True)
 def _get_D_pred(X, W):
-    XW = X @ W
-    return np.exp(XW) / np.sum(np.exp(XW), axis=1).reshape(-1, 1)
+    exp_XW = np.exp(X @ W)
+    return exp_XW / np.sum(exp_XW, axis=1).reshape(-1, 1)
 
 
 @jit(nopython=True)
@@ -161,4 +162,5 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         return super().fit(X, y, rho=rho, **kwargs)
 
     def predict(self, X):
-        return _get_D_pred(X, self._W)
+        XW = X @ self._W
+        return softmax(XW, axis=1)

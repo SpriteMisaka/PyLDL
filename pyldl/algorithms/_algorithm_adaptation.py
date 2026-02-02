@@ -300,17 +300,14 @@ class TrustedReweighting(BaseBFGS, BaseDeepLDL):
         virtual = np.argmax(prototypes[np.ravel(inds)], axis=1)
         pseudo = np.argmax(D, axis=1)
         mask = (virtual == pseudo)
-        if return_mask:
-            return X[mask], D[mask], mask
-        return X[mask], D[mask]
+        return (X[mask], D[mask], mask) if return_mask else (X[mask], D[mask])
 
     @tf.function
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
         w = tf.reshape(self._sample_weights, (-1, 1))
-        weighted_kl = tf.math.reduce_sum(keras.losses.kl_divergence(self._D, D_pred) * w)
-        return weighted_kl
+        return tf.math.reduce_sum(keras.losses.kl_divergence(self._D, D_pred) * w)
 
     def _before_train(self):
         self._sample_weights = self._weight_learner.fit_transform(

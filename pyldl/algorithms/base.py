@@ -286,12 +286,28 @@ class BaseIncomLDL(BaseLDL):
 
 class _BaseDeep(keras.Model):
 
-    def __init__(self, n_hidden=64, n_latent=None, random_state=None):
-        keras.Model.__init__(self)
+    def __init__(self, n_hidden=64, n_latent=None, random_state=None, **kwargs):
+        keras.Model.__init__(self, **kwargs)
+        self._n_hidden = n_hidden
+        self._n_latent = n_latent
         if random_state is not None:
             tf.random.set_seed(random_state)
-        self._n_latent = n_latent
-        self._n_hidden = n_hidden
+        self._model = None
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "model": keras.saving.serialize_keras_object(self._model),
+        })
+        return config
+
+    @classmethod
+    def from_config(cls, config):
+        model_config = config.pop("model")
+        model = keras.saving.deserialize_keras_object(model_config)
+        obj = cls(**config)
+        obj._model = model
+        return obj
 
     @staticmethod
     @tf.function
@@ -349,9 +365,9 @@ class _BaseDeep(keras.Model):
 
 class BaseDeepLDL(BaseLDL, _BaseDeep):
 
-    def __init__(self, n_hidden=64, n_latent=None, random_state=None):
+    def __init__(self, n_hidden=64, n_latent=None, random_state=None, **kwargs):
         BaseLDL.__init__(self, random_state=random_state)
-        _BaseDeep.__init__(self, n_hidden, n_latent, random_state=random_state)
+        _BaseDeep.__init__(self, n_hidden, n_latent, random_state=random_state, **kwargs)
 
     def fit(self, X, D, **kwargs):
         BaseLDL.fit(self, X, D)
@@ -366,9 +382,9 @@ class BaseDeepLDL(BaseLDL, _BaseDeep):
 
 class BaseDeepLE(BaseLE, _BaseDeep):
 
-    def __init__(self, n_hidden=64, n_latent=None, random_state=None):
+    def __init__(self, n_hidden=64, n_latent=None, random_state=None, **kwargs):
         BaseLE.__init__(self, random_state)
-        _BaseDeep.__init__(self, n_hidden, n_latent, random_state)
+        _BaseDeep.__init__(self, n_hidden, n_latent, random_state, **kwargs)
 
     def fit(self, X, L, **kwargs):
         BaseLE.fit(self, X, L)
@@ -407,31 +423,6 @@ class BaseDeepLDLClassifier(BaseLDLClassifier, BaseDeepLDL):
 
 class BaseDeep(_BaseDeep):
 
-    @staticmethod
-    def _inspect_dims(h5_path):
-        import h5py
-        with h5py.File(h5_path, 'r') as f:
-            shapes = []
-            def _func(name, obj):
-                if not isinstance(obj, h5py.Dataset):
-                    return
-                parse = name.split('/')
-                p1 = parse[1]
-                n = int(p1.split('_')[1]) if '_' in p1 else 0
-                m = -1
-                if p1.startswith('sequential'):
-                    p3 = parse[3]
-                    m = int(p3.split('_')[1]) if '_' in p3 else 0
-                elif p1.startswith('dense'):
-                    m = 0
-                if m >= 0 and len(obj.shape) != 1:
-                    shapes.append((n, m, obj.shape))
-
-            f.visititems(_func)
-            shapes.sort(key=lambda x: (x[0], x[1]))
-            shapes = [i[2] for i in shapes]
-            return shapes[0][0], shapes[-1][-1]
-
     def fit(self, X, Y, **kwargs):
         if issubclass(self.__class__, BaseDeepLDL):
             BaseDeepLDL.fit(self, X, Y, **kwargs)
@@ -439,40 +430,20 @@ class BaseDeep(_BaseDeep):
             BaseDeepLE.fit(self, X, Y, **kwargs)
         else:
             raise TypeError("The model must be a subclass of BaseDeepLDL or BaseDeepLE.")
+        self.built = True
 
-    @_path_suffix(".weights.h5")
+    @_path_suffix(".keras")
     def dump(self, file: str):
         """Save the model to a file.
         """
-        from pyldl.algorithms._algorithm_adaptation import CPNN, LDLF
-        if issubclass(self.__class__, CPNN) or issubclass(self.__class__, LDLF):
-            self._useless = BaseDeep.get_2layer_model(1, self._n_outputs)
-        self.built = True
-        self.save_weights(file)
+        self.save(file)
 
     @classmethod
-    @_path_suffix(".weights.h5")
+    @_path_suffix(".keras")
     def load(cls, file: str, **kwargs):
         """Load the model from a file.
         """
-        X = kwargs.pop("X", None)
-        D = kwargs.pop("D", None)
-        if X is None or D is None:
-            from pyldl.algorithms._label_enhancement import LEVI
-            from pyldl.algorithms._algorithm_adaptation import CPNN, BCPNN, ACPNN
-            n_features, n_outputs = cls._inspect_dims(file)
-            if cls is LEVI or cls is BCPNN or cls is ACPNN:
-                n_features -= n_outputs
-            elif cls is CPNN:
-                n_features -= 1
-            X = np.zeros((1, n_features)) if X is None else X
-            D = np.zeros((1, n_outputs)) if D is None else D
-        obj = cls()
-        BaseDeep.fit(obj, X, D, **kwargs)
-        obj.built = True
-        obj.load_weights(file)
-        return obj
-
+        return keras.models.load_model(file, custom_objects=kwargs)
 
 class BaseGD(BaseDeep):
 
