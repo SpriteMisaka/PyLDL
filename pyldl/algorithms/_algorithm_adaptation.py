@@ -28,7 +28,14 @@ class AA_KNN(BaseLDL):
         _, inds = self._knn.kneighbors(X)
         return np.average(self._D[inds], axis=1)
 
+    def __getstate__(self):
+        return self.__dict__.copy()
 
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
+
+@keras.saving.register_keras_serializable()
 class AA_BP(BaseGD, BaseDeepLDL):
     """:class:`AA-BP <pyldl.algorithms.AA_BP>` is proposed in paper :cite:`2016:geng`.
     """
@@ -37,6 +44,7 @@ class AA_BP(BaseGD, BaseDeepLDL):
         super().__init__(**kwargs)
 
 
+@keras.saving.register_keras_serializable()
 class CPNN(BaseGD, BaseDeepLDL):
     """:class:`CPNN <pyldl.algorithms.CPNN>` is proposed in paper :cite:`2013:geng`.
 
@@ -87,6 +95,7 @@ class CPNN(BaseGD, BaseDeepLDL):
         return keras.activations.softmax(results)
 
 
+@keras.saving.register_keras_serializable()
 class BCPNN(CPNN):
     """:class:`BCPNN <pyldl.algorithms.BCPNN>` is proposed in paper :cite:`2017:yang`.
 
@@ -106,6 +115,7 @@ class BCPNN(CPNN):
         super().__init__(mode='binary', **params)
 
 
+@keras.saving.register_keras_serializable()
 class ACPNN(CPNN):
     """:class:`ACPNN <pyldl.algorithms.ACPNN>` is proposed in paper :cite:`2017:yang`.
 
@@ -125,6 +135,7 @@ class ACPNN(CPNN):
         super().__init__(mode='augment', **params)
 
 
+@keras.saving.register_keras_serializable()
 class LDLF(BaseAdam, BaseDeepLDL):
     """:class:`LDLF <pyldl.algorithms.LDLF>` is proposed in paper :cite:`2017:shen`.
 
@@ -146,28 +157,6 @@ class LDLF(BaseAdam, BaseDeepLDL):
         self._n_depth = n_depth
         self._n_leaves = 2 ** n_depth
 
-    def _call(self, X, i):
-        decisions = tf.gather(self._model(X), self._phi[i], axis=1)
-        decisions = tf.expand_dims(decisions, axis=2)
-        decisions = tf.concat([decisions, 1 - decisions], axis=2)
-        mu = tf.ones([X.shape[0], 1, 1])
-
-        begin_idx = 1
-        end_idx = 2
-
-        for level in range(self._n_depth):
-            mu = tf.reshape(mu, [X.shape[0], -1, 1])
-            mu = tf.tile(mu, (1, 1, 2))
-            level_decisions = decisions[:, begin_idx:end_idx, :]
-            mu = mu * level_decisions
-
-            begin_idx = end_idx
-            end_idx = begin_idx + 2 ** (level + 1)
-
-        mu = tf.reshape(mu, [X.shape[0], self._n_leaves])
-
-        return mu
-
     def _get_default_model(self):
         return self.get_3layer_model(self._n_features, self._n_hidden, self._n_latent, output_activation='sigmoid')
 
@@ -177,7 +166,7 @@ class LDLF(BaseAdam, BaseDeepLDL):
         ) for _ in range(self._n_estimators)]
 
         self._pi = [tf.Variable(
-            initial_value = tf.constant_initializer(1 / self.n_outputs)(
+            initial_value = tf.constant_initializer(1 / self._n_outputs)(
                 shape=[self._n_leaves, self._n_outputs]
             ),
             dtype="float32", trainable=True,
@@ -205,6 +194,29 @@ class LDLF(BaseAdam, BaseDeepLDL):
         loss /= self._n_estimators
         return loss
 
+    _serialize_objects = ['_model', '_phi', '_pi']
+    def _call(self, X, i):
+        decisions = tf.gather(self._model(X), self._phi[i], axis=1)
+        decisions = tf.expand_dims(decisions, axis=2)
+        decisions = tf.concat([decisions, 1 - decisions], axis=2)
+        mu = tf.ones([X.shape[0], 1, 1])
+
+        begin_idx = 1
+        end_idx = 2
+
+        for level in range(self._n_depth):
+            mu = tf.reshape(mu, [X.shape[0], -1, 1])
+            mu = tf.tile(mu, (1, 1, 2))
+            level_decisions = decisions[:, begin_idx:end_idx, :]
+            mu = mu * level_decisions
+
+            begin_idx = end_idx
+            end_idx = begin_idx + 2 ** (level + 1)
+
+        mu = tf.reshape(mu, [X.shape[0], self._n_leaves])
+
+        return mu
+
     def predict(self, X):
         res = np.zeros([X.shape[0], self._n_outputs], dtype=np.float32)
         for i in range(self._n_estimators):
@@ -224,6 +236,7 @@ class LDLF(BaseAdam, BaseDeepLDL):
         return self._n_leaves
 
 
+@keras.saving.register_keras_serializable()
 class Duo_LDL(BaseAdam, BaseDeepLDL):
     """:class:`Duo-LDL <pyldl.algorithms.Duo_LDL>` is proposed in paper :cite:`2021:zychowski`.
     """

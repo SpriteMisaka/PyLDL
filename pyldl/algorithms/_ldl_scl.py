@@ -8,11 +8,12 @@ import tensorflow as tf
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
+@keras.saving.register_keras_serializable()
 class LDL_SCL(BaseAdam, BaseDeepLDL):
     """:class:`LDL-SCL <pyldl.algorithms.LDL_SCL>` is proposed in paper :cite:`2018:zheng`. 
     SCL refers to (exploiting) *sample correlations locally*.
 
-    :term:`Adam` is used as optimizer.
+    :term:`Adam` is used as the optimizer.
 
     See also:
 
@@ -66,6 +67,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
             C[:, i] = lr.predict(X).reshape(1, -1)
         return tf.cast(C, dtype=tf.float32)
 
+    _serialize_objects = ['_model', '_X', '_C', '_W']
     def predict(self, X):
         C = self.construct_C(X, self._X, self._C)
         return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))

@@ -78,7 +78,7 @@ class DF_LDL(BaseEnsemble):
         self._knn.fit(self._X, self._D)
 
     def predict(self, X):
-        m, c = X.shape[0], self._D.shape[1]
+        m, c = X.shape[0], self._n_outputs
         p_knn = self._knn.predict(X)
         p = np.zeros((m, c), dtype=np.float32)
         for k in range(m):

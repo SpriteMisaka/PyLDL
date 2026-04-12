@@ -6,6 +6,7 @@ from scipy.stats import rankdata
 from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
+@keras.saving.register_keras_serializable()
 class LDL_DPA(BaseBFGS, BaseDeepLDL):
     """:class:`LDL-DPA <pyldl.algorithms.LDL_DPA>` is proposed in paper :cite:`2024:jia`. 
     DPA refers to *description-degree percentile average*.

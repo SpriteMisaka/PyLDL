@@ -7,6 +7,7 @@ from pyldl.algorithms.utils import pairwise_euclidean, non_diagonal
 from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
 
+@keras.saving.register_keras_serializable()
 class LDLLC(BaseBFGS, BaseDeepLDL):
     """:class:`LDLLC <pyldl.algorithms.LDLLC>` is proposed in paper :cite:`2018:jia`.
 

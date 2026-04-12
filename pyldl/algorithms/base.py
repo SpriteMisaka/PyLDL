@@ -1,3 +1,4 @@
+import os
 import pickle
 import logging
 
@@ -21,6 +22,7 @@ def _path_suffix(suffix):
         @wraps(func)
         def wrapper(self, path: str, *args, **kwargs):
             file = Path(path).with_suffix(suffix)
+            os.makedirs(file.parent, exist_ok=True)
             return func(self, file, *args, **kwargs)
         return wrapper
     return decorator
@@ -39,7 +41,7 @@ class _Base:
     def fit(self, X: np.ndarray, Y: np.ndarray):
         """Fit the model.
         """
-        self._X = X
+        self._X = X.astype(np.float64)
         self._n_samples = self._X.shape[0]
         self._n_features = self._X.shape[1]
         self._n_outputs = Y.shape[1]
@@ -66,8 +68,8 @@ class _Base:
             return new_obj
 
     def _not_been_fit(self):
-        raise ValueError("The model has not yet been fit. "
-                         "Try to call 'fit()' first with some training data.")
+        logging.warning("The model has not yet been fit. "
+                        "Try to call 'fit()' first with some training data.")
 
     @property
     def n_features(self) -> int:
@@ -81,6 +83,16 @@ class _Base:
             self._not_been_fit()
         return self._n_outputs
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        if '_X' in state:
+            del state['_X']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._X = None
+
     def __str__(self) -> str:
         return self.__class__.__name__
 
@@ -92,7 +104,7 @@ class _BaseLDL(_Base):
 
     def fit(self, X: np.ndarray, D: np.ndarray):
         super().fit(X, D)
-        self._D = D
+        self._D = D.astype(np.float64)
         return self
 
     def score(self, X: np.ndarray, D: np.ndarray,
@@ -101,6 +113,16 @@ class _BaseLDL(_Base):
             metrics = DEFAULT_METRICS
         from pyldl.metrics import score
         return score(D, self.predict(X), metrics=metrics, return_dict=return_dict)
+
+    def __getstate__(self):
+        state = super().__getstate__()
+        if '_D' in state:
+            del state['_D']
+        return state
+
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self._D = None
 
 
 class _BaseLE(_Base):
@@ -111,7 +133,7 @@ class _BaseLE(_Base):
 
     def fit(self, X: np.ndarray, L: np.ndarray):
         super().fit(X, L)
-        self._L = L
+        self._L = L.astype(np.float64)
         return self
 
     def transform(self, *args, **kwargs) -> np.ndarray:
@@ -126,6 +148,16 @@ class _BaseLE(_Base):
             metrics = DEFAULT_METRICS
         from pyldl.metrics import score
         return score(D, self.transform(X, L), metrics=metrics, return_dict=return_dict)
+
+    def __getstate__(self):
+        state = super().__getstate__()
+        if '_L' in state:
+            del state['_L']
+        return state
+
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        self._L = None
 
 
 class BaseLDL(_BaseLDL, BaseEstimator):
@@ -294,19 +326,23 @@ class _BaseDeep(keras.Model):
             tf.random.set_seed(random_state)
         self._model = None
 
+    _serialize_objects = ['_model']
+
     def get_config(self):
         config = super().get_config()
-        config.update({
-            "model": keras.saving.serialize_keras_object(self._model),
-        })
+        for i in self._serialize_objects:
+            config[i] = keras.saving.serialize_keras_object(getattr(self, i))
         return config
 
     @classmethod
     def from_config(cls, config):
-        model_config = config.pop("model")
-        model = keras.saving.deserialize_keras_object(model_config)
+        s = {}
+        for i in cls._serialize_objects:
+            model_config = config.pop(i)
+            s[i] = keras.saving.deserialize_keras_object(model_config)
         obj = cls(**config)
-        obj._model = model
+        for i in cls._serialize_objects:
+             setattr(obj, i, s[i])
         return obj
 
     @staticmethod
@@ -444,6 +480,7 @@ class BaseDeep(_BaseDeep):
         """Load the model from a file.
         """
         return keras.models.load_model(file, custom_objects=kwargs)
+
 
 class BaseGD(BaseDeep):
 
