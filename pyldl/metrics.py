@@ -5,25 +5,48 @@ import sys
 import numpy as np
 from scipy import stats
 
-from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, binaryzation, DEFAULT_METRICS
+from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS, DEFAULT_METRICS_GLD
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
 
 
-THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence",
-                          "euclidean", "sorensen", "chi2", "wave_hedges",
-                          "mean_absolute_error", "mean_squared_error",
-                          "sort_loss",
-                          "zero_one_loss", "error_probability",
-                          "hamming", "one_error"]
-
-THE_LARGER_THE_BETTER = ["cosine", "intersection",
-                         "fidelity",
-                         "spearman", "kendall", "dpa", "mu",
-                         "jaccard", "subset_accuracy",
-                         "match_m", "top_k", "max_roc_auc",
-                         "precision", "specificity", "sensitivity", "youden_index", "accuracy"]
-
 sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
+
+sys.modules['pyldl.metrics.DEFAULT_METRICS_GLD'] = DEFAULT_METRICS_GLD
+
+D_METRICS_THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence", "js_divergence",
+                                    "euclidean", "sorensen", "chi2", "wave_hedges",
+                                    "divisiveness_error",
+                                    "mean_absolute_error", "mean_squared_error",
+                                    "sort_loss", "zero_one_loss", "error_probability"]
+
+D_METRICS_THE_LARGER_THE_BETTER = ["cosine", "intersection",
+                                   "fidelity",
+                                   "spearman", "kendall", "dpa", "mu",
+                                   "match_m", "top_k", "max_roc_auc"]
+
+D_METRICS = D_METRICS_THE_SMALLER_THE_BETTER + D_METRICS_THE_LARGER_THE_BETTER
+
+L_METRICS_THE_SMALLER_THE_BETTER = ["hamming"]
+
+L_METRICS_THE_LARGER_THE_BETTER = ["jaccard", "subset_accuracy"]
+
+L_METRICS = L_METRICS_THE_SMALLER_THE_BETTER + L_METRICS_THE_LARGER_THE_BETTER
+
+G_METRICS_THE_SMALLER_THE_BETTER = ["ood_error"]
+
+G_METRICS_THE_LARGER_THE_BETTER = ["spearmanT", "kendallT"]
+
+G_METRICS = G_METRICS_THE_SMALLER_THE_BETTER + G_METRICS_THE_LARGER_THE_BETTER
+
+Y_METRICS_THE_SMALLER_THE_BETTER = []
+
+Y_METRICS_THE_LARGER_THE_BETTER = ["precision", "specificity", "sensitivity", "youden_index", "accuracy"]
+
+Y_METRICS = Y_METRICS_THE_SMALLER_THE_BETTER + Y_METRICS_THE_LARGER_THE_BETTER
+
+THE_SMALLER_THE_BETTER = D_METRICS_THE_SMALLER_THE_BETTER + L_METRICS_THE_SMALLER_THE_BETTER + G_METRICS_THE_SMALLER_THE_BETTER + Y_METRICS_THE_SMALLER_THE_BETTER
+
+THE_LARGER_THE_BETTER = D_METRICS_THE_LARGER_THE_BETTER + L_METRICS_THE_LARGER_THE_BETTER + G_METRICS_THE_LARGER_THE_BETTER + Y_METRICS_THE_LARGER_THE_BETTER
 
 EPS = np.finfo(float).eps
 
@@ -67,6 +90,21 @@ def canberra(D, D_pred):
 
 
 sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
+
+
+@_reduction
+@_clip
+@_1d
+def js_divergence(D, D_pred):
+    r"""Jensen-Shannon divergence. It is defined as:
+
+    .. math::
+
+        \text{JSD}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}
+
+    """
+    M = .5 * (D + D_pred)
+    return .5 * kl_divergence(D, M, reduction=None) + .5 * kl_divergence(D_pred, M, reduction=None)
 
 
 @_reduction
@@ -165,7 +203,7 @@ def fidelity(D, D_pred):
 
 @_reduction
 @_1d
-def spearman(D, D_pred):
+def spearman(D, D_pred, transpose=False):
     r"""Spearman's rank correlation coefficient. It is defined as:
 
     .. math::
@@ -174,19 +212,27 @@ def spearman(D, D_pred):
 
     where :math:`\rho(\cdot)` is the rank of the element in the vector.
     """
+    D, D_pred = map(lambda X: np.transpose(X) if transpose else X, [D, D_pred])
     return np.array([stats.spearmanr(D[i], D_pred[i])[0] for i in range(D.shape[0])])
+
+
+spearmanT = lambda G, G_pred: spearman(G, G_pred, transpose=True)
 
 
 @_reduction
 @_1d
-def kendall(D, D_pred):
+def kendall(D, D_pred, transpose=False):
     r"""Kendall's rank correlation coefficient. It is defined as:
 
     .. math::
 
         \text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j < k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}
     """
+    D, D_pred = map(lambda X: np.transpose(X) if transpose else X, [D, D_pred])
     return np.array([stats.kendalltau(D[i], D_pred[i], variant='b')[0] for i in range(D.shape[0])])
+
+
+kendallT = lambda G, G_pred: kendall(G, G_pred, transpose=True)
 
 
 @_reduction
@@ -203,6 +249,14 @@ def dpa(D, D_pred):
     return np.mean(stats.rankdata(D_pred, axis=1) * D, axis=1)
 
 
+def _uniform_vector(shape, scale=0.):
+    u = 1 / shape[1] * np.ones(shape)
+    if scale > 0:
+        u += np.random.normal(0, scale, size=shape)
+        u /= np.sum(u, axis=1, keepdims=True)
+    return u
+
+
 @_1d
 def mu(D, D_pred, metrics=kl_divergence):
     r"""The :math:`\mu` metric is proposed in paper :cite:`2025:li`. Its KL-divergence-based form is defined as:
@@ -214,20 +268,22 @@ def mu(D, D_pred, metrics=kl_divergence):
     where :math:`\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{c})]` and :math:`\boldsymbol{c}` is a uniform vector.
     """
     from scipy.integrate import quad
-    u = 1 / D.shape[1] * np.ones_like(D)
-    noise = np.random.normal(0, 1e-7, size=u.shape)
-    u += noise
-    u /= np.sum(u, axis=1, keepdims=True)
-    x0 = metrics(D, u)
+    x0 = metrics(D, _uniform_vector(D.shape))
     if np.isnan(x0):
         x0 = 1.
     a = metrics(D, D_pred, reduction=None)
-    def func(delta):
-        return (np.sum(a < delta) / len(a))
     def f(delta):
-        return func(delta) / ((x0 - 0) * 1)
-    auc, _ = quad(f, 0., x0)
+        return np.mean(a < delta)
+    auc, _ = quad(f, 0., x0) / x0
     return auc
+
+
+@_reduction
+@_1d
+def divisiveness_error(D, D_pred, pos, neg):
+    P, N = map(lambda x: np.reshape(x, (-1, 1)), [pos, neg])
+    psi = lambda X: np.minimum(X @ P, X @ N)
+    return np.abs(psi(D) - psi(D_pred))
 
 
 def _mean(D, D_pred, op, mode='macro'):
@@ -277,44 +333,33 @@ def error_probability(D, D_pred):
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
 
 
-def _D2L(f=None, *, keep_pred=False):
-    def _decorator(func):
-        @wraps(func)
-        def _wrapper(D, D_pred, **kwargs):
-            is_binary = lambda X: np.all((X == 0.) | (X == 1.))
-            L = D if is_binary(D) else binaryzation(D)
-            pred = D_pred if is_binary(D_pred) or keep_pred else binaryzation(D_pred) 
-            return func(L, pred, **kwargs)
-        return _wrapper
-    return _decorator(f) if f is not None and callable(f) else _decorator
+@_reduction
+@_1d
+def ood_error(G, G_pred):
+    mask_ood = np.all(G <= 0., axis=1)
+    pred_ood = np.all(G_pred <= 0., axis=1)
+    results = np.zeros(G.shape[0], dtype=float)
+    results[mask_ood] = ~pred_ood[mask_ood]
+    results[~mask_ood] = np.argmax(G_pred[~mask_ood], axis=1) != np.argmax(G[~mask_ood], axis=1)
+    return results
 
 
 @_reduction
-@_D2L
 @_1d
 def hamming(L, L_pred):
     return np.mean(L != L_pred, 1)
 
 
 @_reduction
-@_D2L
 @_1d
 def jaccard(L, L_pred):
     return np.sum(np.logical_and(L, L_pred), 1) / (np.sum(np.logical_or(L, L_pred), 1) + EPS)
 
 
 @_reduction
-@_D2L
 @_1d
 def subset_accuracy(L, L_pred):
     return np.all(L == L_pred, 1).astype(float)
-
-
-@_reduction
-@_D2L(keep_pred=True)
-@_1d
-def one_error(L, D_pred):
-    return 1 - L[np.arange(L.shape[0]), np.argmax(D_pred, 1)]
 
 
 def _calculate_match_m_top_k(D, D_pred, params, mode, top_k_mode='f1_score'):

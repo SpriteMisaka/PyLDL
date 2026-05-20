@@ -5,34 +5,41 @@ import keras
 import tensorflow as tf
 
 from pyldl.algorithms.utils import RProp, proj
-from pyldl.algorithms.base import BaseLDL, BaseDeepLDL, BaseBFGS, BaseGD, BaseAdam
+from pyldl.algorithms.base import Base, BaseLDL, BaseGLD, BaseDeepLDL, BaseBFGS, BaseGD, BaseAdam
 
 
 EPS = np.finfo(np.float32).eps
 
 
-class AA_KNN(BaseLDL):
-    """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
-    """
-
+class _AA_KNN(Base):
     def __init__(self, *, k: int = 5, **kwargs):
         super().__init__(**kwargs)
         self.k = k
 
-    def fit(self, X: np.ndarray, D: np.ndarray):
-        super().fit(X, D)
+    def fit(self, X: np.ndarray, target: np.ndarray):
+        super().fit(X, target)
         self._knn = NearestNeighbors(n_neighbors=self.k).fit(self._X)
         return self
 
     def predict(self, X):
         _, inds = self._knn.kneighbors(X)
-        return np.average(self._D[inds], axis=1)
+        return np.average(self._target[inds], axis=1)
 
     def __getstate__(self):
         return self.__dict__.copy()
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+
+
+class AA_KNN(_AA_KNN, BaseLDL):
+    """:class:`AA-kNN <pyldl.algorithms.AA_KNN>` is proposed in paper :cite:`2016:geng`.
+    """
+    pass
+
+
+class GLD_KNN(_AA_KNN, BaseGLD):
+    pass
 
 
 @keras.saving.register_keras_serializable()

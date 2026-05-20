@@ -7,9 +7,9 @@ warnings.filterwarnings("ignore")
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
-from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR
-from ._algorithm_adaptation import AA_BP, AA_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL, BD_LDL
-from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, LALOT
+from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR, GLD_SVR
+from ._algorithm_adaptation import AA_BP, AA_KNN, GLD_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL, BD_LDL
+from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, GLD_BFGS, LALOT
 
 from ._incomplete import IncomLDL, WInLDL
 from ._classifier import LDL4C, LDL_HR, LDLM
@@ -27,6 +27,7 @@ from ._rknn_ldl import RKNN_LDL
 from ._s_ldl import _S_LDL, S_LRR, S_SCL, S_KLD, S_QFD2, S_CJS, Shallow_S_LDL
 from ._delta_ldl import Delta_LDL
 from ._snefy_ldl import SNEFY_LDL
+from ._ldl_dvs import LDL_DVS
 
 from ._ssg_ldl import SSG_LDL
 
@@ -36,6 +37,8 @@ from ._ldl_da import LDL_DA
 
 
 _ldl__ = [
+# -------------------- 2026 --------------------
+"LDL_DVS",
 # -------------------- 2025 --------------------
 "RG4LDL", "RKNN_LDL", "SNEFY_LDL", "_S_LDL", "S_LRR", "S_SCL", "S_KLD", "S_CJS", "S_QFD2", "Shallow_S_LDL", "Delta_LDL",
 # -------------------- 2024 --------------------
@@ -93,4 +96,9 @@ _ldl_da__ = [
 "LDL_DA",
 ]
 
-__all__ = _ldl__ + _le__ + _incomldl__ + _ldl4c__ + _ssg_ldl__ + _ldl_da__
+_gld__ = [
+# -------------------- 2026 --------------------
+"GLD_KNN", "GLD_SVR", "GLD_BFGS",
+]
+
+__all__ = _ldl__ + _le__ + _incomldl__ + _ldl4c__ + _ssg_ldl__ + _ldl_da__ + _gld__

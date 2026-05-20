@@ -12,6 +12,8 @@ EPS = np.finfo(np.float64).eps
 
 DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]
 
+DEFAULT_METRICS_GLD = ['clark', 'mu', 'hamming', 'subset_accuracy', 'spearman', 'kendallT', 'ood_error']
+
 
 def _clip(func):
     @wraps(func)
@@ -170,6 +172,34 @@ def proj(D: np.ndarray) -> np.ndarray:
 def softmax(D: np.ndarray) -> np.ndarray:
     from scipy.special import softmax as scipy_softmax
     return scipy_softmax(D, axis=1)
+
+
+def shannon_entropy(D: np.ndarray):
+    return -np.sum(D * np.log(D + EPS))
+
+
+def estimate_alpha(D: np.ndarray, max_iterations: int = 100, convergence_criterion=1e-7):
+    from scipy.special import digamma, polygamma
+
+    def inv_digamma(y: np.ndarray) -> np.ndarray:
+        x = np.where(y >= -2.22, np.exp(y) + .5, -1. / (y + np.euler_gamma))
+        for _ in range(5):
+            x = x - (digamma(x) - y) / polygamma(1, x)
+        return x
+
+    log_D_bar = np.mean(np.log(D + EPS), axis=0)
+    alpha = np.ones(D.shape[1], dtype=np.float64)
+
+    for _ in range(max_iterations):
+        alpha0 = np.sum(alpha)
+        y = digamma(alpha0) + log_D_bar
+        alpha_new = inv_digamma(y)
+
+        if np.max(np.abs(alpha_new - alpha)) < convergence_criterion:
+            return alpha_new
+        alpha = alpha_new
+
+    return alpha
 
 
 def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.ndarray:

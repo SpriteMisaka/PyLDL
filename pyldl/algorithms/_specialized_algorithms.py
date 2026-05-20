@@ -2,14 +2,16 @@ import numpy as np
 from scipy.special import softmax
 from scipy.optimize import minimize, fsolve
 
-from pyldl.algorithms.base import BaseLDL
+from sklearn.covariance import LedoitWolf
+
+from pyldl.algorithms.base import Base, BaseLDL, BaseGLD
 from pyldl.algorithms.utils import kl_divergence
 
 
 EPS = np.finfo(np.float32).eps
 
 
-class _SA(BaseLDL):
+class _SA(Base):
     """Base class for :class:`pyldl.algorithms.SA_IIS` and :class:`pyldl.algorithms.SA_BFGS`.
 
     SA refers to *specialized algorithms*, where :term:`MaxEnt` is employed as model.
@@ -25,8 +27,8 @@ class _SA(BaseLDL):
     def _call(self, X):
         return softmax(X @ self._W, axis=1)
 
-    def fit(self, X, D, max_iterations=500, convergence_criterion=1e-7):
-        super().fit(X, D)
+    def fit(self, X, target, max_iterations=500, convergence_criterion=1e-7):
+        super().fit(X, target)
         self._max_iterations = max_iterations
         self._convergence_criterion = convergence_criterion
         self._W = np.random.random((self._n_features, self._n_outputs))
@@ -41,7 +43,7 @@ class _SA(BaseLDL):
         return self._W
 
 
-class SA_BFGS(_SA):
+class SA_BFGS(_SA, BaseLDL):
     """:class:`SA-BFGS <pyldl.algorithms.SA_BFGS>` is proposed in paper :cite:`2016:geng`.
 
     :term:`BFGS` is used as optimization algorithm.
@@ -65,7 +67,7 @@ class SA_BFGS(_SA):
         return self
 
 
-class SA_IIS(_SA):
+class SA_IIS(_SA, BaseLDL):
     """:class:`SA-IIS <pyldl.algorithms.SA_IIS>` is proposed in paper :cite:`2016:geng`.
 
     :term:`IIS` is used as optimization algorithm.
@@ -112,7 +114,63 @@ class SA_IIS(_SA):
         return self
 
 
-class LALOT(_SA):
+class GLD_BFGS(_SA, BaseGLD):
+
+    def _loss_function(self, G, G_pred):
+        diff = G - G_pred
+        left = diff @ self._sigma_inv
+        mahalanobis_squared = np.sum(left * diff, axis=1)
+        return np.mean(mahalanobis_squared)
+
+    def _call(self, X):
+        return np.tanh(X @ self._W)
+
+    def _obj_func(self, w):
+        self._W = w.reshape(self._n_features, self._n_outputs)
+        G_pred = self._call(self._X)
+
+        loss = self._loss_function(self._target, G_pred)
+        grad = (-2 / self._n_samples) * (
+            self._X.T @ ((self._target - G_pred) * (1 - G_pred ** 2)) @ self._sigma_inv
+        ).reshape(-1, )
+
+        self._current_iteration += 1
+        tmp = float(self._current_iteration) / self._max_iterations
+        if tmp >= .5 and self._current_iteration % 100 == 0:
+            self._alpha = (tmp - .5) * 2
+            eps = self._target - G_pred
+            cov = LedoitWolf().fit(eps).covariance_
+            self._sigma_inv = (
+                self._alpha * np.linalg.inv(cov) +
+                (1 - self._alpha) * np.eye(self._n_outputs)
+            )
+
+        return loss, grad
+
+    def fit(self, X, G, **kwargs):
+        super().fit(X, G, **kwargs)
+        self._alpha = 0.
+        self._current_iteration = 0
+        self._sigma_inv = np.eye(self._n_outputs)
+
+        limit = np.sqrt(6. / (self._n_features + self._n_outputs))
+        self._W = np.random.uniform(-limit, limit, (self._n_features, self._n_outputs))
+
+        optimize_result = minimize(
+            self._obj_func,
+            self._W.reshape(-1,),
+            method='L-BFGS-B',
+            jac=True,
+            options={
+                'gtol': self._convergence_criterion,
+                'maxiter': self._max_iterations,
+            }
+        )
+        self._W = optimize_result.x.reshape(self._n_features, self._n_outputs)
+        return self
+
+
+class LALOT(_SA, BaseLDL):
     """:class:`LALOT <pyldl.algorithms.LALOT>` is proposed in paper :cite:`2018:zhao`.
     """
 

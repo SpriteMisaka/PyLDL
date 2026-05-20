@@ -13,7 +13,7 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 
 from pyldl.metrics import THE_SMALLER_THE_BETTER
-from pyldl.algorithms.base import BaseLDL, BaseLE
+from pyldl.algorithms.base import BaseLDL, BaseLE, BaseGLD
 from pyldl.algorithms.utils import normalize, proj, softmax, binaryzation
 
 
@@ -59,7 +59,7 @@ class LDLEarlyStopping(keras.callbacks.Callback):
             tf.print(f"Epoch {self._stopped_epoch}: early stopping (best {self._monitor}: {self._best}).")
 
 
-def load_dataset(name, dir='dataset'):
+def load_dataset(name, dir='dataset', mode='D'):
     if not os.path.exists(dir):
         logging.info(f'Directory {dir} does not exist, creating it.')
         os.makedirs(dir)
@@ -67,8 +67,26 @@ def load_dataset(name, dir='dataset'):
     if not os.path.exists(dataset_path):
         logging.info(f'Dataset {name}.mat does not exist, downloading it now, please wait...')
         download_dataset(name, dataset_path)
+
+    def _data2G(data):
+        Q = data['raw_data']
+        lb = data.get('lower_bounds', Q.min(axis=0).reshape(1, -1))
+        ub = data.get('upper_bounds', Q.max(axis=0).reshape(1, -1))
+        G = BaseGLD.RAW2G(Q, lb, ub)
+        return G, lb, ub
+
     data = sio.loadmat(dataset_path)
-    return data['features'], data['labels']
+    X = data['features']
+    if mode == 'D':
+        D = data.get('labels')
+        if D is None:
+            D = BaseGLD.G2D(*_data2G(data))
+        return X, D
+    elif mode == 'G':
+        return X, *_data2G(data)
+    else:
+        raise ValueError(f"Unknown mode: {mode}. "
+                         "Supported modes are 'D' for label distribution and 'G' for generalized label distribution.")
 
 
 def download_dataset(name, dataset_path):
@@ -88,15 +106,17 @@ def gaussian_noise(D: np.ndarray, mean: float = 0., std: float = .1):
 def _random_mask(D, rate, weighted):
     if rate <= 0. or rate >= 1.:
         raise ValueError("Invalid rate, which should be in the range (0, 1).")
-    if weighted:
-        p = 1 - D
-        p /= np.sum(p).flatten()
-        select = np.random.choice(D.size, size=int(D.size * rate), replace=False, p=p)
-        mask = np.zeros_like(D, dtype=bool)
-        mask.flat[select] = True
-    else:
-        mask = np.random.rand(*D.shape) < rate
-    return mask
+    return _weighted_mask(D, rate) if weighted else np.random.rand(*D.shape) < rate
+
+
+def _weighted_mask(D, rate):
+    p = 1 - D
+    p /= np.sum(p)
+    p = p.flatten()
+    select = np.random.choice(D.size, size=int(D.size * rate), replace=False, p=p)
+    result = np.zeros_like(D, dtype=bool)
+    result.flat[select] = True
+    return result
 
 
 def random_missing(D, rate=.8, weighted=False, return_mask=True):

@@ -1,4 +1,5 @@
 import os
+import inspect
 import pickle
 import logging
 
@@ -14,7 +15,7 @@ import tensorflow_probability as tfp
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from pyldl.algorithms.utils import proj, DEFAULT_METRICS
+from pyldl.algorithms.utils import proj, normalize, DEFAULT_METRICS, DEFAULT_METRICS_GLD
 
 
 def _path_suffix(suffix):
@@ -28,6 +29,11 @@ def _path_suffix(suffix):
     return decorator
 
 
+def _first_arg_name(func):
+    params = list(inspect.signature(inspect.unwrap(func)).parameters.keys())
+    return params[0] if params else None
+
+
 class _Base:
     """Base class for all models in PyLDL.
     """
@@ -37,6 +43,7 @@ class _Base:
             np.random.seed(random_state)
         self._n_features = None
         self._n_outputs = None
+        self._target = None
 
     def fit(self, X: np.ndarray, Y: np.ndarray):
         """Fit the model.
@@ -87,6 +94,8 @@ class _Base:
         state = self.__dict__.copy()
         if '_X' in state:
             del state['_X']
+        if '_target' in state:
+            del state['_target']
         return state
 
     def __setstate__(self, state):
@@ -105,6 +114,7 @@ class _BaseLDL(_Base):
     def fit(self, X: np.ndarray, D: np.ndarray):
         super().fit(X, D)
         self._D = D.astype(np.float64)
+        self._target = self._D
         return self
 
     def score(self, X: np.ndarray, D: np.ndarray,
@@ -123,6 +133,7 @@ class _BaseLDL(_Base):
     def __setstate__(self, state):
         super().__setstate__(state)
         self._D = None
+        self._target = None
 
 
 class _BaseLE(_Base):
@@ -160,6 +171,111 @@ class _BaseLE(_Base):
         self._L = None
 
 
+class _BaseGLD(_Base):
+
+    def __init__(self, lower_bounds, upper_bounds, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lower_bounds = lower_bounds
+        self.upper_bounds = upper_bounds
+
+    def predict(self, _) -> np.ndarray:
+        raise NotImplementedError("The 'predict()' method is not implemented.")
+
+    @staticmethod
+    def G2RAW(G: np.ndarray, lb, ub):
+        return (ub - lb) * (G + 1.) / 2. + lb
+
+    @staticmethod
+    def RAW2G(Q: np.ndarray, lb, ub):
+        return 2. * (Q - lb) / (ub - lb) - 1.
+
+    @staticmethod
+    def G2D(G: np.ndarray, lb, ub):
+        Q = _BaseGLD.G2RAW(G, lb, ub)
+        select = np.all(Q >= 0., axis=1) & (np.sum(Q, axis=1) > 0.)
+        D = np.empty_like(Q, dtype=np.float64)
+        D[select] = normalize(Q[select])
+        D[~select] = proj(Q[~select])
+        return D
+
+    @staticmethod
+    def G2TL(G: np.ndarray):
+        return np.where(G > (1. / 3.), 1., np.where(G <= (-1. / 3.), -1., 0.))
+
+    @staticmethod
+    def G2L(G: np.ndarray):
+        return np.where(G > 0, 1., 0.)
+
+    @staticmethod
+    def G2SL(G: np.ndarray):
+        return np.argmax(G, axis=1)
+
+    def predict_D(self, X: np.ndarray):
+        return _BaseGLD.G2D(self.predict(X), self.lower_bounds, self.upper_bounds)
+
+    def predict_TL(self, X: np.ndarray):
+        return _BaseGLD.G2TL(self.predict(X))
+
+    def predict_L(self, X: np.ndarray):
+        return _BaseGLD.G2L(self.predict(X))
+
+    def predict_SL(self, X: np.ndarray):
+        return _BaseGLD.G2SL(self.predict(X))
+
+    def fit(self, X: np.ndarray, G: np.ndarray):
+        super().fit(X, G)
+        self._G = G.astype(np.float64)
+        self._target = self._G
+        return self
+
+    def score(self, X: np.ndarray, G: np.ndarray,
+              metrics: Optional[list[str]] = None, return_dict: bool = False):
+        from pyldl.metrics import score, D_METRICS, L_METRICS, G_METRICS
+
+        if metrics is None:
+            metrics = DEFAULT_METRICS_GLD
+
+        targets = {
+            'D': self.G2D(G, self.lower_bounds, self.upper_bounds),
+            'L': self.G2L(G),
+            'G': G,
+        }
+        preds = {}
+
+        def _metric_type(metric):
+            if isinstance(metric, str):
+                if metric in D_METRICS:
+                    return 'D'
+                if metric in L_METRICS:
+                    return 'L'
+                if metric in G_METRICS:
+                    return 'G'
+            else:
+                arg_name = _first_arg_name(metric)
+                if arg_name in {'D', 'L', 'G'}:
+                    return arg_name
+            raise ValueError(f"Unknown metric: {metric}. "
+                             "If you are using a custom metric, please make sure that its first argument is "
+                             "named 'D', 'L' or 'G' to indicate the type of the metric.")
+
+        def _predict(metric_type):
+            if metric_type not in preds:
+                if metric_type == 'D':
+                    preds[metric_type] = self.predict_D(X)
+                elif metric_type == 'L':
+                    preds[metric_type] = self.predict_L(X)
+                else:
+                    preds[metric_type] = self.predict(X)
+            return preds[metric_type]
+
+        scores = []
+        for metric in metrics:
+            metric_type = _metric_type(metric)
+            scores.append(score(targets[metric_type], _predict(metric_type), metrics=[metric])[0])
+
+        return dict(zip(metrics, scores)) if return_dict else tuple(scores)
+
+
 class BaseLDL(_BaseLDL, BaseEstimator):
     """Base class for all LDL models in PyLDL.
     """
@@ -176,6 +292,14 @@ class BaseLE(_BaseLE, BaseEstimator):
         super().__init__(**kwargs)
 
 
+class BaseGLD(_BaseGLD, BaseEstimator):
+    """Base class for all GLD models in PyLDL.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 class Base(_Base):
 
     def fit(self, X, Y, **kwargs):
@@ -186,8 +310,10 @@ class Base(_Base):
             BaseLDL.fit(self, X, Y, **kwargs)
         elif isinstance(self, BaseLE):
             BaseLE.fit(self, X, Y, **kwargs)
+        elif isinstance(self, BaseGLD):
+            BaseGLD.fit(self, X, Y, **kwargs)
         else:
-            raise TypeError("The model must be a subclass of BaseLDL or BaseLE.")
+            raise TypeError("The model must be a subclass of BaseLDL, BaseLE or BaseGLD.")
 
 
 class BaseADMM(Base):
