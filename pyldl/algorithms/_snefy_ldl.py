@@ -33,31 +33,42 @@ class SNEFY_LDL(BaseAdam, BaseDeepLDL):
 
     @tf.function
     def _loss(self, X, D, start, end):
-        features = self._encoder(X)
+        features = self._model(X)
         latent = tf.math.exp(self._log_D[start:end] @ self._W + features + self._b)
         net = tf.reshape((tf.norm(latent @ tf.transpose(self._V), axis=1)**2), (-1, ))
         log = tf.math.log(net + EPS)
         VKV = self._calculate_VKV(features)
         return - tf.reduce_mean(log - tf.math.log(tf.reduce_sum(VKV, axis=(1, 2)) + EPS))
 
+    def _get_default_model(self):
+        return self.get_3layer_model(self._n_features, self._n_hidden, self._n_hidden,
+                                     hidden_activation='relu', output_activation=None)
+
     def _before_train(self):
         self._log_D = tf.math.log(self._D)
-        self._encoder = self.get_3layer_model(self._n_features, self._n_hidden, self._n_hidden,
-                                              hidden_activation='relu', output_activation=None)
-        self._W = tf.Variable(tf.random.normal((self._n_outputs, self._n_hidden)), trainable=True)
-        self._V = tf.Variable(tf.random.normal((self._n_latent, self._n_hidden), 0., 1.) *\
-                              tf.sqrt(1. / (self._n_latent * self._n_hidden)), trainable=True)
-        self._b = tf.Variable(tf.zeros((1, self._n_hidden)), trainable=True)
+        self._W = self.add_weight(
+            name='W', shape=(self._n_outputs, self._n_hidden),
+            initializer=tf.random_normal_initializer(
+                stddev=tf.sqrt(2. / self._n_outputs)
+            ), trainable=True
+        )
+        self._V = self.add_weight(
+            name='V', shape=(self._n_latent, self._n_hidden),
+            initializer=tf.random_normal_initializer(
+                stddev=tf.sqrt(1. / (self._n_latent * self._n_hidden))
+            ), trainable=True
+        )
+        self._b = self.add_weight(
+            name='b', shape=(1, self._n_hidden),
+            initializer=tf.zeros_initializer(), trainable=True
+        )
 
     def train_step(self, batch, loss, trainable_variables, optimizer, epoch, epochs, start, end):
         super().train_step(batch, loss, trainable_variables, optimizer, epoch, epochs, start, end)
         self._W.assign(tf.maximum(self._W, -.495))
 
-    def fit(self, X, Y, *, batch_size=64, **kwargs):
-        return super().fit(X, Y, batch_size=batch_size, **kwargs)
-
     def predict(self, X, return_uncertainty=False):
-        features = self._encoder(X)
+        features = self._model(X)
         VKV = self._calculate_VKV(features)
         W = tf.expand_dims(self._W, axis=1) + tf.expand_dims(self._W, axis=2)
         alpha = W + 1

@@ -1,11 +1,14 @@
 import numpy as np
-from sklearn.svm import SVR
+from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
 import keras
 import tensorflow as tf
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
+
+
+EPS = np.finfo(np.float32).eps
 
 
 @keras.saving.register_keras_serializable()
@@ -25,9 +28,9 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         2021:jia
     """
 
-    def __init__(self, n_clusters=5, alpha=1e-3, beta=1e-6, **kwargs):
+    def __init__(self, n_clusters=5, alpha=1e-3, beta=1e-3, **kwargs):
         super().__init__(**kwargs)
-        self._n_clusters = n_clusters
+        self.n_clusters = n_clusters
         self.alpha = alpha
         self.beta = beta
 
@@ -35,12 +38,18 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         return self.get_2layer_model(self._n_features, self._n_outputs)
 
     def _before_train(self):
-        self._P = tf.cast(KMeans(n_clusters=self._n_clusters).fit(self._D).cluster_centers_,
-                          dtype=tf.float32)
-        self._C = tf.Variable(tf.zeros((self._n_samples, self._n_clusters)) + 1e-6,
-                              trainable=True)
-        self._W = tf.Variable(tf.random.normal((self._n_clusters, self._n_outputs)),
-                              trainable=True)
+        self._P = tf.cast(
+            KMeans(n_clusters=self.n_clusters).fit(self._D).cluster_centers_,
+            dtype=tf.float32
+        )
+        self._C = self.add_weight(
+            name='C', shape=(self._n_samples, self.n_clusters),
+            initializer=tf.constant_initializer(EPS), trainable=True
+        )
+        self._W = self.add_weight(
+            name='W', shape=(self.n_clusters, self._n_outputs),
+            initializer=tf.random_normal_initializer(), trainable=True
+        )
 
     @staticmethod
     @tf.function
@@ -62,7 +71,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
     def construct_C(X, old_X, old_C):
         C = np.zeros((X.shape[0], old_C.shape[1]))
         for i in range(old_C.shape[1]):
-            lr = SVR()
+            lr = LinearRegression()
             lr.fit(old_X, old_C.numpy()[:, i].reshape(-1))
             C[:, i] = lr.predict(X).reshape(1, -1)
         return tf.cast(C, dtype=tf.float32)
@@ -71,7 +80,3 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
     def predict(self, X):
         C = self.construct_C(X, self._X, self._C)
         return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))
-
-    @property
-    def n_clusters(self):
-        return self._n_clusters

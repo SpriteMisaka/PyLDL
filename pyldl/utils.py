@@ -232,8 +232,12 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
                 L = binaryzation(D)
                 D = model.fit_transform(X, L)
 
-        c = MinMaxScaler(feature_range=(1e-7, 1-1e-7)).fit_transform(D)
-        colors[start:end,:,:] = c.reshape(n_samples, n_samples, 3)[start:end,:,:]
+        from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
+        hsv = rgb_to_hsv(D.reshape(-1, 1, 3))
+        hsv[:, :, 1] *= 1.75
+        hsv[:, :, 1] = np.clip(hsv[:, :, 1], 0., 1.)
+        c = hsv_to_rgb(hsv) ** .4545
+        colors[start:end, :, :] = c.reshape(n_samples, n_samples, 3)[start:end, :, :]
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
     ax.xaxis._axinfo['grid']['linestyle'] = '--'
