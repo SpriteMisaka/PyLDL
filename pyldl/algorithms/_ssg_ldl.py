@@ -1,7 +1,6 @@
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
 
-from pyldl.algorithms.base import BaseLDL
+from pyldl.algorithms.base.shallow import BaseLDL
 
 
 class SSG_LDL(BaseLDL):
@@ -39,6 +38,7 @@ class SSG_LDL(BaseLDL):
         self._new_D = np.concatenate([self._new_D, D.reshape(1, -1)])
 
     def fit_transform(self, X, D, synthetic_only=False):
+        from sklearn.neighbors import NearestNeighbors
         super().fit(X, D)
 
         repeated_X = np.repeat([self._X], self._n_samples, axis=0).transpose(1, 0, 2)

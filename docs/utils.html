@@ -7,12 +7,12 @@
 
     <title>Utils &amp; Metrics &#8212; PyLDL 0.0.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <script src="_static/documentation_options.js?v=47de8214"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Glossary" href="glossary.html" />
@@ -66,7 +66,7 @@
 <h2><cite>binaryzation</cite><a class="headerlink" href="#binaryzation" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.binaryzation">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">binaryzation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.binaryzation" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">binaryzation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.binaryzation" title="Link to this definition">¶</a></dt>
 <dd><p>Transform label distribution matrix to logical label matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -99,7 +99,15 @@
 <h2><cite>csr2sparse</cite><a class="headerlink" href="#csr2sparse" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.csr2sparse">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">csr2sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">csr_matrix</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SparseTensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.csr2sparse" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">csr2sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.csr2sparse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="estimate-alpha">
+<h2><cite>estimate_alpha</cite><a class="headerlink" href="#estimate-alpha" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.estimate_alpha">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">estimate_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.estimate_alpha" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -107,7 +115,7 @@
 <h2><cite>kernel</cite><a class="headerlink" href="#kernel" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.kernel">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kernel" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kernel" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -116,17 +124,27 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.kl_divergence">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kl_divergence" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Kullback-Leibler divergence. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{KLD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}\]</div>
 </dd></dl>
 
 </section>
+<section id="locass-proj">
+<h2><cite>locass_proj</cite><a class="headerlink" href="#locass-proj" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.locass_proj">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">locass_proj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.locass_proj" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="non-diagonal">
 <h2><cite>non_diagonal</cite><a class="headerlink" href="#non-diagonal" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.non_diagonal">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">non_diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.non_diagonal" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">non_diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.non_diagonal" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -142,54 +160,29 @@
 <h2><cite>pairwise_cosine</cite><a class="headerlink" href="#pairwise-cosine" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_cosine">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'similarity'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_cosine" title="Link to this definition">¶</a></dt>
-<dd><p>Pairwise cosine distance/similarity.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, n]\)</span>).</p></li>
-<li><p><strong>Y</strong> (<em>tf.Tensor</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{Y}},\, n]\)</span>).</p></li>
-<li><p><strong>mode</strong> (<em>str</em>) – Defaults to ‘similarity’. The options are ‘similarity’ and ‘distance’.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pairwise cosine similarity (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, m_{\boldsymbol{Y}}]\)</span>).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tf.Tensor</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'similarity'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_cosine" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
 
 </section>
 <section id="pairwise-euclidean">
 <h2><cite>pairwise_euclidean</cite><a class="headerlink" href="#pairwise-euclidean" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_euclidean">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_euclidean" title="Link to this definition">¶</a></dt>
-<dd><p>Pairwise Euclidean distance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{X}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, n]\)</span>).</p></li>
-<li><p><strong>Y</strong> (<em>Union</em><em>[</em><em>np.ndarray</em><em>, </em><em>tf.Tensor</em><em>]</em><em>, </em><em>optional</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{Y}\)</span> (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{Y}},\, n]\)</span>), if None, <span class="math notranslate nohighlight">\(\boldsymbol{Y} = \boldsymbol{X}\)</span>, defaults to None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Pairwise Euclidean distance (shape: <span class="math notranslate nohighlight">\([m_{\boldsymbol{X}},\, m_Y]\)</span>).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[np.ndarray, tf.Tensor]</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_euclidean" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
 
 </section>
 <section id="pairwise-pearsonr">
 <h2><cite>pairwise_pearsonr</cite><a class="headerlink" href="#pairwise-pearsonr" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_pearsonr">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_pearsonr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tensor</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_pearsonr" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_pearsonr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_pearsonr" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_pearsonr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 </section>
@@ -211,6 +204,14 @@
 </dd>
 </dl>
 </dd></dl>
+
+</section>
+<section id="shannon-entropy">
+<h2><cite>shannon_entropy</cite><a class="headerlink" href="#shannon-entropy" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.shannon_entropy">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">shannon_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.shannon_entropy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="soft-thresholding">
@@ -316,6 +317,14 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dd></dd></dl>
 
 </section>
+<section id="weighted-mask">
+<h2><cite>_weighted_mask</cite><a class="headerlink" href="#weighted-mask" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.utils._weighted_mask">
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">_weighted_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils._weighted_mask" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="artificial">
 <h2><cite>artificial</cite><a class="headerlink" href="#artificial" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -352,7 +361,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>load_dataset</cite><a class="headerlink" href="#load-dataset" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.utils.load_dataset">
-<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dataset'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.load_dataset" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dataset'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.load_dataset" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -368,7 +377,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>plot_artificial</cite><a class="headerlink" href="#plot-artificial" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.utils.plot_artificial">
-<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">plot_artificial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.plot_artificial" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">plot_artificial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_func_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.plot_artificial" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -392,15 +401,33 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>regressor2ldl</cite><a class="headerlink" href="#regressor2ldl" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.utils.regressor2ldl">
-<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">regressor2ldl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regressor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ldl.html#pyldl.algorithms.base.BaseLDL" title="pyldl.algorithms.base.BaseLDL"><span class="pre">BaseLDL</span></a></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.regressor2ldl" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.utils.</span></span><span class="sig-name descname"><span class="pre">regressor2ldl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regressor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ldl.html#pyldl.algorithms.base.BaseLDL" title="pyldl.algorithms.base.shallow.BaseLDL"><span class="pre">BaseLDL</span></a></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.utils.regressor2ldl" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
-<section id="d2l">
-<h2><cite>_D2L</cite><a class="headerlink" href="#d2l" title="Link to this heading">¶</a></h2>
+<section id="nu">
+<h2><cite>_nu</cite><a class="headerlink" href="#nu" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyldl.metrics._D2L">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_D2L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_pred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics._D2L" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyldl.metrics._nu">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_nu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics._nu" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_nu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+</section>
+<section id="register">
+<h2><cite>_register</cite><a class="headerlink" href="#register" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics._register">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">larger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics._register" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="uniform-vector">
+<h2><cite>_uniform_vector</cite><a class="headerlink" href="#uniform-vector" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics._uniform_vector">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">_uniform_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics._uniform_vector" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -417,6 +444,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.canberra">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.canberra" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Canberra distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Can.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}\]</div>
@@ -428,6 +457,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.chebyshev">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.chebyshev" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Chebyshev distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Cheby.}(\boldsymbol{u}, \, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}\]</div>
@@ -439,6 +470,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.chi2">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.chi2" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Chi-squared distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\chi^2(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}\]</div>
@@ -450,6 +483,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.clark">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.clark" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Clark distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Clark}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}\]</div>
@@ -461,10 +496,22 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.cosine">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.cosine" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Cosine similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Cosine}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}u_j v_j}{\sqrt{\sum^l_{j=1}u_j^2}\sqrt{\sum^l_{j=1}v_j^2}}\text{.}\]</div>
 </dd></dl>
+
+</section>
+<section id="divisiveness-error-downarrow">
+<h2><cite>divisiveness_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#divisiveness-error-downarrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.divisiveness_error">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">divisiveness_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neg</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.divisiveness_error" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">divisiveness_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
 
 </section>
 <section id="dpa-uparrow">
@@ -472,6 +519,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.dpa">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">dpa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.dpa" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">dpa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Degree percentile average (DPA) is proposed in paper <span id="id48">[<a class="reference internal" href="ldl.html#id278" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{DPA}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{l} \sum_{j=1}^{l} u_j \rho(v_j)\text{,}\]</div>
@@ -484,6 +533,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.error_probability">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">error_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.error_probability" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">error_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Error probability. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}\]</div>
@@ -495,6 +546,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.euclidean">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.euclidean" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Euclidean distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Eucl.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\left( u_j - v_j \right)^2}\text{.}\]</div>
@@ -506,6 +559,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.fidelity">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">fidelity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.fidelity" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">fidelity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Fidelity similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Fid.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \sqrt{u_j v_j}\text{.}\]</div>
@@ -517,6 +572,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.hamming">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">hamming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.hamming" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">hamming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 </section>
@@ -525,6 +582,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.intersection">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.intersection" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Intersection similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}\]</div>
@@ -536,6 +595,37 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.jaccard">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jaccard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jaccard" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jaccard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+</section>
+<section id="js-divergence-downarrow">
+<h2><cite>js_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#js-divergence-downarrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.js_divergence">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">js_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.js_divergence" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">js_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Jensen-Shannon divergence. It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\text{JSD}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}\]</div>
+</dd></dl>
+
+</section>
+<section id="jsd-dirichlet-expectation">
+<h2><cite>jsd_dirichlet_expectation</cite><a class="headerlink" href="#jsd-dirichlet-expectation" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.jsd_dirichlet_expectation">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jsd_dirichlet_expectation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jsd_dirichlet_expectation" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="jsd-dirichlet-variance">
+<h2><cite>jsd_dirichlet_variance</cite><a class="headerlink" href="#jsd-dirichlet-variance" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.jsd_dirichlet_variance">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jsd_dirichlet_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jsd_dirichlet_variance" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -543,11 +633,21 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>kendall</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#kendall-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.kendall">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.kendall" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.kendall" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Kendall’s rank correlation coefficient. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j &lt; k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}\]</div>
 </dd></dl>
+
+</section>
+<section id="kendallt-uparrow">
+<h2><cite>kendallT</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#kendallt-uparrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.kendallT">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendallT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.kendallT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="match-m-uparrow">
@@ -586,7 +686,9 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>mu</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#mu-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.mu">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">kl_divergence&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.mu" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.mu" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>The <span class="math notranslate nohighlight">\(\mu\)</span> metric is proposed in paper <span id="id49">[<a class="reference internal" href="ldl.html#id273" title="Weiwei Li, Haitao Wu, Yunan Lu, and Xiuyi Jia. Approximately correct label distribution learning. In Proceedings of the International Conference on Machine Learning, 36298–36309. 2025.">LDL-LWLJ25</a>]</span>. Its KL-divergence-based form is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\mu(\boldsymbol{U}, \, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}\]</div>
@@ -594,11 +696,37 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 </dd></dl>
 
 </section>
-<section id="one-error-downarrow">
-<h2><cite>one_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#one-error-downarrow" title="Link to this heading">¶</a></h2>
+<section id="nu1-uparrow">
+<h2><cite>nu1</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#nu1-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyldl.metrics.one_error">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">one_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.one_error" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyldl.metrics.nu1">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">nu1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.nu1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="nu2-uparrow">
+<h2><cite>nu2</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#nu2-uparrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.nu2">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">nu2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.nu2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="nu3-uparrow">
+<h2><cite>nu3</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#nu3-uparrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.nu3">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">nu3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.nu3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="ood-error-downarrow">
+<h2><cite>ood_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span><a class="headerlink" href="#ood-error-downarrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.ood_error">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">ood_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.ood_error" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">ood_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 </section>
@@ -614,7 +742,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>score</cite><a class="headerlink" href="#score" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.score">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.score" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.score" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -631,6 +759,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.sorensen">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">sorensen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.sorensen" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">sorensen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd>S&oslash;rensen's distance. It is defined as:<div class="math notranslate nohighlight">
 \[\text{S}\phi\text{ren.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}\left\vert u_j - v_j \right\vert}{\sum^l_{j=1}\left( u_j + v_j \right)}\text{.}\]</div>
 </dd></dl>
@@ -640,12 +770,22 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <h2><cite>spearman</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#spearman-uparrow" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.spearman">
-<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.spearman" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.spearman" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Spearman’s rank correlation coefficient. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{Spear.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{l} (\rho(u_j) - \rho(v_j))^2 }{l(l^2 - 1)}\text{,}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the rank of the element in the vector.</p>
 </dd></dl>
+
+</section>
+<section id="spearmant-uparrow">
+<h2><cite>spearmanT</cite><span class="math notranslate nohighlight">\(\uparrow\)</span><a class="headerlink" href="#spearmant-uparrow" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.metrics.spearmanT">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearmanT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.spearmanT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="specificity-uparrow">
@@ -661,6 +801,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.subset_accuracy">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">subset_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.subset_accuracy" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">subset_accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
 </section>
@@ -677,6 +819,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.wave_hedges">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.wave_hedges" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Wave-Hedges distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{WHD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, \, v_j)}\text{.}\]</div>
@@ -704,6 +848,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.zero_one_loss">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">zero_one_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.zero_one_loss" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">zero_one_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>0/1 loss. It is defined as:</p>
 <div class="math notranslate nohighlight">
 \[\text{0/1 loss}(\boldsymbol{u}, \, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \, \arg\max(\boldsymbol{v}))\text{,}\]</div>
@@ -748,16 +894,7 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 
 
 
-
-<search id="searchbox" style="display: none" role="search">
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
@@ -771,19 +908,23 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#reduction"><cite>_reduction</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#csr2sparse"><cite>csr2sparse</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimate-alpha"><cite>estimate_alpha</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kernel"><cite>kernel</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kl-divergence-downarrow"><cite>kl_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#locass-proj"><cite>locass_proj</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-diagonal"><cite>non_diagonal</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#normalize"><cite>normalize</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-pearsonr"><cite>pairwise_pearsonr</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#proj"><cite>proj</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#shannon-entropy"><cite>shannon_entropy</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#soft-thresholding"><cite>soft_thresholding</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#softmax"><cite>softmax</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#solvel21"><cite>solvel21</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#svt"><cite>svt</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#random-mask"><cite>_random_mask</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#weighted-mask"><cite>_weighted_mask</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#artificial"><cite>artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#download-dataset"><cite>download_dataset</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#emphasize"><cite>emphasize</cite></a></li>
@@ -794,13 +935,16 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#random-exchange"><cite>random_exchange</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#random-missing"><cite>random_missing</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#regressor2ldl"><cite>regressor2ldl</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#d2l"><cite>_D2L</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nu"><cite>_nu</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#register"><cite>_register</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uniform-vector"><cite>_uniform_vector</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#accuracy-uparrow"><cite>accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#canberra-downarrow"><cite>canberra</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#chebyshev-downarrow"><cite>chebyshev</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#chi2-downarrow"><cite>chi2</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clark-downarrow"><cite>clark</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cosine-uparrow"><cite>cosine</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#divisiveness-error-downarrow"><cite>divisiveness_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dpa-uparrow"><cite>dpa</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#error-probability-downarrow"><cite>error_probability</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#euclidean-downarrow"><cite>euclidean</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
@@ -808,18 +952,26 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l2"><a class="reference internal" href="#hamming-downarrow"><cite>hamming</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#intersection-uparrow"><cite>intersection</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jaccard-uparrow"><cite>jaccard</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#js-divergence-downarrow"><cite>js_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jsd-dirichlet-expectation"><cite>jsd_dirichlet_expectation</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jsd-dirichlet-variance"><cite>jsd_dirichlet_variance</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kendall-uparrow"><cite>kendall</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kendallt-uparrow"><cite>kendallT</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#match-m-uparrow"><cite>match_m</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#max-roc-auc-uparrow"><cite>max_roc_auc</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-absolute-error-downarrow"><cite>mean_absolute_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mean-squared-error-downarrow"><cite>mean_squared_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mu-uparrow"><cite>mu</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#one-error-downarrow"><cite>one_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nu1-uparrow"><cite>nu1</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nu2-uparrow"><cite>nu2</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nu3-uparrow"><cite>nu3</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ood-error-downarrow"><cite>ood_error</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#precision-uparrow"><cite>precision</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#score"><cite>score</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sensitivity-uparrow"><cite>sensitivity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sorensen-downarrow"><cite>sorensen</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#spearman-uparrow"><cite>spearman</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spearmant-uparrow"><cite>spearmanT</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specificity-uparrow"><cite>specificity</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#subset-accuracy-uparrow"><cite>subset_accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#top-k-uparrow"><cite>top_k</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
@@ -833,22 +985,6 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="app.html" title="previous chapter">Applications</a></li>
-      <li>Next: <a href="glossary.html" title="next chapter">Glossary</a></li>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
 
         </div>
       </div>
@@ -858,8 +994,8 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
       &#169;2024, SpriteMisaka.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
       <a href="_sources/utils.rst.txt"

@@ -1,105 +1,213 @@
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import logging
-import warnings
-warnings.filterwarnings("ignore")
+from typing import TYPE_CHECKING
 
-import tensorflow as tf
-tf.get_logger().setLevel(logging.ERROR)
+if TYPE_CHECKING:
+    from ._problem_transformation import *
+    from ._algorithm_adaptation import *
+    from ._specialized_algorithms import *
 
-from ._problem_transformation import _PT, PT_Bayes, PT_SVM, LDSVR, GLD_SVR
-from ._algorithm_adaptation import AA_BP, AA_KNN, GLD_KNN, CPNN, BCPNN, ACPNN, LDLF, Duo_LDL, BD_LDL
-from ._specialized_algorithms import _SA, SA_BFGS, SA_IIS, GLD_BFGS, LALOT
+    from ._incomplete import *
+    from ._classifier import *
+    from ._ensemble import *
 
-from ._incomplete import IncomLDL, WInLDL
-from ._classifier import LDL4C, LDL_HR, LDLM
-from ._ensemble import RG4LDL, DF_LDL, StructRF, LDLogitBoost, AdaBoostLDL
+    from ._bp import *
+    from ._cpnn import *
+    from ._duo_ldl import *
+    from ._ldlf import *
+    from ._ldllc import *
+    from ._ldlsf import *
+    from ._ldl_lclr import *
+    from ._ldl_scl import *
+    from ._ldl_lrr import *
+    from ._ldl_dpa import *
+    from ._lrldl import *
+    from ._ldl_hvlc import *
+    from ._rknn_ldl import *
+    from ._s_ldl import *
+    from ._delta_ldl import *
+    from ._snefy_ldl import *
+    from ._ldl_dvs import *
+    from ._ldl_dpm import *
 
-from ._ldllc import LDLLC
-from ._ldlsf import LDLSF
-from ._ldl_lclr import LDL_LCLR
-from ._ldl_scl import LDL_SCL
-from ._ldl_lrr import LDL_LRR
-from ._ldl_dpa import LDL_DPA
-from ._lrldl import _LRLDL, TLRLDL, TKLRLDL
-from ._ldl_hvlc import LDL_HVLC
-from ._rknn_ldl import RKNN_LDL
-from ._s_ldl import _S_LDL, S_LRR, S_SCL, S_KLD, S_QFD2, S_CJS, Shallow_S_LDL
-from ._delta_ldl import Delta_LDL
-from ._snefy_ldl import SNEFY_LDL
-from ._ldl_dvs import LDL_DVS
-from ._ldl_dpm import LDL_DPM
+    from ._ssg_ldl import *
 
-from ._ssg_ldl import SSG_LDL
+    from ._label_enhancement import *
 
-from ._label_enhancement import FCM, KM, LP, ML, GLLE, LEVI, LIBLE, ConLE
-
-from ._ldl_da import LDL_DA
+    from ._ldl_da import *
 
 
-_ldl__ = [
-# -------------------- 2026 --------------------
-"LDL_DVS", "LDL_DPM",
-# -------------------- 2025 --------------------
-"RG4LDL", "RKNN_LDL", "SNEFY_LDL", "_S_LDL", "S_LRR", "S_SCL", "S_KLD", "S_CJS", "S_QFD2", "Shallow_S_LDL", "Delta_LDL",
+_LDL_MODULE_MAP = {
+    # -------------------- 2026 --------------------
+    "LDL_DVS": "._ldl_dvs",
+    "LDL_DPM": "._ldl_dpm",
+    # -------------------- 2025 --------------------
+    "RG4LDL": "._ensemble",
+    "RKNN_LDL": "._rknn_ldl",
+    "SNEFY_LDL": "._snefy_ldl",
+    **dict.fromkeys(
+        [
+            "_S_LDL",
+            "S_LRR",
+            "S_SCL",
+            "S_KLD",
+            "S_CJS",
+            "S_QFD2",
+            "Shallow_S_LDL",
+        ],
+        "._s_ldl"
+    ),
+    "Delta_LDL": "._delta_ldl",
 # -------------------- 2024 --------------------
-"LDL_HVLC", "_LRLDL", "TKLRLDL", "TLRLDL", "LDL_DPA",
-# -------------------- 2023 --------------------
-"LDL_LRR",
-# -------------------- 2021 --------------------
-"DF_LDL", "LDL_SCL", "Duo_LDL", "BD_LDL",
-# -------------------- 2020 --------------------
-"AdaBoostLDL",
-# -------------------- 2019 --------------------
-"LDL_LCLR", "LDLSF",
-# -------------------- 2018 --------------------
-"LDLLC", "LALOT", "StructRF",
-# -------------------- 2017 --------------------
-"BCPNN", "ACPNN", "LDLF",
-# -------------------- 2016 --------------------
-"LDLogitBoost", "_SA", "SA_BFGS", "SA_IIS", "AA_KNN", "AA_BP", "_PT", "PT_Bayes", "PT_SVM",
-# -------------------- 2015 --------------------
-"LDSVR",
-# -------------------- 2013 --------------------
-"CPNN",
-]
+    "LDL_HVLC": "._ldl_hvlc",
+    **dict.fromkeys(
+        [
+            "_LRLDL",
+            "TKLRLDL",
+            "TLRLDL",
+        ],
+        "._lrldl"
+    ),
+    "LDL_DPA": "._ldl_dpa",
+    # -------------------- 2023 --------------------
+    "LDL_LRR": "._ldl_lrr",
+    # -------------------- 2021 --------------------
+    "DF_LDL": "._ensemble",
+    "LDL_SCL": "._ldl_scl",
+    "Duo_LDL": "._duo_ldl",
+    "BD_LDL": "._algorithm_adaptation",
+    # -------------------- 2019 --------------------
+    "LDL_LCLR": "._ldl_lclr",
+    "LDLSF": "._ldlsf",
+    # -------------------- 2018 --------------------
+    "LDLLC": "._ldllc",
+    "LALOT": "._specialized_algorithms",
+    "StructRF": "._ensemble",
+    # -------------------- 2017 --------------------
+    "BCPNN": "._cpnn",
+    "ACPNN": "._cpnn",
+    "LDLF": "._ldlf",
+    # -------------------- 2016 --------------------
+    "LDLogitBoost": "._ensemble",
+    **dict.fromkeys(
+        [
+            "_SA",
+            "SA_BFGS",
+            "SA_IIS",
+        ],
+        "._specialized_algorithms"
+    ),
+    "AA_BP": "._bp",
+    "AA_KNN": "._algorithm_adaptation",
+    **dict.fromkeys(
+        [
+            "_PT",
+            "PT_Bayes",
+            "PT_SVM",
+        ],
+        "._problem_transformation"
+    ),
+    # -------------------- 2015 --------------------
+    "LDSVR": "._problem_transformation",
+    # -------------------- 2013 --------------------
+    "CPNN": "._cpnn",
+}
 
-_le__ = [
-# -------------------- 2023 --------------------
-"LIBLE", "ConLE",
-# -------------------- 2020 --------------------
-"LEVI",
-# -------------------- 2019 --------------------
-"GLLE", "ML", "LP", "KM", "FCM",
-]
+_LE_MODULE_MAP = {
+    # -------------------- 2023 --------------------
+    **dict.fromkeys(
+        [
+            "LIBLE",
+            "ConLE",
+        ],
+        "._label_enhancement"
+    ),
+    # -------------------- 2020 --------------------
+    "LEVI": "._label_enhancement",
+    # -------------------- 2019 --------------------
+    **dict.fromkeys(
+        [
+            "GLLE",
+            "ML",
+            "LP",
+            "KM",
+            "FCM",
+        ],
+        "._label_enhancement"
+    ),
+}
 
-_incomldl__ = [
-# -------------------- 2024 --------------------
-"WInLDL",
-# -------------------- 2017 --------------------
-"IncomLDL",
-]
+_INCOMLDL_MODULE_MAP = {
+    # -------------------- 2024 --------------------
+    "WInLDL": "._incomplete",
+    # -------------------- 2017 --------------------
+    "IncomLDL": "._incomplete",
+}
 
-_ldl4c__ = [
-# -------------------- 2021 --------------------
-"LDLM", "LDL_HR",
-# -------------------- 2019 --------------------
-"LDL4C",
-]
+_LDL4C_MODULE_MAP = {
+    # -------------------- 2021 --------------------
+    **dict.fromkeys(
+        [
+            "LDLM",
+            "LDL_HR",
+            "LDL4C",
+        ],
+        "._classifier"
+    ),
+}
 
-_ssg_ldl__ = [
-# -------------------- 2021 --------------------
-"SSG_LDL",
-]
+_SSG_LDL_MODULE_MAP = {
+    # -------------------- 2021 --------------------
+    "SSG_LDL": "._ssg_ldl"
+}
 
-_ldl_da__ = [
-# -------------------- 2025 --------------------
-"LDL_DA",
-]
+_LDL_DA_MODULE_MAP = {
+    # -------------------- 2025 --------------------
+    "LDL_DA": "._ldl_da"
+}
 
-_gld__ = [
-# -------------------- 2026 --------------------
-"GLD_KNN", "GLD_SVR", "GLD_BFGS",
-]
+_GLD_MODULE_MAP = {
+    # -------------------- 2026 --------------------
+    "GLD_SVR": "._problem_transformation",
+    "GLD_KNN": "._algorithm_adaptation",  
+    "GLD_BFGS": "._specialized_algorithms",
+}
+
+_MODULE_MAP = {
+    **_LDL_MODULE_MAP,
+    **_LE_MODULE_MAP,
+    **_INCOMLDL_MODULE_MAP,
+    **_LDL4C_MODULE_MAP,
+    **_SSG_LDL_MODULE_MAP,
+    **_LDL_DA_MODULE_MAP,
+    **_GLD_MODULE_MAP,
+}
+
+
+_ldl__ = list(_LDL_MODULE_MAP)
+_le__ = list(_LE_MODULE_MAP)
+_incomldl__ = list(_INCOMLDL_MODULE_MAP)
+_ldl4c__ = list(_LDL4C_MODULE_MAP)
+_ssg_ldl__ = list(_SSG_LDL_MODULE_MAP)
+_ldl_da__ = list(_LDL_DA_MODULE_MAP)
+_gld__ = list(_GLD_MODULE_MAP)
+
 
 __all__ = _ldl__ + _le__ + _incomldl__ + _ldl4c__ + _ssg_ldl__ + _ldl_da__ + _gld__
+
+
+def __getattr__(name):
+
+    if name not in _MODULE_MAP:
+        raise AttributeError(name)
+
+    import importlib
+
+    module = importlib.import_module(
+        _MODULE_MAP[name],
+        package=__name__
+    )
+
+    obj = getattr(module, name)
+
+    globals()[name] = obj
+
+    return obj

@@ -1,11 +1,11 @@
-from functools import wraps
-from typing import Optional
 import sys
+from typing import Optional
+from itertools import chain
 
 import numpy as np
 from scipy import stats
 
-from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, sort_loss, DEFAULT_METRICS, DEFAULT_METRICS_GLD
+from pyldl.algorithms.utils import _clip, _reduction, _1d, kl_divergence, DEFAULT_METRICS, DEFAULT_METRICS_GLD
 from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_fscore_support, roc_auc_score
 
 
@@ -13,44 +13,20 @@ sys.modules['pyldl.metrics.DEFAULT_METRICS'] = DEFAULT_METRICS
 
 sys.modules['pyldl.metrics.DEFAULT_METRICS_GLD'] = DEFAULT_METRICS_GLD
 
-D_METRICS_THE_SMALLER_THE_BETTER = ["chebyshev", "clark", "canberra", "kl_divergence", "js_divergence",
-                                    "euclidean", "sorensen", "chi2", "wave_hedges",
-                                    "divisiveness_error",
-                                    "mean_absolute_error", "mean_squared_error",
-                                    "sort_loss", "zero_one_loss", "error_probability"]
+_METRIC_REGISTRY = {}
 
-D_METRICS_THE_LARGER_THE_BETTER = ["cosine", "intersection",
-                                   "fidelity",
-                                   "spearman", "kendall", "dpa", "mu",
-                                   "match_m", "top_k", "max_roc_auc"]
-
-D_METRICS = D_METRICS_THE_SMALLER_THE_BETTER + D_METRICS_THE_LARGER_THE_BETTER
-
-L_METRICS_THE_SMALLER_THE_BETTER = ["hamming"]
-
-L_METRICS_THE_LARGER_THE_BETTER = ["jaccard", "subset_accuracy"]
-
-L_METRICS = L_METRICS_THE_SMALLER_THE_BETTER + L_METRICS_THE_LARGER_THE_BETTER
-
-G_METRICS_THE_SMALLER_THE_BETTER = ["ood_error"]
-
-G_METRICS_THE_LARGER_THE_BETTER = ["spearmanT", "kendallT"]
-
-G_METRICS = G_METRICS_THE_SMALLER_THE_BETTER + G_METRICS_THE_LARGER_THE_BETTER
-
-Y_METRICS_THE_SMALLER_THE_BETTER = []
-
-Y_METRICS_THE_LARGER_THE_BETTER = ["precision", "specificity", "sensitivity", "youden_index", "accuracy"]
-
-Y_METRICS = Y_METRICS_THE_SMALLER_THE_BETTER + Y_METRICS_THE_LARGER_THE_BETTER
-
-THE_SMALLER_THE_BETTER = D_METRICS_THE_SMALLER_THE_BETTER + L_METRICS_THE_SMALLER_THE_BETTER + G_METRICS_THE_SMALLER_THE_BETTER + Y_METRICS_THE_SMALLER_THE_BETTER
-
-THE_LARGER_THE_BETTER = D_METRICS_THE_LARGER_THE_BETTER + L_METRICS_THE_LARGER_THE_BETTER + G_METRICS_THE_LARGER_THE_BETTER + Y_METRICS_THE_LARGER_THE_BETTER
+def _register(prefix, larger=False, name=None):
+    def decorator(func):
+        _METRIC_REGISTRY[name or func.__name__] = (prefix, larger)
+        return func
+    return decorator
 
 EPS = np.finfo(float).eps
 
+LOG2 = np.log(2)
 
+
+@_register("D")
 @_reduction
 @_1d
 def chebyshev(D, D_pred):
@@ -63,6 +39,7 @@ def chebyshev(D, D_pred):
     return np.max(np.abs(D - D_pred), 1)
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -76,6 +53,7 @@ def clark(D, D_pred):
     return np.sqrt(np.sum(np.power(D - D_pred, 2) / np.power(D + D_pred, 2), 1))
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -90,8 +68,10 @@ def canberra(D, D_pred):
 
 
 sys.modules['pyldl.metrics.kl_divergence'] = kl_divergence
+_register("D")(kl_divergence)
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -107,6 +87,7 @@ def js_divergence(D, D_pred):
     return .5 * kl_divergence(D, M, reduction=None) + .5 * kl_divergence(D_pred, M, reduction=None)
 
 
+@_register("D", larger=True)
 @_reduction
 @_1d
 def cosine(D, D_pred):
@@ -120,6 +101,7 @@ def cosine(D, D_pred):
     return 1 - paired_cosine_distances(D, D_pred)
 
 
+@_register("D", larger=True)
 @_reduction
 @_1d
 def intersection(D, D_pred):
@@ -132,6 +114,7 @@ def intersection(D, D_pred):
     return 1 - 0.5 * np.sum(np.abs(D - D_pred), 1)
 
 
+@_register("D")
 @_reduction
 @_1d
 def euclidean(D, D_pred):
@@ -144,6 +127,7 @@ def euclidean(D, D_pred):
     return np.sqrt(np.sum((D - D_pred) ** 2, 1))
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -160,6 +144,7 @@ def sorensen(D, D_pred):
     return (np.sum(np.abs(D - D_pred), 1) / np.sum(D + D_pred, 1))
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -173,6 +158,7 @@ def chi2(D, D_pred):
     return np.sum((D - D_pred) ** 2 / (D + D_pred), 1)
 
 
+@_register("D")
 @_reduction
 @_clip
 @_1d
@@ -186,9 +172,7 @@ def wave_hedges(D, D_pred):
     return np.sum(np.abs(D - D_pred) / np.maximum(D, D_pred), 1)
 
 
-sys.modules['pyldl.metrics.sort_loss'] = sort_loss
-
-
+@_register("D", larger=True)
 @_reduction
 @_1d
 def fidelity(D, D_pred):
@@ -201,6 +185,7 @@ def fidelity(D, D_pred):
     return np.sum(np.sqrt(D * D_pred), 1)
 
 
+@_register("D", larger=True)
 @_reduction
 @_1d
 def spearman(D, D_pred, transpose=False):
@@ -217,8 +202,10 @@ def spearman(D, D_pred, transpose=False):
 
 
 spearmanT = lambda G, G_pred: spearman(G, G_pred, transpose=True)
+_register("G", larger=True, name="spearmanT")(spearmanT)
 
 
+@_register("D", larger=True)
 @_reduction
 @_1d
 def kendall(D, D_pred, transpose=False):
@@ -233,8 +220,10 @@ def kendall(D, D_pred, transpose=False):
 
 
 kendallT = lambda G, G_pred: kendall(G, G_pred, transpose=True)
+_register("G", larger=True, name="kendallT")(kendallT)
 
 
+@_register("D", larger=True)
 @_reduction
 @_1d
 def dpa(D, D_pred):
@@ -257,8 +246,9 @@ def _uniform_vector(shape, scale=0.):
     return u
 
 
+@_register("D", larger=True)
 @_1d
-def mu(D, D_pred, metrics=kl_divergence):
+def mu(D, D_pred):
     r"""The :math:`\mu` metric is proposed in paper :cite:`2025:li`. Its KL-divergence-based form is defined as:
 
     .. math::
@@ -267,17 +257,12 @@ def mu(D, D_pred, metrics=kl_divergence):
 
     where :math:`\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{c})]` and :math:`\boldsymbol{c}` is a uniform vector.
     """
-    from scipy.integrate import quad
-    x0 = metrics(D, _uniform_vector(D.shape))
-    if np.isnan(x0):
-        x0 = 1.
-    a = metrics(D, D_pred, reduction=None)
-    def f(delta):
-        return np.mean(a < delta)
-    auc, _ = quad(f, 0., x0) / x0
-    return auc
+    x0 = kl_divergence(D, _uniform_vector(D.shape))
+    kld = kl_divergence(D, D_pred, reduction=None)
+    return 1. - np.mean(np.minimum(kld, x0)) / x0
 
 
+@_register("D")
 @_reduction
 @_1d
 def divisiveness_error(D, D_pred, pos, neg):
@@ -297,16 +282,19 @@ def _mean(D, D_pred, op, mode='macro'):
         return np.sum(op(D, D_pred), axis=1)
 
 
+@_register("D")
 @_reduction
 def mean_absolute_error(D, D_pred, mode='macro'):
     return _mean(D, D_pred, lambda X, Y: np.abs(X - Y), mode=mode)
 
 
+@_register("D")
 @_reduction
 def mean_squared_error(D, D_pred, mode='macro'):
     return _mean(D, D_pred, lambda X, Y: (X - Y) ** 2, mode=mode)
 
 
+@_register("D")
 @_reduction
 @_1d
 def zero_one_loss(D, D_pred):
@@ -321,6 +309,7 @@ def zero_one_loss(D, D_pred):
     return 1 - (np.argmax(D, 1) == np.argmax(D_pred, 1))
 
 
+@_register("D")
 @_reduction
 @_1d
 def error_probability(D, D_pred):
@@ -333,6 +322,7 @@ def error_probability(D, D_pred):
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
 
 
+@_register("G")
 @_reduction
 @_1d
 def ood_error(G, G_pred):
@@ -344,18 +334,21 @@ def ood_error(G, G_pred):
     return results
 
 
+@_register("L")
 @_reduction
 @_1d
 def hamming(L, L_pred):
     return np.mean(L != L_pred, 1)
 
 
+@_register("L", larger=True)
 @_reduction
 @_1d
 def jaccard(L, L_pred):
     return np.sum(np.logical_and(L, L_pred), 1) / (np.sum(np.logical_or(L, L_pred), 1) + EPS)
 
 
+@_register("L", larger=True)
 @_reduction
 @_1d
 def subset_accuracy(L, L_pred):
@@ -390,28 +383,33 @@ def _calculate_match_m_top_k(D, D_pred, params, mode, top_k_mode='f1_score'):
     return results[0] if len(results) == 1 else results
 
 
+@_register("D", larger=True)
 def match_m(D, D_pred, m=None):
     if m is None:
         m = [1, 2, 3, 4]
     return _calculate_match_m_top_k(D, D_pred, m, 'match_m')
 
 
+@_register("D", larger=True)
 def top_k(D, D_pred, k=None, mode='f1_score'):
     if k is None:
         k = [1, 2, 3, 4]
     return _calculate_match_m_top_k(D, D_pred, k, 'top_k', mode)
 
 
+@_register("D", larger=True)
 def max_roc_auc(D, D_pred):
     L = np.eye(D.shape[1])[np.argmax(D, 1)]
     L_pred = np.eye(D_pred.shape[1])[np.argmax(D_pred, 1)]
     return roc_auc_score(L.ravel(), L_pred.ravel())
 
 
+@_register("Y", larger=True)
 def precision(y, y_pred):
     return precision_score(y, y_pred, average='macro')
 
 
+@_register("Y", larger=True)
 def specificity(y, y_pred):
     result = 0.
     labels = np.union1d(np.unique(y), np.unique(y_pred))
@@ -423,38 +421,49 @@ def specificity(y, y_pred):
     return result / len(labels)
 
 
+@_register("Y", larger=True)
 def sensitivity(y, y_pred):
     return recall_score(y, y_pred, average='macro')
 
 
+@_register("Y", larger=True)
 def youden_index(y, y_pred):
     return sensitivity(y, y_pred) + specificity(y, y_pred) - 1
 
 
+@_register("Y", larger=True)
 def accuracy(y, y_pred):
     return accuracy_score(y, y_pred)
 
 
 def worst_kl_divergence(D: np.ndarray):
-    from scipy.optimize import minimize
-    from scipy.special import gammaln, digamma
-    def dirichlet_log_likelihood(alpha: np.ndarray, A: np.ndarray):
-        diff = gammaln(np.sum(alpha)) - np.sum(gammaln(alpha))
-        return -(A.shape[0] * diff + np.sum((alpha - 1) * np.log(A)))
-    alpha = minimize(
-        dirichlet_log_likelihood, np.ones(D.shape[1]),
-        args=(D,), method="L-BFGS-B", bounds=[(1e-7, None)] * D.shape[1]
-    ).x
+    from pyldl.algorithms.utils import estimate_alpha
+    from scipy.special import digamma
+    alpha = estimate_alpha(D)
     alpha_sum = np.sum(alpha)
     return np.sum(
         alpha * ((digamma(alpha + 1) - digamma(alpha_sum + 1)) + np.log(len(alpha)))
     ) / alpha_sum
 
 
-def score(target: np.ndarray, pred: Optional[np.ndarray] = None,
+_TYPES = "DLGY"
+_GROUPED = {p: [[], []] for p in _TYPES}
+for name, (prefix, larger) in _METRIC_REGISTRY.items():
+    _GROUPED[prefix][1 if larger else 0].append(name)
+
+for prefix, (smaller, larger) in _GROUPED.items():
+    globals()[f"{prefix}_METRICS_THE_SMALLER_THE_BETTER"] = tuple(smaller)
+    globals()[f"{prefix}_METRICS_THE_LARGER_THE_BETTER"] = tuple(larger)
+    globals()[f"{prefix}_METRICS"] = tuple(smaller + larger)
+
+THE_SMALLER_THE_BETTER = tuple(chain.from_iterable(_GROUPED[p][0] for p in _TYPES))
+THE_LARGER_THE_BETTER = tuple(chain.from_iterable(_GROUPED[p][1] for p in _TYPES))
+
+NAME_TO_TYPE = {name: prefix for name, (prefix, _) in _METRIC_REGISTRY.items()}
+
+
+def score(target: np.ndarray, pred: np.ndarray,
           metrics: Optional[list] = None, return_dict: bool = False):
-    if pred is None:
-        pred = np.ones_like(target) * (1 / target.shape[1])
     if metrics is None:
         metrics = DEFAULT_METRICS
     scores = tuple((eval(i)(target, pred) if isinstance(i, str) else i(target, pred) for i in metrics))

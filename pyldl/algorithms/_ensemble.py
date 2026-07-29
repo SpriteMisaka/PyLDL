@@ -5,7 +5,7 @@ import numpy as np
 from scipy.special import expit, softmax
 from sklearn.cluster import KMeans
 
-from pyldl.algorithms.base import BaseEnsemble, BaseLDL
+from pyldl.algorithms.base.shallow import BaseEnsemble, BaseLDL
 from pyldl.algorithms.utils import sort_loss
 
 from pyldl.algorithms._tree import _Node, best_split

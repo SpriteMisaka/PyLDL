@@ -14,6 +14,9 @@ LDL refers to *label distribution learning*. Its definition can be as follows:
    Given a training set of :math:`n` samples :math:`\mathcal{S} = \lbrace \boldsymbol{X},\, \boldsymbol{D} \rbrace = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}`, 
    the goal of LDL is to learn a mapping function :math:`f: \mathcal{X} \to \Delta^{c-1}` that minimizes the discrepancy between predicted and true label distributions. The performance of :math:`f` is ultimately evaluated on a test set, typically by distance/similarity measures.
 
+.. include:: ../../demo/quick_start.ipynb
+   :parser: myst_nb.docutils_
+
 .. toctree::
    :maxdepth: 2
 

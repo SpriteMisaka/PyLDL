@@ -7,12 +7,12 @@
 
     <title>LDL &#8212; PyLDL 0.0.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
-    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <script src="_static/documentation_options.js?v=47de8214"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="LE" href="le.html" />
@@ -48,22 +48,517 @@ It is under the constraints of probability simplex, i.e., <span class="math notr
 <p>Given a training set of <span class="math notranslate nohighlight">\(n\)</span> samples <span class="math notranslate nohighlight">\(\mathcal{S} = \lbrace \boldsymbol{X},\, \boldsymbol{D} \rbrace = \lbrace (\boldsymbol{x}_i,\, \boldsymbol{d}_i) \rbrace_{i=1}^{n}\)</span>,
 the goal of LDL is to learn a mapping function <span class="math notranslate nohighlight">\(f: \mathcal{X} \to \Delta^{c-1}\)</span> that minimizes the discrepancy between predicted and true label distributions. The performance of <span class="math notranslate nohighlight">\(f\)</span> is ultimately evaluated on a test set, typically by distance/similarity measures.</p>
 </div></blockquote>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">SA_BFGS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;SJAFFE&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">D_train</span><span class="p">,</span> <span class="n">D_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SA_BFGS</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">D_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-1 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-1 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-1 pre {
+  padding: 0;
+}
+
+#sk-container-id-1 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-1 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-1 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-1 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-1 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-1 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-1 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-1 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-1 label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+#sk-container-id-1 label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-1 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label label.sk-toggleable__label,
+#sk-container-id-1 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-1 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-1 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-1 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-1 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-1 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-1 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>SA_BFGS</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator  sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label  sk-toggleable__label-arrow"><div><div>SA_BFGS</div></div><div><span class="sk-estimator-doc-link ">i<span>Not fitted</span></span></div></label><div class="sk-toggleable__content "><pre>SA_BFGS</pre></div> </div></div></div></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">D_test</span><span class="p">,</span> <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>chebyshev: 0.0924
+clark: 0.3452
+canberra: 0.7006
+kl_divergence: 0.0446
+cosine: 0.9600
+intersection: 0.8840
+</pre></div>
+</div>
+</div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <section id="baseldl">
 <h2><cite>BaseLDL</cite><a class="headerlink" href="#baseldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.base.BaseLDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseLDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseLDL" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for all LDL models in PyLDL.</p>
 </dd></dl>
+
+</section>
+<section id="ldl-dvs">
+<h2>LDL-DVS<a class="headerlink" href="#ldl-dvs" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DVS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DVS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_DVS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="ldl-dpm">
+<h2>LDL-DPM<a class="headerlink" href="#ldl-dpm" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.LDL_DPM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DPM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concentration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_DPM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="rg4ldl">
 <h2>RG4LDL<a class="headerlink" href="#rg4ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.RG4LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RG4LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RG4LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RG4LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RG4LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.RG4LDL" title="pyldl.algorithms.RG4LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RG4LDL</span></code></a> is proposed in paper <span id="id1">[<a class="reference internal" href="#id275" title="Chao Tan, Sheng Chen, Jiaxi Zhang, Zilong Xu, Xin Geng, and Genlin Ji. RG4LDL: renormalization group for label distribution learning. Knowledge-Based Systems, 320:113666, 2025. URL: https://doi.org/10.1016/j.knosys.2025.113666.">LDL-TCZ+25</a>]</span>.
 RG refers to <em>renormalization group</em>.</p>
 </dd></dl>
@@ -73,7 +568,7 @@ RG refers to <em>renormalization group</em>.</p>
 <h2>R<span class="math notranslate nohighlight">\(k\)</span>NN-LDL<a class="headerlink" href="#rknn-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.RKNN_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RKNN_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RKNN_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">RKNN_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.RKNN_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.RKNN_LDL" title="pyldl.algorithms.RKNN_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RkNN-LDL</span></code></a> is proposed in paper <span id="id2">[<a class="reference internal" href="#id277" title="Jing Wang, Fu Feng, Jianhui Lv, and Xin Geng. Residual k-nearest neighbors label distribution learning. Pattern Recognition, 158:111006, 2025. URL: https://doi.org/10.1016/j.patcog.2024.111006.">LDL-WFLG25</a>]</span>.
 R<span class="math notranslate nohighlight">\(k\)</span>NN refers to <em>residual</em> <span class="math notranslate nohighlight">\(k\)</span><em>-nearest neighbor</em>.</p>
 </dd></dl>
@@ -83,7 +578,7 @@ R<span class="math notranslate nohighlight">\(k\)</span>NN refers to <em>residua
 <h2>SNEFY-LDL<a class="headerlink" href="#snefy-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.SNEFY_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SNEFY_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SNEFY_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SNEFY_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SNEFY_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.SNEFY_LDL" title="pyldl.algorithms.SNEFY_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">SNEFY-LDL</span></code></a> is proposed in paper <span id="id3">[<a class="reference internal" href="#id274" title="Daokun Zhang, Russell Tsuchida, and Dino Sejdinovic. Label distribution learning using the squared neural family on the probability simplex. In Proceedings of the Conference on Uncertainty in Artificial Intelligence, 4872–4888. 2025.">LDL-ZTS25</a>]</span>.
 SNEFY refers to <em>squared neural family</em>.</p>
 </dd></dl>
@@ -93,7 +588,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h2><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-LDL<a class="headerlink" href="#mathcal-s-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms._S_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_S_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._S_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_S_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._S_LDL" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-LDL algorithms, which are proposed in paper <span id="id4">[<a class="reference internal" href="#id272" title="Haitao Wu, Weiwei Li, and Xiuyi Jia. Divide and conquer: learning label distribution with subtasks. In Proceedings of the International Conference on Machine Learning, 67408–67426. 2025. URL: https://proceedings.mlr.press/v267/wu25p.html.">LDL-WLJ25</a>]</span>.
 <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> refers to <em>subtasks</em>.</p>
 </dd></dl>
@@ -102,7 +597,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-LRR<a class="headerlink" href="#mathcal-s-lrr" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.S_LRR">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_LRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_LRR" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_LRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_LRR" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -110,7 +605,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-SCL<a class="headerlink" href="#mathcal-s-scl" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.S_SCL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_SCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_SCL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_SCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_SCL" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -118,7 +613,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-KLD<a class="headerlink" href="#mathcal-s-kld" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.S_KLD">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_KLD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_KLD" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_KLD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_KLD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -126,7 +621,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-CJS<a class="headerlink" href="#mathcal-s-cjs" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.S_CJS">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_CJS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_CJS" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_CJS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_CJS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -134,7 +629,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3><span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-QFD<span class="math notranslate nohighlight">\(^{2}\)</span><a class="headerlink" href="#mathcal-s-qfd-2" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.S_QFD2">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_QFD2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_QFD2" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">S_QFD2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.S_QFD2" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -142,7 +637,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h3>Shallow <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>-LDL<a class="headerlink" href="#shallow-mathcal-s-ldl" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.Shallow_S_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Shallow_S_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Shallow_S_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Shallow_S_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Shallow_S_LDL" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -151,7 +646,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h2><span class="math notranslate nohighlight">\(\delta\)</span>-LDL<a class="headerlink" href="#delta-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.Delta_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Delta_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Delta_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Delta_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Delta_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.Delta_LDL" title="pyldl.algorithms.Delta_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">Delta-LDL</span></code></a> is proposed in paper <span id="id5">[<a class="reference internal" href="#id273" title="Weiwei Li, Haitao Wu, Yunan Lu, and Xiuyi Jia. Approximately correct label distribution learning. In Proceedings of the International Conference on Machine Learning, 36298–36309. 2025.">LDL-LWLJ25</a>]</span>.</p>
 </dd></dl>
 
@@ -160,7 +655,7 @@ SNEFY refers to <em>squared neural family</em>.</p>
 <h2>LDL-HVLC<a class="headerlink" href="#ldl-hvlc" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_HVLC">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_HVLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_HVLC" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_HVLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_HVLC" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_HVLC" title="pyldl.algorithms.LDL_HVLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-HVLC</span></code></a> is proposed in paper <span id="id6">[<a class="reference internal" href="#id279" title="Yaojin Lin, Yulin Li, Chenxi Wang, Lei Guo, and Jinkun Chen. Label distribution learning based on horizontal and vertical mining of label correlations. IEEE Transactions on Big Data, 10(3):275–287, 2024. URL: https://doi.org/10.1109/TBDATA.2023.3338023.">LDL-LLW+24</a>]</span>.
 HVLC refers to <em>horizontal &amp; vertical label correlation</em>.</p>
 </dd></dl>
@@ -170,7 +665,7 @@ HVLC refers to <em>horizontal &amp; vertical label correlation</em>.</p>
 <h2>LRLDL<a class="headerlink" href="#lrldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms._LRLDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_LRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._LRLDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_LRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'threshold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._LRLDL" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for <a class="reference internal" href="#pyldl.algorithms.TLRLDL" title="pyldl.algorithms.TLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.TLRLDL</span></code></a> and <a class="reference internal" href="#pyldl.algorithms.TKLRLDL" title="pyldl.algorithms.TKLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.TKLRLDL</span></code></a>,
 which are proposed in paper <span id="id7">[<a class="reference internal" href="#id280" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>. LR refers to <em>low-rank</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as optimization algorithm.</p>
@@ -210,7 +705,7 @@ which are proposed in paper <span id="id7">[<a class="reference internal" href="
 <h3>TKLRLDL<a class="headerlink" href="#tklrldl" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.TKLRLDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TKLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TKLRLDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TKLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TKLRLDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.TKLRLDL" title="pyldl.algorithms.TKLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TKLRLDL</span></code></a> is proposed in paper <span id="id10">[<a class="reference internal" href="#id280" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
 TK refers to <em>top-</em><span class="math notranslate nohighlight">\(k\)</span> (a top-<span class="math notranslate nohighlight">\(k\)</span> <a class="reference internal" href="utils.html#pyldl.algorithms.utils.binaryzation" title="pyldl.algorithms.utils.binaryzation"><code class="xref py py-class docutils literal notranslate"><span class="pre">binaryzation</span></code></a> method is used to generate the logical label matrix).</p>
 </dd></dl>
@@ -220,7 +715,7 @@ TK refers to <em>top-</em><span class="math notranslate nohighlight">\(k\)</span
 <h3>TLRLDL<a class="headerlink" href="#tlrldl" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.TLRLDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TLRLDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">TLRLDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.TLRLDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.TLRLDL" title="pyldl.algorithms.TLRLDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">TLRLDL</span></code></a> is proposed in paper <span id="id11">[<a class="reference internal" href="#id280" title="Zhiqiang Kou, Jing Wang, Jiawei Tang, Yuheng Jia, Boyu Shi, and Xin Geng. Exploiting multi-label correlation in label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 4326–4334. 2024. URL: https://doi.org/10.24963/ijcai.2024/478.">LDL-KWT+24</a>]</span>.
 T refers to <em>threshold</em> (a threshold-based <a class="reference internal" href="utils.html#pyldl.algorithms.utils.binaryzation" title="pyldl.algorithms.utils.binaryzation"><code class="xref py py-class docutils literal notranslate"><span class="pre">binaryzation</span></code></a> method is used to generate the logical label matrix).</p>
 </dd></dl>
@@ -231,7 +726,7 @@ T refers to <em>threshold</em> (a threshold-based <a class="reference internal" 
 <h2>LDL-DPA<a class="headerlink" href="#ldl-dpa" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_DPA">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DPA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_DPA" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_DPA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_DPA" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_DPA" title="pyldl.algorithms.LDL_DPA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-DPA</span></code></a> is proposed in paper <span id="id12">[<a class="reference internal" href="#id278" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>.
 DPA refers to <em>description-degree percentile average</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as the optimization algorithm.</p>
@@ -242,7 +737,7 @@ DPA refers to <em>description-degree percentile average</em>.</p>
 <h2>LDL-LRR<a class="headerlink" href="#ldl-lrr" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_LRR">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LRR" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LRR" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LRR" title="pyldl.algorithms.LDL_LRR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LRR</span></code></a> is proposed in paper <span id="id13">[<a class="reference internal" href="#id282" title="Xiuyi Jia, Xiaoxia Shen, Weiwei Li, Yunan Lu, and Jihua Zhu. Label distribution learning by maintaining label ranking relation. IEEE Transactions on Knowledge and Data Engineering, 35(2):1695-1707, 2023. URL: https://doi.org/10.1109/TKDE.2021.3099294.">LDL-JSL+23</a>]</span>.
 LRR refers to <em>label ranking relation</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as the optimization algorithm.</p>
@@ -253,7 +748,7 @@ LRR refers to <em>label ranking relation</em>.</p>
 <h2>DF-LDL<a class="headerlink" href="#df-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.DF_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">DF_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.DF_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">DF_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.DF_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.DF_LDL" title="pyldl.algorithms.DF_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">DF-LDL</span></code></a> is proposed in paper <span id="id14">[<a class="reference internal" href="#id288" title="Manuel González, Germán González-Almagro, Isaac Triguero, José-Ramón Cano, and Salvador García. Decomposition-fusion for label distribution learning. Information Fusion, 66:64–75, 2021. URL: https://doi.org/10.1016/j.inffus.2020.08.024.">LDL-GGAT+21</a>]</span>.
 DF refers to <em>decomposition &amp; fusion</em>.</p>
 </dd></dl>
@@ -263,10 +758,10 @@ DF refers to <em>decomposition &amp; fusion</em>.</p>
 <h2>LDL-SCL<a class="headerlink" href="#ldl-scl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_SCL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_SCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_SCL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_SCL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_SCL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_SCL" title="pyldl.algorithms.LDL_SCL"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-SCL</span></code></a> is proposed in paper <span id="id15">[<a class="reference internal" href="#id303" title="Xiang Zheng, Xiuyi Jia, and Weiwei Li. Label distribution learning by exploiting sample correlations locally. In Proceedings of the AAAI Conference on Artificial Intelligence, 4556–4563. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11693.">LDL-ZJL18</a>]</span>.
 SCL refers to (exploiting) <em>sample correlations locally</em>.</p>
-<p><a class="reference internal" href="glossary.html#term-Adam"><span class="xref std std-term">Adam</span></a> is used as optimizer.</p>
+<p><a class="reference internal" href="glossary.html#term-Adam"><span class="xref std std-term">Adam</span></a> is used as the optimizer.</p>
 <p>See also:</p>
 <div class="docutils container" id="id16">
 <div role="list" class="citation-list">
@@ -283,7 +778,7 @@ SCL refers to (exploiting) <em>sample correlations locally</em>.</p>
 <h2>Duo-LDL<a class="headerlink" href="#duo-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.Duo_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Duo_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Duo_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">Duo_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.Duo_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.Duo_LDL" title="pyldl.algorithms.Duo_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">Duo-LDL</span></code></a> is proposed in paper <span id="id60">[<a class="reference internal" href="#id291" title="Adam Żychowski and Jacek Mańdziuk. Duo-ldl method for label distribution learning based on pairwise class dependencies. Applied Soft Computing, 110:107585, 2021. URL: https://doi.org/10.1016/j.asoc.2021.107585.">LDL-ZM21</a>]</span>.</p>
 </dd></dl>
 
@@ -292,7 +787,7 @@ SCL refers to (exploiting) <em>sample correlations locally</em>.</p>
 <h2>BD-LDL<a class="headerlink" href="#bd-ldl" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.BD_LDL">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">BD_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.BD_LDL" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">BD_LDL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.BD_LDL" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.BD_LDL" title="pyldl.algorithms.BD_LDL"><code class="xref py py-class docutils literal notranslate"><span class="pre">BD-LDL</span></code></a> is proposed in paper <span id="id61">[<a class="reference internal" href="#id290" title="Xinyuan Liu, Jihua Zhu, Qinghai Zheng, Zhongyu Li, Ruixin Liu, and Jun Wang. Bidirectional loss function for label enhancement and distribution learning. Knowledge-Based Systems, 213:106690, 2021. URL: https://doi.org/10.1016/j.knosys.2020.106690.">LDL-LZZ+21</a>]</span>.</p>
 </dd></dl>
 
@@ -301,7 +796,7 @@ SCL refers to (exploiting) <em>sample correlations locally</em>.</p>
 <h2>LDL-LCLR<a class="headerlink" href="#ldl-lclr" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDL_LCLR">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LCLR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LCLR" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDL_LCLR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDL_LCLR" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDL_LCLR" title="pyldl.algorithms.LDL_LCLR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDL-LCLR</span></code></a> is proposed in paper <span id="id62">[<a class="reference internal" href="#id295" title="Tingting Ren, Xiuyi Jia, Weiwei Li, and Shu Zhao. Label distribution learning with label correlations via low-rank approximation. In Proceedings of the International Joint Conference on Artificial Intelligence, 3325–3331. 2019. URL: https://doi.org/10.24963/ijcai.2019/461.">LDL-RJLZ19</a>]</span>.
 LC and LR refer to <em>label correlation</em> and <em>low-rank</em>, respectively.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as the optimization algorithm.</p>
@@ -327,7 +822,7 @@ LC and LR refer to <em>label correlation</em> and <em>low-rank</em>, respectivel
 <h2>LDLSF<a class="headerlink" href="#ldlsf" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLSF">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLSF" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLSF" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDLSF" title="pyldl.algorithms.LDLSF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLSF</span></code></a> is proposed in paper <span id="id64">[<a class="reference internal" href="#id294" title="Tingting Ren, Xiuyi Jia, Weiwei Li, Lei Chen, and Zechao Li. Label distribution learning with label-specific features. In Proceedings of the International Joint Conference on Artificial Intelligence, 3318–3324. 2019. URL: https://doi.org/10.24963/ijcai.2019/460.">LDL-RJL+19</a>]</span>.
 SF refers to <em>specific features</em>.</p>
 <p><a class="reference internal" href="glossary.html#term-ADMM"><span class="xref std std-term">ADMM</span></a> is used as optimization algorithm.</p>
@@ -338,7 +833,7 @@ SF refers to <em>specific features</em>.</p>
 <h2>LDLLC<a class="headerlink" href="#ldllc" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLLC">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLLC" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLLC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLLC" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDLLC" title="pyldl.algorithms.LDLLC"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLLC</span></code></a> is proposed in paper <span id="id65">[<a class="reference internal" href="#id300" title="Xiuyi Jia, Weiwei Li, Junyu Liu, and Yu Zhang. Label distribution learning by exploiting label correlations. In Proceedings of the AAAI Conference on Artificial Intelligence, 3310–3317. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11664.">LDL-JLLZ18</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as optimization algorithm.</p>
 </dd></dl>
@@ -348,7 +843,7 @@ SF refers to <em>specific features</em>.</p>
 <h2>LALOT<a class="headerlink" href="#lalot" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LALOT">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LALOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LALOT" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LALOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LALOT" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LALOT" title="pyldl.algorithms.LALOT"><code class="xref py py-class docutils literal notranslate"><span class="pre">LALOT</span></code></a> is proposed in paper <span id="id66">[<a class="reference internal" href="#id302" title="Peng Zhao and Zhi-Hua Zhou. Label distribution learning by optimal transport. In Proceedings of the AAAI Conference on Artificial Intelligence, 4506–4513. 2018. URL: https://doi.org/10.1609/aaai.v32i1.11609.">LDL-ZZ18</a>]</span>.</p>
 </dd></dl>
 
@@ -357,12 +852,12 @@ SF refers to <em>specific features</em>.</p>
 <h2>StructRF<a class="headerlink" href="#structrf" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.StructRF">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">StructRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">StructRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.StructRF" title="pyldl.algorithms.StructRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">StructRF</span></code></a> is proposed in paper <span id="id67">[<a class="reference internal" href="#id299" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.
 StructRF refers to <em>structured random forest</em>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.StructRF.StructTree">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">StructTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_to_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF.StructTree" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StructTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_to_split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.StructRF.StructTree" title="Link to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">StructTree</span></code> is proposed in paper <span id="id68">[<a class="reference internal" href="#id299" title="Mengting Chen, Xinggang Wang, Bin Feng, and Wenyu Liu. Structured random forest for label distribution learning. Neurocomputing, 320:171–182, 2018. URL: https://doi.org/10.1016/j.neucom.2018.09.002.">LDL-CWFL18</a>]</span>.</p>
 </dd></dl>
 
@@ -373,7 +868,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>BCPNN<a class="headerlink" href="#bcpnn" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.BCPNN">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">BCPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.BCPNN" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">BCPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.BCPNN" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.BCPNN" title="pyldl.algorithms.BCPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">BCPNN</span></code></a> is proposed in paper <span id="id69">[<a class="reference internal" href="#id307" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 <p>This algorithm is based on <a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a>. See also:</p>
@@ -392,7 +887,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>ACPNN<a class="headerlink" href="#acpnn" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.ACPNN">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">ACPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.ACPNN" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">ACPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.ACPNN" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.ACPNN" title="pyldl.algorithms.ACPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">ACPNN</span></code></a> is proposed in paper <span id="id114">[<a class="reference internal" href="#id307" title="Jufeng Yang, Ming Sun, and Xiaoxiao Sun. Learning visual sentiment distributions via augmented conditional probability neural network. In Proceedings of the AAAI Conference on Artificial Intelligence, 224-230. 2017. URL: https://doi.org/10.1609/aaai.v31i1.10485.">LDL-YSS17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 <p>This algorithm is based on <a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a>. See also:</p>
@@ -411,7 +906,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>LDLF<a class="headerlink" href="#ldlf" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLF">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLF" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLF" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDLF" title="pyldl.algorithms.LDLF"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLF</span></code></a> is proposed in paper <span id="id159">[<a class="reference internal" href="#id306" title="Wei Shen, Kai Zhao, Yilu Guo, and Alan Yuille. Label distribution learning forests. In Advances in Neural Information Processing Systems, 834–843. 2017.">LDL-SZGY17</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-Adam"><span class="xref std std-term">Adam</span></a> is used as the optimizer.</p>
 <p>This algorithm employs deep neural decision forests. See also:</p>
@@ -430,7 +925,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>LDLogitBoost<a class="headerlink" href="#ldlogitboost" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDLogitBoost">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLogitBoost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLogitBoost" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDLogitBoost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_estimators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDLogitBoost" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDLogitBoost" title="pyldl.algorithms.LDLogitBoost"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDLogitBoost</span></code></a> is proposed in paper <span id="id204">[<a class="reference internal" href="#id309" title="Chao Xing, Xin Geng, and Hui Xue. Logistic boosting regression for label distribution learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, 4489–4497. 2016. URL: https://doi.org/10.1109/CVPR.2016.486.">LDL-XGX16</a>]</span>.</p>
 </dd></dl>
 
@@ -439,7 +934,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>SA<a class="headerlink" href="#sa" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms._SA">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_SA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._SA" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_SA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._SA" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for <a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.SA_IIS</span></code></a> and <a class="reference internal" href="#pyldl.algorithms.SA_BFGS" title="pyldl.algorithms.SA_BFGS"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.SA_BFGS</span></code></a>.</p>
 <p>SA refers to <em>specialized algorithms</em>, where <a class="reference internal" href="glossary.html#term-MaxEnt"><span class="xref std std-term">MaxEnt</span></a> is employed as model.</p>
 </dd></dl>
@@ -448,7 +943,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h3>SA-BFGS<a class="headerlink" href="#sa-bfgs" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.SA_BFGS">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_BFGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_BFGS" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_BFGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_BFGS" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.SA_BFGS" title="pyldl.algorithms.SA_BFGS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-BFGS</span></code></a> is proposed in paper <span id="id205">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-BFGS"><span class="xref std std-term">BFGS</span></a> is used as optimization algorithm.</p>
 </dd></dl>
@@ -458,7 +953,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h3>SA-IIS<a class="headerlink" href="#sa-iis" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.SA_IIS">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_IIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_IIS" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">SA_IIS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.SA_IIS" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-IIS</span></code></a> is proposed in paper <span id="id206">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-IIS"><span class="xref std std-term">IIS</span></a> is used as optimization algorithm.</p>
 <p>IIS-LLD is the early version of <a class="reference internal" href="#pyldl.algorithms.SA_IIS" title="pyldl.algorithms.SA_IIS"><code class="xref py py-class docutils literal notranslate"><span class="pre">SA-IIS</span></code></a>. See also:</p>
@@ -481,6 +976,15 @@ StructRF refers to <em>structured random forest</em>.</p>
 </dd></dl>
 
 </section>
+<section id="aa-bp">
+<h3>AA-BP<a class="headerlink" href="#aa-bp" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.AA_BP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_BP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_BP" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_BP" title="pyldl.algorithms.AA_BP"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-BP</span></code></a> is proposed in paper <span id="id260">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+</dd></dl>
+
+</section>
 </section>
 <section id="aa">
 <h2>AA<a class="headerlink" href="#aa" title="Link to this heading">¶</a></h2>
@@ -489,17 +993,8 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h3>AA-<span class="math notranslate nohighlight">\(k\)</span>NN<a class="headerlink" href="#aa-knn" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.AA_KNN">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_KNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_KNN" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_KNN" title="pyldl.algorithms.AA_KNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-kNN</span></code></a> is proposed in paper <span id="id260">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
-</dd></dl>
-
-</section>
-<section id="aa-bp">
-<h3>AA-BP<a class="headerlink" href="#aa-bp" title="Link to this heading">¶</a></h3>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyldl.algorithms.AA_BP">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_BP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_BP" title="Link to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_BP" title="pyldl.algorithms.AA_BP"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-BP</span></code></a> is proposed in paper <span id="id261">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">AA_KNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.AA_KNN" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.AA_KNN" title="pyldl.algorithms.AA_KNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">AA-kNN</span></code></a> is proposed in paper <span id="id261">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
 </section>
@@ -508,7 +1003,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>PT<a class="headerlink" href="#pt" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms._PT">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_PT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._PT" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">_PT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms._PT" title="Link to this definition">¶</a></dt>
 <dd><p>Base class for <a class="reference internal" href="#pyldl.algorithms.PT_Bayes" title="pyldl.algorithms.PT_Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.PT_Bayes</span></code></a> and <a class="reference internal" href="#pyldl.algorithms.PT_SVM" title="pyldl.algorithms.PT_SVM"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyldl.algorithms.PT_SVM</span></code></a>.</p>
 <p>PT refers to <em>problem transformation</em>.</p>
 </dd></dl>
@@ -517,7 +1012,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h3>PT-Bayes<a class="headerlink" href="#pt-bayes" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.PT_Bayes">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_Bayes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_Bayes" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_Bayes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_smoothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_Bayes" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.PT_Bayes" title="pyldl.algorithms.PT_Bayes"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-Bayes</span></code></a> is proposed in paper <span id="id262">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
@@ -526,7 +1021,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h3>PT-SVM<a class="headerlink" href="#pt-svm" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.PT_SVM">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_SVM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_SVM" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">PT_SVM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.PT_SVM" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.PT_SVM" title="pyldl.algorithms.PT_SVM"><code class="xref py py-class docutils literal notranslate"><span class="pre">PT-SVM</span></code></a> is proposed in paper <span id="id263">[<a class="reference internal" href="#id308" title="Xin Geng. Label distribution learning. IEEE Transactions on Knowledge and Data Engineering, 28(7):1734–1748, 2016. URL: https://doi.org/10.1109/TKDE.2016.2545658.">LDL-Gen16</a>]</span>.</p>
 </dd></dl>
 
@@ -536,7 +1031,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>LDSVR<a class="headerlink" href="#ldsvr" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.LDSVR">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDSVR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDSVR" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">LDSVR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.LDSVR" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.LDSVR" title="pyldl.algorithms.LDSVR"><code class="xref py py-class docutils literal notranslate"><span class="pre">LDSVR</span></code></a> is proposed in paper <span id="id264">[<a class="reference internal" href="#id311" title="Xin Geng and Peng Hou. Pre-release prediction of crowd opinion on movies by label distribution learning. In Proceedings of the International Joint Conference on Artificial Intelligence, 3511–3517. 2015.">LDL-GH15</a>]</span>.</p>
 </dd></dl>
 
@@ -545,7 +1040,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <h2>CPNN<a class="headerlink" href="#cpnn" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyldl.algorithms.CPNN">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">CPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.CPNN" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">CPNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.CPNN" title="Link to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="#pyldl.algorithms.CPNN" title="pyldl.algorithms.CPNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">CPNN</span></code></a> is proposed in paper <span id="id265">[<a class="reference internal" href="#id313" title="Xin Geng, Chao Yin, and Zhi-Hua Zhou. Facial age estimation by learning from label distributions. IEEE Transactions on Pattern Analysis and Machine Intelligence, 35(10):2401–2412, 2013. URL: https://doi.org/10.1109/TPAMI.2013.51.">LDL-GYZ13</a>]</span>.</p>
 <p><a class="reference internal" href="glossary.html#term-RProp"><span class="xref std std-term">RProp</span></a> is used as the optimizer.</p>
 </dd></dl>
@@ -807,19 +1302,12 @@ StructRF refers to <em>structured random forest</em>.</p>
 
 
 
-
-<search id="searchbox" style="display: none" role="search">
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">LDL</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#baseldl"><cite>BaseLDL</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ldl-dvs">LDL-DVS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ldl-dpm">LDL-DPM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rg4ldl">RG4LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rknn-ldl">R<span class="math notranslate nohighlight">\(k\)</span>NN-LDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#snefy-ldl">SNEFY-LDL</a></li>
@@ -865,22 +1353,6 @@ StructRF refers to <em>structured random forest</em>.</p>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">PyLDL Documentation</a></li>
-      <li>Next: <a href="le.html" title="next chapter">LE</a></li>
-  </ul></li>
-</ul>
-</div>
-
-
-
-
-
-
-
 
         </div>
       </div>
@@ -890,8 +1362,8 @@ StructRF refers to <em>structured random forest</em>.</p>
       &#169;2024, SpriteMisaka.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
       <a href="_sources/ldl.rst.txt"

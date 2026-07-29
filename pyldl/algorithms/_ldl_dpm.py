@@ -3,14 +3,13 @@ import numpy as np
 import keras
 import tensorflow as tf
 
-from scipy.special import softplus
-
 from pyldl.algorithms.base import BaseLDL
 
 EPS = np.finfo(np.float64).eps
 
 
 class LDL_DPM(BaseLDL):
+
     def __init__(self, concentration=1., strength=3., max_k=15,
                  alpha=1e-6, beta=1e-6, **kwargs):
         super().__init__(**kwargs)
@@ -98,6 +97,7 @@ class LDL_DPM(BaseLDL):
         self._optimizer.apply_gradients(zip(grads, [self._Theta, self._Gamma]))
 
     def _slice_gibbs(self, X, D, z, u):
+        from scipy.special import softplus
         X_aug = np.concatenate([X, np.ones((X.shape[0], 1))], axis=1)
         g_np = X_aug @ self._Gamma.numpy()
         Theta_np = self._Theta.numpy()

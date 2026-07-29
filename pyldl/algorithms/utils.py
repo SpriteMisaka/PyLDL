@@ -1,11 +1,7 @@
-from typing import Union, Optional
-from functools import wraps
+from typing import Optional
+from functools import wraps, singledispatch
 
-import scipy.sparse
 import numpy as np
-
-import keras
-import tensorflow as tf
 
 
 EPS = np.finfo(np.float64).eps
@@ -16,16 +12,21 @@ DEFAULT_METRICS_GLD = ['clark', 'mu', 'hamming', 'subset_accuracy', 'spearman', 
 
 
 def _clip(func):
-    @wraps(func)
+
+    @singledispatch
     def _wrapper(D, D_pred, **kwargs):
-        if isinstance(D, np.ndarray):
-            D = np.clip(D, EPS, 1)
-            D_pred = np.clip(D_pred, EPS, 1)
-        elif isinstance(D, tf.Tensor):
-            D = tf.clip_by_value(D, EPS, 1)
-            D_pred = tf.clip_by_value(D_pred, EPS, 1)
+        import keras.ops as ops
+        D = ops.clip(D, EPS, 1.)
+        D_pred = ops.clip(D_pred, EPS, 1.)
         return func(D, D_pred, **kwargs)
-    return _wrapper
+
+    @_wrapper.register(np.ndarray)
+    def _(D: np.ndarray, D_pred: np.ndarray, **kwargs):
+        D = np.clip(D, EPS, 1.)
+        D_pred = np.clip(D_pred, EPS, 1.)
+        return func(D, D_pred, **kwargs)
+
+    return wraps(func)(_wrapper)
 
 
 def _reduction(func):
@@ -37,26 +38,29 @@ def _reduction(func):
 
 
 def _1d(func):
-    @wraps(func)
+
+    @singledispatch
     def _wrapper(X, Y=None, **kwargs):
-        if isinstance(X, np.ndarray):
-            if X.ndim != 1:
-                return func(X, Y, **kwargs)
-            X = X[np.newaxis, :]
-            if Y is not None:
-                Y = Y[np.newaxis, :]
-        elif isinstance(X, tf.Tensor):
-            if X.shape.ndims != 1:
-                return func(X, Y, **kwargs)
-            X = tf.expand_dims(X, axis=0)
-            if Y is not None:
-                Y = tf.expand_dims(Y, axis=0)
+        import keras.ops as ops
+        if len(ops.shape(X)) != 1:
+            return func(X, Y, **kwargs)
+        X = ops.expand_dims(X, axis=0)
+        if Y is not None:
+            Y = ops.expand_dims(Y, axis=0)
         results = func(X, Y, **kwargs)
-        if isinstance(X, np.ndarray):
-            return results.ravel()[0]
-        elif isinstance(X, tf.Tensor):
-            return tf.reshape(results, (-1, ))[0]
-    return _wrapper
+        return ops.squeeze(results, axis=0)
+
+    @_wrapper.register(np.ndarray)
+    def _(X: np.ndarray, Y: Optional[np.ndarray] = None, **kwargs):
+        if len(np.shape(X)) != 1:
+            return func(X, Y, **kwargs)
+        X = np.expand_dims(X, axis=0)
+        if Y is not None:
+            Y = np.expand_dims(Y, axis=0)
+        results = func(X, Y, **kwargs)
+        return np.squeeze(results, axis=0)
+
+    return wraps(func)(_wrapper)
 
 
 @_reduction
@@ -169,6 +173,16 @@ def proj(D: np.ndarray) -> np.ndarray:
     return np.maximum(D - theta[:, np.newaxis], 0)
 
 
+def locass_proj(D, k):
+    a = D * k
+    b = np.floor(a).astype(np.int64)
+    remainder = a - b
+    deficit = k - np.sum(b, axis=1)
+    rank = np.argsort(np.argsort(-remainder, axis=1), axis=1)
+    bonus = (rank < deficit[:, None]).astype(np.int64)
+    return (b + bonus) / k
+
+
 def softmax(D: np.ndarray) -> np.ndarray:
     from scipy.special import softmax as scipy_softmax
     return scipy_softmax(D, axis=1)
@@ -248,71 +262,67 @@ def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.nda
 
 
 @_1d
-def pairwise_euclidean(X: Union[np.ndarray, tf.Tensor],
-                       Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
-    r"""Pairwise Euclidean distance.
+def pairwise_euclidean(X, Y=None):
 
-    :param X: Matrix :math:`\boldsymbol{X}` (shape: :math:`[m_{\boldsymbol{X}},\, n]`).
-    :type X: Union[np.ndarray, tf.Tensor]
-    :param Y: Matrix :math:`\boldsymbol{Y}` (shape: :math:`[m_{\boldsymbol{Y}},\, n]`), if None, :math:`\boldsymbol{Y} = \boldsymbol{X}`, defaults to None.
-    :type Y: Union[np.ndarray, tf.Tensor], optional
-    :return: Pairwise Euclidean distance (shape: :math:`[m_{\boldsymbol{X}},\, m_Y]`).
-    :rtype: Union[np.ndarray, tf.Tensor]
-    """
-    Y = X if Y is None else Y
-    if isinstance(X, np.ndarray):
+    @singledispatch
+    def _pairwise(X, Y):
+        import keras.ops as ops
+        return ops.sqrt(ops.sum((X[:, None] - Y[None, :])**2, axis=2))
+
+    @_pairwise.register(np.ndarray)
+    def _(X: np.ndarray, Y: np.ndarray):
         return np.sqrt(np.sum((X[:, np.newaxis] - Y[np.newaxis]) ** 2, axis=2))
-    elif isinstance(X, tf.Tensor):
-        return tf.sqrt(tf.reduce_sum((X[:, tf.newaxis] - Y[tf.newaxis]) ** 2, axis=2))
-    else:
-        raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
+
+    Y = X if Y is None else Y
+    return _pairwise(X, Y)
 
 
 @_1d
-def pairwise_cosine(X: Union[np.ndarray, tf.Tensor],
-                    Y: Optional[Union[np.ndarray, tf.Tensor]] = None,
-                    mode: str = 'similarity') -> Union[np.ndarray, tf.Tensor]:
-    r"""Pairwise cosine distance/similarity.
+def pairwise_cosine(X, Y=None, mode: str = 'similarity'):
 
-    :param X: Matrix :math:`\boldsymbol{X}` (shape: :math:`[m_{\boldsymbol{X}},\, n]`).
-    :type X: tf.Tensor
-    :param Y: Matrix :math:`\boldsymbol{Y}` (shape: :math:`[m_{\boldsymbol{Y}},\, n]`).
-    :type Y: tf.Tensor
-    :param mode: Defaults to 'similarity'. The options are 'similarity' and 'distance'.
-    :type mode: str
-    :return: Pairwise cosine similarity (shape: :math:`[m_{\boldsymbol{X}},\, m_{\boldsymbol{Y}}]`).
-    :rtype: tf.Tensor
-    """
-    Y = X if Y is None else Y
-    if isinstance(X, np.ndarray):
+    @singledispatch
+    def _pairwise(X, Y):
+        import keras.ops as ops
+        X_norm = X / ops.sqrt(ops.sum(X**2, axis=1, keepdims=True))
+        Y_norm = Y / ops.sqrt(ops.sum(Y**2, axis=1, keepdims=True))
+        similarity = ops.matmul(X_norm, ops.transpose(Y_norm))
+        return similarity
+
+    @_pairwise.register(np.ndarray)
+    def _(X: np.ndarray, Y: np.ndarray):
         X_norm = X / np.linalg.norm(X, axis=1, keepdims=True)
         Y_norm = Y / np.linalg.norm(Y, axis=1, keepdims=True)
-        similarity = np.dot(X_norm, Y_norm.T)
-    elif isinstance(X, tf.Tensor):
-        X_norm = tf.nn.l2_normalize(X, axis=1)
-        Y_norm = tf.nn.l2_normalize(Y, axis=1)
-        similarity = tf.matmul(X_norm, Y_norm, transpose_b=True)
-    else:
-        raise TypeError("Input must be either a tf.Tensor or a np.ndarray")
+        similarity = np.dot(X_norm, np.transpose(Y_norm))
+        return similarity
+
+    Y = X if Y is None else Y
+    similarity = _pairwise(X, Y)
     return 1 - similarity if mode == 'distance' else similarity
 
 
 @_1d
-def pairwise_pearsonr(X: Union[np.ndarray, tf.Tensor],
-                      Y: Optional[Union[np.ndarray, tf.Tensor]] = None) -> Union[np.ndarray, tf.Tensor]:
-    if isinstance(X, np.ndarray):
-        return np.corrcoef(X) if Y is None else np.corrcoef(X, Y)[:X.shape[0], X.shape[0]:]
-    elif isinstance(X, tf.Tensor):
+def pairwise_pearsonr(X, Y=None):
+
+    @singledispatch
+    def _pairwise(X, Y):
+        import keras.ops as ops
         Y = X if Y is None else Y
-        X_centered = X - tf.reduce_mean(X, axis=1, keepdims=True)
-        Y_centered = Y - tf.reduce_mean(Y, axis=1, keepdims=True)
-        cov = tf.matmul(X_centered, Y_centered, transpose_b=True)
-        X_std = tf.sqrt(tf.reduce_sum(tf.square(X_centered), axis=1, keepdims=True))
-        Y_std = tf.sqrt(tf.reduce_sum(tf.square(Y_centered), axis=1))
-        return cov / (X_std * tf.expand_dims(Y_std, 0))
+        X_centered = X - ops.mean(X, axis=1, keepdims=True)
+        Y_centered = Y - ops.mean(Y, axis=1, keepdims=True)
+        cov = ops.matmul(X_centered, ops.transpose(Y_centered))
+        X_std = ops.sqrt(ops.sum(X_centered**2, axis=1, keepdims=True))
+        Y_std = ops.sqrt(ops.sum(Y_centered**2, axis=1, keepdims=True))
+        return cov / ops.matmul(X_std, ops.transpose(Y_std))
+
+    @_pairwise.register(np.ndarray)
+    def _(X: np.ndarray, Y: Optional[np.ndarray]):
+        return np.corrcoef(X) if Y is None else np.corrcoef(X, Y)[:X.shape[0], X.shape[0]:]
+
+    return _pairwise(X, Y)
 
 
-def csr2sparse(A: scipy.sparse.csr_matrix) -> tf.SparseTensor:
+def csr2sparse(A):
+    import tensorflow as tf
     coo = A.tocoo()
     indices = np.asmatrix([coo.row, coo.col]).transpose()
     return tf.sparse.reorder(
@@ -320,76 +330,23 @@ def csr2sparse(A: scipy.sparse.csr_matrix) -> tf.SparseTensor:
     )
 
 
-def kernel(X: Union[np.ndarray, tf.Tensor],
-           Y: Optional[Union[np.ndarray, tf.Tensor]] = None,
-           gamma: Optional[float] = None) -> Union[np.ndarray, tf.Tensor]:
+def kernel(X, Y=None, gamma: Optional[float] = None):
     from sklearn.metrics.pairwise import rbf_kernel
     Y = X if Y is None else Y
     if gamma is None:
         gamma = 1. / (2. * np.mean(pairwise_euclidean(X, Y)) ** 2)
-    K = rbf_kernel(X, Y, gamma=gamma)
-    if isinstance(X, np.ndarray):
-        return K
-    elif isinstance(X, tf.Tensor):
-        return tf.cast(K, dtype=tf.float32)
+    return rbf_kernel(X, Y, gamma=gamma)
 
 
-def non_diagonal(X: Union[np.ndarray, tf.Tensor]) -> Union[np.ndarray, tf.Tensor]:
-    if isinstance(X, np.ndarray):
+def non_diagonal(X):
+
+    @singledispatch
+    def _non_diagonal(X):
+        import keras.ops as ops
+        return  X * (1 - ops.eye(ops.shape(X)[0], dtype=X.dtype))
+
+    @_non_diagonal.register(np.ndarray)
+    def _(X: np.ndarray):
         return X - np.diag(np.diag(X))
-    elif isinstance(X, tf.Tensor):
-        return X - tf.linalg.diag(tf.linalg.diag_part(X))
 
-
-class RProp(keras.optimizers.Optimizer):
-
-    def __init__(self, init_alpha=1e-3, scale_up=1.2, scale_down=0.5, min_alpha=1e-6, max_alpha=50., **kwargs):
-        super(RProp, self).__init__(name='rprop', learning_rate=init_alpha, **kwargs)
-        self._init_alpha = init_alpha
-        self._scale_up = scale_up
-        self._scale_down = scale_down
-        self._min_alpha = min_alpha
-        self._max_alpha = max_alpha
-
-    def build(self, variables):
-        if self.built:
-            return
-        super().build(variables)
-        shapes = [tf.shape(p) for p in variables]
-        self._alphas = [tf.Variable(tf.ones(shape) * self._init_alpha) for shape in shapes]
-        self._old_grads = [tf.Variable(tf.zeros(shape)) for shape in shapes]
-        self._prev_weight_deltas = [tf.Variable(tf.zeros(shape)) for shape in shapes]
-
-    def update_step(self, gradient, variable, _):
-        idx = self._get_variable_index(variable)
-        alpha = self._alphas[idx]
-        old_grad = self._old_grads[idx]
-        prev_weight_delta = self._prev_weight_deltas[idx]
-
-        new_alpha = tf.where(
-            tf.greater(gradient * old_grad, 0),
-            tf.minimum(alpha * self._scale_up, self._max_alpha),
-            tf.where(tf.less(gradient * old_grad, 0), tf.maximum(alpha * self._scale_down, self._min_alpha), alpha)
-        )
-
-        new_delta = tf.where(tf.greater(gradient, 0), -new_alpha,
-                             tf.where(tf.less(gradient, 0), new_alpha, tf.zeros_like(new_alpha)))
-
-        weight_delta = tf.where(tf.less(gradient*old_grad, 0), -prev_weight_delta, new_delta)
-        gradient = tf.where(tf.less(gradient * old_grad, 0), tf.zeros_like(gradient), gradient)
-
-        self.assign(variable, variable + weight_delta)
-        alpha.assign(new_alpha)
-        old_grad.assign(gradient)
-        prev_weight_delta.assign(weight_delta)
-
-    def get_config(self):
-        config = {
-            'init_alpha': self._init_alpha,
-            'scale_up': self._scale_up,
-            'scale_down': self._scale_down,
-            'min_alpha': self._min_alpha,
-            'max_alpha': self._max_alpha,
-        }
-        base_config = super(RProp, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+    return _non_diagonal(X)
