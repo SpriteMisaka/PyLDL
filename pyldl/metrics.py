@@ -262,6 +262,107 @@ def mu(D, D_pred):
     return 1. - np.mean(np.minimum(kld, x0)) / x0
 
 
+def jsd_dirichlet_expectation(alpha, beta):
+    from scipy.special import digamma
+    from pyldl.algorithms.utils import shannon_entropy
+
+    alpha0 = np.sum(alpha)
+    beta0 = np.sum(beta)
+    gamma = .5 * (alpha / alpha0 + beta / beta0)
+
+    var_alpha = alpha * (alpha0 - alpha) / (alpha0**2 * (alpha0 + 1))
+    var_beta  = beta  * (beta0 - beta)  / (beta0**2 * (beta0 + 1))
+
+    term1 = shannon_entropy(gamma)
+    term2 = -(1. / 8.) * np.sum((var_alpha + var_beta) / gamma)
+    term3 = .5 * np.sum(alpha / alpha0 * (digamma(alpha + 1) - digamma(alpha0 + 1)))
+    term4 = .5 * np.sum(beta / beta0 * (digamma(beta + 1) - digamma(beta0 + 1)))
+    return term1 + term2 + term3 + term4
+
+
+def jsd_dirichlet_variance(alpha, beta):
+    alpha0 = np.sum(alpha)
+    beta0 = np.sum(beta)
+    c = len(alpha)
+
+    mu = alpha / alpha0
+    nu = beta / beta0
+    gamma = .5 * (mu + nu)
+
+    g_alpha = .5 * np.log(mu / gamma)
+    g_beta = .5 * np.log(nu / gamma)
+    g = np.hstack([g_alpha, g_beta])
+
+    a_diag = .5 / mu - .25 / gamma
+    b_diag = -.25 / gamma
+    c_diag = .5 / nu - .25 / gamma
+
+    A = np.diag(a_diag)
+    C = np.diag(c_diag)
+    B = np.diag(b_diag)
+
+    H = np.block([[A, B], [B, C]])
+
+    denom_a = alpha0**2 * (alpha0 + 1)
+    denom_b = beta0**2 * (beta0 + 1)
+
+    Sigma_d = np.empty((c, c))
+    Sigma_t = np.empty((c, c))
+
+    for i in range(c):
+        for j in range(c):
+            if i == j:
+                Sigma_d[i, j] = alpha[i] * (alpha0 - alpha[i]) / denom_a
+                Sigma_t[i, j] = beta[i]  * (beta0 - beta[i])  / denom_b
+            else:
+                Sigma_d[i, j] = -alpha[i] * alpha[j] / denom_a
+                Sigma_t[i, j] = -beta[i]  * beta[j]  / denom_b
+
+    Sigma = np.block([[Sigma_d, np.zeros((c, c))], [np.zeros((c, c)), Sigma_t]])
+    SH = Sigma @ H
+    return g.T @ Sigma @ g + .5 * np.trace(SH @ SH)
+
+
+@_1d
+def _nu(D, D_pred, type=None, min_beta=3.):
+
+    def _rapxcr12(D, D_pred, min_beta):
+        from pyldl.algorithms.utils import estimate_alpha
+        alpha = estimate_alpha(D)
+        beta = estimate_alpha(D_pred) if type == 1 else alpha
+        mean = jsd_dirichlet_expectation(alpha, beta) / LOG2
+        var = jsd_dirichlet_variance(alpha, beta) / (LOG2 * LOG2)
+
+        if min_beta is not None:
+            var_max = mean * (1. - mean)**2 / (min_beta + 1. - mean)
+            var = min(var, var_max)
+
+        w = mean * (1. - mean) / var - 1.
+        a, b = mean * w, (1. - mean) * w
+        return (a + b) / a
+
+    jsdlog2 = js_divergence(D, D_pred) / LOG2
+    if type != 3:
+        return 1. - _rapxcr12(D, D_pred, min_beta) * jsdlog2
+    _rapxcr3 = js_divergence(D, _uniform_vector(D.shape))
+    return 1. - (jsdlog2) / (_rapxcr3 / LOG2 + EPS)
+
+
+@_register("D", larger=True)
+def nu1(D, D_pred, *args, **kwargs):
+    return _nu(D, D_pred, type=1, *args, **kwargs)
+
+
+@_register("D", larger=True)
+def nu2(D, D_pred, *args, **kwargs):
+    return _nu(D, D_pred, type=2, *args, **kwargs)
+
+
+@_register("D", larger=True)
+def nu3(D, D_pred):
+    return _nu(D, D_pred, type=3)
+
+
 @_register("D")
 @_reduction
 @_1d
