@@ -3,7 +3,7 @@ import tensorflow as tf
 
 import numpy as np
 
-from pyldl.algorithms.base.deep import BaseDeepLDL, BaseAdam
+from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
 
 @keras.saving.register_keras_serializable()

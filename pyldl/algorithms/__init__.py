@@ -194,20 +194,5 @@ _gld__ = list(_GLD_MODULE_MAP)
 __all__ = _ldl__ + _le__ + _incomldl__ + _ldl4c__ + _ssg_ldl__ + _ldl_da__ + _gld__
 
 
-def __getattr__(name):
-
-    if name not in _MODULE_MAP:
-        raise AttributeError(name)
-
-    import importlib
-
-    module = importlib.import_module(
-        _MODULE_MAP[name],
-        package=__name__
-    )
-
-    obj = getattr(module, name)
-
-    globals()[name] = obj
-
-    return obj
+from .base._lazy import lazy_module
+__getattr__ = lazy_module(_MODULE_MAP, __name__)

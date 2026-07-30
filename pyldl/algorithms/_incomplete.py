@@ -3,7 +3,7 @@ import numpy as np
 from qpsolvers import solve_qp
 
 from pyldl.algorithms.utils import svt, proj
-from pyldl.algorithms.base.shallow import BaseADMM, BaseIncomLDL
+from pyldl.algorithms.base import BaseADMM, BaseIncomLDL
 
 
 class IncomLDL(BaseADMM, BaseIncomLDL):

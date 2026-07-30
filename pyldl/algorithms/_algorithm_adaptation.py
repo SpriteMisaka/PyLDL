@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyldl.algorithms.base.shallow import Base, BaseLDL, BaseGLD
+from pyldl.algorithms.base import Base, BaseLDL, BaseGLD
 
 
 EPS = np.finfo(np.float32).eps

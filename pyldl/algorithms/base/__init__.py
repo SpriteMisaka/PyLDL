@@ -5,35 +5,37 @@ if TYPE_CHECKING:
     from .deep import *
 
 
-__all__ = [
+_MODULE_MAP = {
+    **dict.fromkeys(
+        [
+            "Base",
+            "BaseLDL",
+            "BaseLE",
+            "BaseGLD",
+            "BaseADMM",
+            "BaseIncomLDL",
+            "BaseLDLClassifier",
+            "BaseEnsemble",
+        ],
+        ".shallow",
+    ),
 
-    # Shallow
-    "Base", "BaseLDL", "BaseLE", "BaseGLD",
-    "BaseADMM",
-    "BaseIncomLDL", "BaseLDLClassifier",
-    "BaseEnsemble",
+    **dict.fromkeys(
+        [
+            "BaseDeep",
+            "BaseDeepLDL",
+            "BaseDeepLE",
+            "BaseGD",
+            "BaseAdam",
+            "BaseBFGS",
+            "BaseDeepLDLClassifier",
+        ],
+        ".deep",
+    ),
+}
 
-    # Deep
-    "BaseDeep", "BaseDeepLDL", "BaseDeepLE",
-    "BaseGD", "BaseAdam", "BaseBFGS",
-    "BaseDeepLDLClassifier",
-
-]
+__all__ = list(_MODULE_MAP)
 
 
-def __getattr__(name):
-    if name not in __all__:
-        raise AttributeError(name)
-
-    import importlib
-    for module_name in (".shallow", ".deep"):
-        try:
-            module = importlib.import_module(
-                module_name,
-                package=__name__
-            )
-            return getattr(module, name)
-        except AttributeError:
-            pass
-
-    raise AttributeError(name)
+from ._lazy import lazy_module
+__getattr__ = lazy_module(_MODULE_MAP, __name__)

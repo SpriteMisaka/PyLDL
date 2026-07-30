@@ -4,7 +4,7 @@ from scipy.optimize import minimize, fsolve
 
 from sklearn.covariance import LedoitWolf
 
-from pyldl.algorithms.base.shallow import Base, BaseLDL, BaseGLD
+from pyldl.algorithms.base import Base, BaseLDL, BaseGLD
 from pyldl.algorithms.utils import kl_divergence
 
 

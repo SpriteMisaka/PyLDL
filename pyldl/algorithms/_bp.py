@@ -1,6 +1,6 @@
 import keras
 
-from pyldl.algorithms.base.deep import BaseDeepLDL, BaseGD
+from pyldl.algorithms.base import BaseDeepLDL, BaseGD
 
 
 @keras.saving.register_keras_serializable()

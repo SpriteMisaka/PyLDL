@@ -1,6 +1,6 @@
 import numpy as np
 
-from pyldl.algorithms.base.shallow import BaseLDL
+from pyldl.algorithms.base import BaseLDL
 
 
 class SSG_LDL(BaseLDL):
