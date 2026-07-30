@@ -17,7 +17,7 @@ class LDLEarlyStopping(keras.callbacks.Callback):
         if self._monitor == 'loss':
             self._smaller = True
         else:
-            from pyldl.algorithms.utils import THE_SMALLER_THE_BETTER
+            from pyldl.metrics import THE_SMALLER_THE_BETTER
             self._smaller = self._monitor in THE_SMALLER_THE_BETTER
             if self._monitor not in self.model._metrics:
                 self.model._metrics.append(self._monitor)

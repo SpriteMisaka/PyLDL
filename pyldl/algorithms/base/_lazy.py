@@ -5,6 +5,7 @@ def lazy_module(module_map, package):
         if name not in module_map:
             raise AttributeError(name)
 
+        import sys
         import importlib
         module = importlib.import_module(
             module_map[name],
@@ -12,7 +13,7 @@ def lazy_module(module_map, package):
         )
 
         obj = getattr(module, name)
-        globals()[name] = obj
+        setattr(sys.modules[package], name, obj)
         return obj
 
     return __getattr__
