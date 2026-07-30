@@ -65,12 +65,10 @@ class _Base:
             new_obj.__dict__.update(obj.__dict__)
             return new_obj
 
-    def _score_impl(self, X, targets, pred_funcs, default_metrics,
-                    metrics, return_dict):
+    def _score_impl(self, X, targets, funcs, metrics, return_dict):
         from pyldl.metrics import NAME_TO_TYPE
 
-        if metrics is None:
-            metrics = default_metrics
+        pred = self.predict(X)
 
         def _first_arg_name(func):
             params = list(inspect.signature(inspect.unwrap(func)).parameters.keys())
@@ -79,21 +77,15 @@ class _Base:
         def _metric_type(metric):
             if isinstance(metric, str):
                 t = NAME_TO_TYPE.get(metric)
-                if t in pred_funcs:
+                if t is not None:
                     return t
             else:
                 arg_name = _first_arg_name(metric)
-                if arg_name in pred_funcs:
+                if arg_name is not None:
                     return arg_name
             raise ValueError(f"Unknown metric: {metric}. "
                              "If you are using a custom metric, please make sure that its first argument is "
-                             f"named {'/'.join(pred_funcs)} to indicate the type of the metric.")
-
-        preds_cache = {}
-        def _predict(t):
-            if t not in preds_cache:
-                preds_cache[t] = pred_funcs[t](self, X)
-            return preds_cache[t]
+                             "named to indicate the type of the metric.")
 
         import importlib
         module = importlib.import_module('pyldl.metrics')
@@ -102,7 +94,10 @@ class _Base:
         for metric in metrics:
             t = _metric_type(metric)
             fn = getattr(module, metric) if isinstance(metric, str) else metric
-            scores.append(fn(targets[t], _predict(t)))
+            if t in funcs:
+                scores.append(fn(funcs[t](targets), funcs[t](pred)))
+            else:
+                scores.append(fn(targets, pred))
 
         return dict(zip(metrics, scores)) if return_dict else tuple(scores)
 
@@ -152,13 +147,10 @@ class _BaseLDL(_Base):
     def score(self, X: np.ndarray, D: np.ndarray,
               metrics: Optional[list[str]] = None, return_dict: bool = False):
         from pyldl.algorithms.utils import binaryzation
-        targets = {'D': D, 'L': binaryzation(D)}
-        pred_funcs = {
-            'D': lambda self, X: self.predict(X),
-            'L': lambda self, X: binaryzation(self.predict(X)),
-        }
-        return self._score_impl(X, targets, pred_funcs, DEFAULT_METRICS,
-                                metrics, return_dict)
+        if metrics is None:
+            metrics = DEFAULT_METRICS
+        return self._score_impl(X, D, funcs={'L': binaryzation},
+                                metrics=metrics, return_dict=return_dict)
 
     def __getstate__(self):
         state = super().__getstate__()
@@ -266,18 +258,12 @@ class _BaseGLD(_Base):
 
     def score(self, X: np.ndarray, G: np.ndarray,
               metrics: Optional[list[str]] = None, return_dict: bool = False):
-        targets = {
-            'D': self.G2D(G, self.lower_bounds, self.upper_bounds),
-            'L': self.G2L(G),
-            'G': G,
-        }
-        pred_funcs = {
-            'D': lambda self, X: self.predict_D(X),
-            'L': lambda self, X: self.predict_L(X),
-            'G': lambda self, X: self.predict(X),
-        }
-        return self._score_impl(X, targets, pred_funcs, DEFAULT_METRICS_GLD,
-                                metrics, return_dict)
+        if metrics is None:
+            metrics = DEFAULT_METRICS_GLD
+        return self._score_impl(X, G, funcs={
+            'D': lambda x: self.G2D(x, self.lower_bounds, self.upper_bounds),
+            'L': self.G2L,
+        }, metrics=metrics, return_dict=return_dict)
 
 
 class BaseLDL(_BaseLDL, BaseEstimator):
