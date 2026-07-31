@@ -3,9 +3,7 @@ from functools import wraps
 import numpy as np
 
 import keras
-import tensorflow as tf
-
-import tensorflow_probability as tfp
+import keras.ops as ops
 
 from .shallow import _path_suffix, BaseLDL, BaseLE, BaseLDLClassifier
 
@@ -17,8 +15,14 @@ class _BaseDeep(keras.Model):
         self._n_hidden = n_hidden
         self._n_latent = n_latent
         if random_state is not None:
-            tf.random.set_seed(random_state)
+            keras.utils.set_random_seed(random_state)
         self._model = None
+
+        backend = keras.backend.backend()
+        if backend == 'tensorflow':
+            self._predict = lambda X: self._call(X).numpy()
+        elif backend == 'torch':
+            self._predict = lambda X: self._call(X).detach().cpu().numpy()
 
     _serialize_objects = ['_model']
 
@@ -40,17 +44,15 @@ class _BaseDeep(keras.Model):
         return obj
 
     @staticmethod
-    @tf.function
     def _l2_reg(model):
         if isinstance(model, keras.Model):
-            return tf.reduce_sum([tf.reduce_sum(tf.square(v)) for v in model.trainable_variables]) / 2.
+            return ops.sum([ops.sum(ops.square(v)) for v in model.trainable_variables]) / 2.
         else:
-            return tf.reduce_sum(tf.square(model)) / 2.
+            return ops.sum(ops.square(model)) / 2.
 
     @staticmethod
-    @tf.function
     def loss_function(Y, Y_pred):
-        return tf.math.reduce_mean(keras.losses.mean_squared_error(Y, Y_pred))
+        return ops.mean(keras.losses.mean_squared_error(Y, Y_pred))
 
     def _call(self, X):
         return self._model(X)
@@ -73,7 +75,6 @@ class _BaseDeep(keras.Model):
     def _before_train(self):
         pass
 
-    @tf.function
     def _loss(self, X, Y, start, end):
         Y_pred = self._call(X)
         return self.loss_function(Y, Y_pred)
@@ -101,13 +102,13 @@ class BaseDeepLDL(BaseLDL, _BaseDeep):
 
     def fit(self, X, D, **kwargs):
         BaseLDL.fit(self, X, D)
-        self._X = tf.cast(self._X, dtype=tf.float32)
-        self._D = tf.cast(self._D, dtype=tf.float32)
+        self._X = ops.cast(self._X, dtype="float32")
+        self._D = ops.cast(self._D, dtype="float32")
         _BaseDeep.fit(self, self._X, self._D, **kwargs)
         return self
 
     def predict(self, X):
-        return self._call(X).numpy()
+        return self._predict(X)
 
 
 class BaseDeepLE(BaseLE, _BaseDeep):
@@ -118,8 +119,8 @@ class BaseDeepLE(BaseLE, _BaseDeep):
 
     def fit(self, X, L, **kwargs):
         BaseLE.fit(self, X, L)
-        self._X = tf.cast(self._X, dtype=tf.float32)
-        self._L = tf.cast(self._L, dtype=tf.float32)
+        self._X = ops.cast(self._X, dtype="float32")
+        self._L = ops.cast(self._L, dtype="float32")
         _BaseDeep.fit(self, self._X, self._L, **kwargs)
         return self
 
@@ -161,6 +162,19 @@ class BaseDeep(_BaseDeep):
 
 class BaseGD(BaseDeep):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._setup_backend()
+
+    def _setup_backend(self):
+        backend = keras.backend.backend()
+        if backend == 'tensorflow':
+            self._train_step_impl = self._tf_train_step
+            self._make_dataset = self._tf_make_dataset
+        elif backend == 'torch':
+            self._train_step_impl = self._torch_train_step
+            self._make_dataset = self._torch_make_dataset
+
     def _get_default_optimizer(self):
         return keras.optimizers.SGD(1e-3)
 
@@ -183,16 +197,46 @@ class BaseGD(BaseDeep):
             return score(val, val_pred, metrics=self._metrics, return_dict=True)
         return {}
 
-    def train_step(self, batch, loss, trainable_variables, optimizer, epoch, epochs, start, end):
+    def _tf_train_step(self, pair, batch, loss, start, end):
+        import tensorflow as tf
+        trainable_variables, optimizer = pair
+        X, Y = batch
         with tf.GradientTape() as tape:
-            l = loss(batch[0], batch[1], start, end)
+            l = loss(X, Y, start, end)
             self.total_loss += l
         gradients = tape.gradient(l, trainable_variables)
         optimizer.apply_gradients(zip(gradients, trainable_variables))
 
+    def _torch_train_step(self, pair, batch, loss, start, end):
+        trainable_variables, optimizer = pair
+        X, Y = batch
+        for var in trainable_variables:
+            var.value.grad = None
+        l = loss(X, Y, start, end)
+        self.total_loss += float(l)
+        l.backward()
+        grads = [var.value.grad for var in trainable_variables]
+        optimizer.apply_gradients(zip(grads, trainable_variables))
+
+    def train_step(self, pair, batch, loss, start, end):
+        return self._train_step_impl(pair, batch, loss, start, end)
+
+    def _tf_make_dataset(self, X, Y):
+        import tensorflow as tf
+        return tf.data.Dataset.from_tensor_slices((X, Y)).batch(self._batch_size)
+
+    def _torch_make_dataset(self, X, Y):
+        import torch
+        from torch.utils.data import DataLoader, TensorDataset
+        dataset = TensorDataset(
+            torch.as_tensor(X, dtype=torch.float32),
+            torch.as_tensor(Y, dtype=torch.float32),
+        )
+        return DataLoader(dataset, batch_size=self._batch_size, shuffle=False)
+
     def train(self, X, Y, epochs, callbacks, X_val, D_val, L_val):
 
-        data = tf.data.Dataset.from_tensor_slices((X, Y)).batch(self._batch_size)
+        data = self._make_dataset(X, Y)
 
         if not isinstance(callbacks, keras.callbacks.CallbackList):
             callbacks = keras.callbacks.CallbackList(callbacks, model=self)
@@ -211,7 +255,7 @@ class BaseGD(BaseDeep):
                 start = step * self._batch_size
                 end = min(start + self._batch_size, X.shape[0])
                 callbacks.on_train_batch_begin(step)
-                self.train_step(batch, self._loss, self.trainable_variables, self._optimizer, epoch, epochs, start, end)
+                self.train_step((self.trainable_variables, self._optimizer), batch, self._loss, start, end)
                 callbacks.on_train_batch_end(step)
 
             scores = self._calculate_validation_scores(X_val, D_val, L_val)
@@ -242,41 +286,33 @@ class BaseAdam(BaseGD):
 
 class BaseBFGS(BaseDeep):
 
-    @staticmethod
-    def make_val_and_grad_fn(value_fn):
-        @wraps(value_fn)
-        def val_and_grad(x):
-            return tfp.math.value_and_gradient(value_fn, x)
-        return val_and_grad
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._setup_bfgs_backend()
+
+    def _setup_bfgs_backend(self):
+        backend = keras.backend.backend()
+        if backend == 'tensorflow':
+            self._optimize_bfgs = self._tf_optimize_bfgs
+        elif backend == 'torch':
+            self._optimize_bfgs = self._torch_optimize_bfgs
 
     @staticmethod
-    @tf.function
     def loss_function(Y, Y_pred):
-        return tf.math.reduce_mean(keras.losses.kl_divergence(Y, Y_pred))
-
-    @tf.function
-    def _params2model(self, params_1d):
-        params = tf.dynamic_partition(params_1d, self._part, self._n_tensors)
-        return [
-            tf.reshape(param, shape)
-            for shape, param in zip(self._model_shapes, params)
-        ]
-
-    def _assign_new_model_parameters(self, params_1d):
-        for i, j in enumerate(self._params2model(params_1d)):
-            self._model.trainable_variables[i].assign(j)
+        return ops.mean(keras.losses.kl_divergence(Y, Y_pred))
 
     def _loss(self, params_1d):
         pred = keras.activations.softmax(self._X @ self._params2model(params_1d)[0])
         return self.loss_function(self._D if issubclass(self.__class__, BaseDeepLDL) else self._L, pred)
 
-    def _get_obj_func(self):
-        return self.make_val_and_grad_fn(self._loss)
-
     def _get_default_model(self):
         return self.get_2layer_model(self._n_features, self._n_outputs)
 
-    def _optimize_bfgs(self, max_iterations):
+    def _tf_optimize_bfgs(self, max_iterations):
+        import tensorflow as tf
+        import tensorflow_probability as tfp
+
+        self._model_shapes_np = [tuple(v.shape) for v in self._model.trainable_variables]
 
         self._model_shapes = tf.shape_n(self._model.trainable_variables)
         self._n_tensors = len(self._model_shapes)
@@ -291,13 +327,60 @@ class BaseBFGS(BaseDeep):
             count += n
         self._part = tf.constant(self._part)
 
+        @wraps(self._loss)
+        def obj_func(x):
+            return tfp.math.value_and_gradient(self._loss, x)
+
         results = tfp.optimizer.lbfgs_minimize(
-            value_and_gradients_function=self._get_obj_func(),
+            value_and_gradients_function=obj_func,
             initial_position=tf.dynamic_stitch(self._idx, self._model.trainable_variables),
             max_iterations=max_iterations
         )
 
         self._assign_new_model_parameters(results.position)
+
+    def _torch_optimize_bfgs(self, max_iterations):
+        import torch
+        import numpy as np
+
+        self._model_shapes_np = [tuple(v.shape) for v in self._model.trainable_variables]
+
+        flat_parts = [v.value.detach().flatten() for v in self._model.trainable_variables]
+        param = torch.nn.Parameter(torch.cat(flat_parts))
+
+        optimizer = torch.optim.LBFGS(
+            [param],
+            max_iter=max_iterations,
+            line_search_fn='strong_wolfe',
+        )
+
+        def closure():
+            optimizer.zero_grad()
+            loss = self._loss(param)
+            loss.backward()
+            return loss
+
+        optimizer.step(closure)
+
+        with torch.no_grad():
+            offset = 0
+            for v in self._model.trainable_variables:
+                n = int(np.prod(v.shape))
+                v.assign(param.data[offset:offset+n].reshape(v.shape))
+                offset += n
+
+    def _params2model(self, params_1d):
+        params = []
+        offset = 0
+        for shape in self._model_shapes_np:
+            n = int(np.prod(shape))
+            params.append(ops.reshape(params_1d[offset:offset+n], shape))
+            offset += n
+        return params
+
+    def _assign_new_model_parameters(self, params_1d):
+        for i, j in enumerate(self._params2model(params_1d)):
+            self._model.trainable_variables[i].assign(j)
 
     def fit(self, X, Y, *, max_iterations=50, **kwargs):
         super().fit(X, Y, **kwargs)

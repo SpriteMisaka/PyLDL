@@ -1,7 +1,7 @@
 import numpy as np
 
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
 
@@ -23,24 +23,21 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
         self.beta = beta
 
     @staticmethod
-    @tf.function
     def ranking_loss(D_pred, P, W):
-        P_hat = tf.math.sigmoid(D_pred[:, :, None] - D_pred[:, None, :])
-        l = ((1 - P) * tf.math.log(tf.clip_by_value(1 - P_hat, EPS, 1.)) +\
-              P * tf.math.log(tf.clip_by_value(P_hat, EPS, 1.))) * W
-        return -tf.reduce_sum(l)
+        P_hat = ops.sigmoid(D_pred[:, :, None] - D_pred[:, None, :])
+        l = ((1 - P) * ops.log(ops.clip(1 - P_hat, EPS, 1.)) +
+              P * ops.log(ops.clip(P_hat, EPS, 1.))) * W
+        return -ops.sum(l)
 
     @staticmethod
-    @tf.function
     def preprocessing(D):
         diff = D[:, :, None] - D[:, None, :]
-        return tf.where(diff > .5, 1., 0.), tf.square(diff)
+        return ops.where(diff > .5, 1., 0.), ops.square(diff)
 
-    @tf.function
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
-        kld = tf.math.reduce_mean(keras.losses.kl_divergence(self._D, D_pred))
+        kld = ops.mean(keras.losses.kl_divergence(self._D, D_pred))
         rnk = self.ranking_loss(D_pred, self._P, self._W) / (2 * self._n_samples)
         return kld + self.alpha * rnk + self.beta * self._l2_reg(theta)
 

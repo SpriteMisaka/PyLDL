@@ -105,9 +105,9 @@ class RKNN_LDL(BaseGD, BaseDeepLDL):
         denominator = reduce_sum(C_inv, axis=[1, 2])[:, None]
         self._Z.assign(tf.transpose(tf.where(self._G_dense != 0, numerator / denominator, 0.)))
 
-    def train_step(self, batch, loss, _, __, epoch, epochs, start, end):
-        super().train_step(batch, loss, self._model.trainable_variables, self._optimizer, epoch, epochs, start, end)
-        super().train_step(batch, loss, [self._rho], self._rho_optimizer, epoch, epochs, start, end)
+    def train_step(self, _, *args, **kwargs):
+        super().train_step([self._model.trainable_variables, self._optimizer], *args, **kwargs)
+        super().train_step([[self._rho], self._rho_optimizer], *args, **kwargs)
         self._rho.assign(tf.clip_by_value(self._rho, 0., 1.))
         self._update_Z()
 

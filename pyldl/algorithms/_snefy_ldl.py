@@ -63,8 +63,8 @@ class SNEFY_LDL(BaseAdam, BaseDeepLDL):
             initializer=tf.zeros_initializer(), trainable=True
         )
 
-    def train_step(self, batch, loss, trainable_variables, optimizer, epoch, epochs, start, end):
-        super().train_step(batch, loss, trainable_variables, optimizer, epoch, epochs, start, end)
+    def train_step(self, *args, **kwargs):
+        super().train_step(*args, **kwargs)
         self._W.assign(tf.maximum(self._W, -.495))
 
     def predict(self, X, return_uncertainty=False):

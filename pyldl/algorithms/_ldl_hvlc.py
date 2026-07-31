@@ -54,9 +54,9 @@ class LDL_HVLC(BaseGD, BaseDeepLDL):
         self._p = tf.convert_to_tensor([pairwise_pearsonr(self._C[i], self._D[i]) for i in range(self._n_samples)], dtype=tf.float32)
         self._P = tf.convert_to_tensor(pairwise_pearsonr(tf.transpose(self._D)) , dtype=tf.float32)
 
-    def train_step(self, batch, loss, _, __, epoch, epochs, start, end):
-        super().train_step(batch, loss, self._model.trainable_variables, self._optimizer, epoch, epochs, start, end)
-        super().train_step(batch, loss, [self._M], self._M_optimizer, epoch, epochs, start, end)
+    def train_step(self, _, *args, **kwargs):
+        super().train_step([self._model.trainable_variables, self._optimizer], *args, **kwargs)
+        super().train_step([[self._M], self._M_optimizer], *args, **kwargs)
 
     def fit(self, X, D, *, M_optimizer=None, **kwargs):
         self._M_optimizer = M_optimizer or self._get_default_optimizer()
