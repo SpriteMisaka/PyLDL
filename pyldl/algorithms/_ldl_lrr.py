@@ -1,12 +1,7 @@
-import numpy as np
-
 import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseBFGS
-
-
-EPS = np.finfo(np.float32).eps
 
 
 @keras.saving.register_keras_serializable()
@@ -17,16 +12,16 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
     :term:`BFGS` is used as the optimization algorithm.
     """
 
-    def __init__(self, alpha=1e-2, beta=0., **kwargs):
+    def __init__(self, alpha=1e-3, beta=0., **kwargs):
         super().__init__(**kwargs)
         self.alpha = alpha
         self.beta = beta
 
     @staticmethod
     def ranking_loss(D_pred, P, W):
-        P_hat = ops.sigmoid(D_pred[:, :, None] - D_pred[:, None, :])
-        l = ((1 - P) * ops.log(ops.clip(1 - P_hat, EPS, 1.)) +
-              P * ops.log(ops.clip(P_hat, EPS, 1.))) * W
+        logsig = lambda x: -ops.logaddexp(0., -x)
+        P_hat = D_pred[:, :, None] - D_pred[:, None, :]
+        l = ((1 - P) * logsig(1 - P_hat) + P * logsig(P_hat)) * W
         return -ops.sum(l)
 
     @staticmethod

@@ -20,9 +20,9 @@ class _BaseDeep(keras.Model):
 
         backend = keras.backend.backend()
         if backend == 'tensorflow':
-            self._predict = lambda X: self._call(X).numpy()
+            self._to_numpy = lambda tensor: tensor.numpy()
         elif backend == 'torch':
-            self._predict = lambda X: self._call(X).detach().cpu().numpy()
+            self._to_numpy = lambda tensor: tensor.detach().cpu().numpy()
 
     _serialize_objects = ['_model']
 
@@ -108,7 +108,7 @@ class BaseDeepLDL(BaseLDL, _BaseDeep):
         return self
 
     def predict(self, X):
-        return self._predict(X)
+        return self._to_numpy(self._call(X))
 
 
 class BaseDeepLE(BaseLE, _BaseDeep):
@@ -126,13 +126,13 @@ class BaseDeepLE(BaseLE, _BaseDeep):
 
     def transform(self, X=None, L=None):
         X = self._X if X is None else X
-        return keras.activations.softmax(self._call(self._X)).numpy()
+        return self._to_numpy(keras.activations.softmax(self._call(X)))
 
 
 class BaseDeepLDLClassifier(BaseLDLClassifier, BaseDeepLDL):
 
     def predict_proba(self, X):
-        return self._call(X).numpy()
+        return self._to_numpy(self._call(X))
 
 
 class BaseDeep(_BaseDeep):
@@ -226,12 +226,8 @@ class BaseGD(BaseDeep):
         return tf.data.Dataset.from_tensor_slices((X, Y)).batch(self._batch_size)
 
     def _torch_make_dataset(self, X, Y):
-        import torch
         from torch.utils.data import DataLoader, TensorDataset
-        dataset = TensorDataset(
-            torch.as_tensor(X, dtype=torch.float32),
-            torch.as_tensor(Y, dtype=torch.float32),
-        )
+        dataset = TensorDataset(X, Y)
         return DataLoader(dataset, batch_size=self._batch_size, shuffle=False)
 
     def train(self, X, Y, epochs, callbacks, X_val, D_val, L_val):

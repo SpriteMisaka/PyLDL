@@ -267,11 +267,11 @@ def pairwise_euclidean(X, Y=None):
     @singledispatch
     def _pairwise(X, Y):
         import keras.ops as ops
-        return ops.sqrt(ops.sum((X[:, None] - Y[None, :])**2, axis=2))
+        return ops.sqrt(ops.sum((X[:, None] - Y[None, :])**2, axis=2) + EPS)
 
     @_pairwise.register(np.ndarray)
     def _(X: np.ndarray, Y: np.ndarray):
-        return np.sqrt(np.sum((X[:, np.newaxis] - Y[np.newaxis]) ** 2, axis=2))
+        return np.sqrt(np.sum((X[:, np.newaxis] - Y[np.newaxis]) ** 2, axis=2) + EPS)
 
     Y = X if Y is None else Y
     return _pairwise(X, Y)

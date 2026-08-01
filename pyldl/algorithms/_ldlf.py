@@ -1,5 +1,5 @@
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 import numpy as np
 
@@ -36,55 +36,59 @@ class LDLF(BaseAdam, BaseDeepLDL):
             np.arange(self._n_latent), size=self._n_leaves, replace=False
         ) for _ in range(self._n_estimators)]
 
-        self._pi = [tf.Variable(
-            initial_value = tf.constant_initializer(1 / self._n_outputs)(
-                shape=[self._n_leaves, self._n_outputs]
-            ),
-            dtype="float32", trainable=True,
+        self._pi = [keras.Variable(
+            initializer=keras.initializers.Constant(1 / self._n_outputs),
+            shape=[self._n_leaves, self._n_outputs],
+            dtype="float32", trainable=False,
         ) for _ in range(self._n_estimators)]
 
-    @tf.function
-    def _loss(self, X, D, start=None, end=None):
+    def _loss(self, X, D, *_):
         loss = 0.
+        self._pi_new = []
         for i in range(self._n_estimators):
             _mu = self._call(X, i)
-            _prob = tf.matmul(_mu, self._pi[i])
+            _prob = ops.matmul(_mu, self._pi[i])
 
-            loss += tf.math.reduce_mean(keras.losses.kl_divergence(D, _prob))
+            loss += ops.mean(keras.losses.kl_divergence(D, _prob))
 
-            _D = tf.expand_dims(D, axis=1)
-            _pi = tf.expand_dims(self._pi[i], axis=0)
-            _mu = tf.expand_dims(_mu, axis=2)
-            _prob = tf.clip_by_value(
-                tf.expand_dims(_prob, axis=1), clip_value_min=1e-7, clip_value_max=1.)
-            _new_pi = tf.multiply(tf.multiply(_D, _pi), _mu) / _prob
-            _new_pi = tf.reduce_sum(_new_pi, axis=0)
+            _D = ops.expand_dims(D, axis=1)
+            _pi = ops.expand_dims(self._pi[i], axis=0)
+            _mu = ops.expand_dims(_mu, axis=2)
+            _prob = ops.clip(
+                ops.expand_dims(_prob, axis=1), 1e-7, 1.)
+            _new_pi = ops.multiply(ops.multiply(_D, _pi), _mu) / _prob
+            _new_pi = ops.sum(_new_pi, axis=0)
             _new_pi = keras.activations.softmax(_new_pi)
-            self._pi[i].assign(_new_pi)
+            self._pi_new.append(_new_pi)
 
         loss /= self._n_estimators
         return loss
 
+    def train_step(self, pair, batch, loss, start, end):
+        super().train_step(pair, batch, loss, start, end)
+        for i in range(self._n_estimators):
+            self._pi[i].assign(ops.stop_gradient(self._pi_new[i]))
+
     _serialize_objects = ['_model', '_phi', '_pi']
     def _call(self, X, i):
-        decisions = tf.gather(self._model(X), self._phi[i], axis=1)
-        decisions = tf.expand_dims(decisions, axis=2)
-        decisions = tf.concat([decisions, 1 - decisions], axis=2)
-        mu = tf.ones([X.shape[0], 1, 1])
+        decisions = ops.take(self._model(X), self._phi[i], axis=1)
+        decisions = ops.expand_dims(decisions, axis=2)
+        decisions = ops.concatenate([decisions, 1 - decisions], axis=2)
+        mu = ops.ones([X.shape[0], 1, 1])
 
         begin_idx = 1
         end_idx = 2
 
         for level in range(self._n_depth):
-            mu = tf.reshape(mu, [X.shape[0], -1, 1])
-            mu = tf.tile(mu, (1, 1, 2))
+            mu = ops.reshape(mu, [X.shape[0], -1, 1])
+            mu = ops.tile(mu, (1, 1, 2))
             level_decisions = decisions[:, begin_idx:end_idx, :]
             mu = mu * level_decisions
 
             begin_idx = end_idx
             end_idx = begin_idx + 2 ** (level + 1)
 
-        mu = tf.reshape(mu, [X.shape[0], self._n_leaves])
+        mu = ops.reshape(mu, [X.shape[0], self._n_leaves])
 
         return mu
 
@@ -92,7 +96,9 @@ class LDLF(BaseAdam, BaseDeepLDL):
         from pyldl.algorithms.utils import proj
         res = np.zeros([X.shape[0], self._n_outputs], dtype=np.float32)
         for i in range(self._n_estimators):
-            res += proj(tf.matmul(self._call(X, i), self._pi[i]).numpy())
+            res += proj(self._to_numpy(
+                ops.matmul(self._call(X, i), self._pi[i])
+            ))
         return res / self._n_estimators
 
     @property

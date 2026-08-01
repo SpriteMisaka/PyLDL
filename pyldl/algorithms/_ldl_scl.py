@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
 
@@ -38,32 +38,30 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         return self.get_2layer_model(self._n_features, self._n_outputs)
 
     def _before_train(self):
-        self._P = tf.cast(
+        self._P = ops.convert_to_tensor(
             KMeans(n_clusters=self.n_clusters).fit(self._D).cluster_centers_,
-            dtype=tf.float32
+            dtype="float32"
         )
         self._C = self.add_weight(
             name='C', shape=(self._n_samples, self.n_clusters),
-            initializer=tf.constant_initializer(EPS), trainable=True
+            initializer=keras.initializers.Constant(EPS), trainable=True
         )
         self._W = self.add_weight(
             name='W', shape=(self.n_clusters, self._n_outputs),
-            initializer=tf.random_normal_initializer(), trainable=True
+            initializer=keras.initializers.RandomNormal(), trainable=True
         )
 
     @staticmethod
-    @tf.function
     def scl_loss(D_pred, P, C):
-        corr = tf.math.reduce_mean(C * keras.losses.mean_squared_error(
-            tf.expand_dims(D_pred, 1), tf.expand_dims(P, 0)
+        corr = ops.mean(C * keras.losses.mean_squared_error(
+            ops.expand_dims(D_pred, 1), ops.expand_dims(P, 0)
         ))
-        barr = tf.math.reduce_mean(1 / C)
+        barr = ops.mean(1 / C)
         return corr, barr
 
-    @tf.function
     def _loss(self, X, D, start, end):
-        D_pred = keras.activations.softmax(self._model(X) + tf.matmul(self._C[start:end], self._W))
-        kl = tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
+        D_pred = keras.activations.softmax(self._model(X) + ops.matmul(self._C[start:end], self._W))
+        kl = ops.mean(keras.losses.kl_divergence(D, D_pred))
         corr, barr = self.scl_loss(D_pred, self._P, self._C[start:end])
         return kl + self.alpha * corr + self.beta * barr
 
@@ -74,9 +72,11 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
             lr = LinearRegression()
             lr.fit(old_X, old_C.numpy()[:, i].reshape(-1))
             C[:, i] = lr.predict(X).reshape(1, -1)
-        return tf.cast(C, dtype=tf.float32)
+        return ops.convert_to_tensor(C, dtype="float32")
 
     _serialize_objects = ['_model', '_X', '_C', '_W']
     def predict(self, X):
         C = self.construct_C(X, self._X, self._C)
-        return keras.activations.softmax(self._model(X) + tf.matmul(C, self._W))
+        return self._to_numpy(
+            keras.activations.softmax(self._model(X) + ops.matmul(C, self._W))
+        )
