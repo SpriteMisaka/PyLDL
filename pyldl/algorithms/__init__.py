@@ -95,8 +95,8 @@ _LDL_MODULE_MAP = {
         ],
         "._specialized_algorithms"
     ),
-    "AA_BP": "._bp",
     "AA_KNN": "._algorithm_adaptation",
+    "AA_BP": "._bp",
     **dict.fromkeys(
         [
             "_PT",

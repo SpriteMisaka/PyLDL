@@ -1,5 +1,5 @@
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseGD, BaseDeepLDL
 
@@ -20,9 +20,8 @@ class CPNN(BaseGD, BaseDeepLDL):
         self._v = v
 
     @staticmethod
-    @tf.function
     def loss_function(D, D_pred):
-        return tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
+        return ops.mean(keras.losses.kl_divergence(D, D_pred))
 
     def _get_default_model(self):
         extra = 1 if self._mode == 'none' else self._n_outputs
@@ -35,24 +34,25 @@ class CPNN(BaseGD, BaseDeepLDL):
     def _before_train(self):
         if self._mode == 'augment':
             n = self._n_samples
-            one_hot = tf.one_hot(tf.math.argmax(self._D, axis=1), self._n_outputs)
-            self._X = tf.repeat(self._X, self._v, axis=0)
-            self._D = tf.repeat(self._D, self._v, axis=0)
-            one_hot = tf.repeat(one_hot, self._v, axis=0)
-            v = tf.reshape(tf.tile([1 / (i + 1) for i in range(self._v)], [n]), (-1, 1))
+            one_hot = ops.one_hot(ops.argmax(self._D, axis=1), num_classes=self._n_outputs)
+            self._X = ops.repeat(self._X, self._v, axis=0)
+            self._D = ops.repeat(self._D, self._v, axis=0)
+            one_hot = ops.repeat(one_hot, self._v, axis=0)
+            v = ops.reshape(ops.tile([1 / (i + 1) for i in range(self._v)], [n]), (-1, 1))
             self._D += self._D * one_hot * v
 
     def _make_inputs(self, X):
-        temp = tf.reshape(tf.tile([i + 1 for i in range(self._n_outputs)], [X.shape[0]]), (-1, 1))
+        temp = ops.reshape(ops.tile([i + 1 for i in range(self._n_outputs)], [X.shape[0]]), (-1, 1))
         if self._mode != 'none':
-            temp = tf.one_hot(tf.reshape(temp, (-1, )) - 1, depth=self._n_outputs)
-        return tf.concat([tf.cast(tf.repeat(X, self._n_outputs, axis=0), dtype=tf.float32),
-                          tf.cast(temp, dtype=tf.float32)], axis=1)
+            temp = ops.one_hot(ops.reshape(temp, (-1, )) - 1, num_classes=self._n_outputs)
+        return ops.concatenate([
+            ops.cast(ops.repeat(X, self._n_outputs, axis=0), dtype="float32"), ops.cast(temp, dtype="float32")
+        ], axis=1)
 
     def _call(self, X):
         inputs = self._make_inputs(X)
         outputs = self._model(inputs)
-        results = tf.reshape(outputs, (X.shape[0], self._n_outputs))
+        results = ops.reshape(outputs, (X.shape[0], self._n_outputs))
         return keras.activations.softmax(results)
 
 

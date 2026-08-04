@@ -1,6 +1,7 @@
 import numpy as np
 
 import keras
+import keras.ops as ops
 import tensorflow as tf
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
@@ -14,6 +15,8 @@ EULER_GAMMA = np.euler_gamma
 @keras.saving.register_keras_serializable()
 class Delta_LDL(BaseAdam, BaseDeepLDL):
     r""":class:`Delta-LDL <pyldl.algorithms.Delta_LDL>` is proposed in paper :cite:`2025:li`.
+
+    This algorithm is hyperparameter-free.
     """
 
     @staticmethod
@@ -38,14 +41,14 @@ class Delta_LDL(BaseAdam, BaseDeepLDL):
         kl = keras.losses.kl_divergence(D, D_pred)
 
         def f(delta):
-            return tf.reduce_mean(keras.activations.sigmoid(kl - delta))
+            return ops.mean(keras.activations.sigmoid(kl - delta))
 
         init = Delta_LDL._simpson(f, 0., self._delta)
         return Delta_LDL._asr(f, 0., self._delta, EPS, init, 5)
 
     def _before_train(self):
-        uni = tf.fill(self._D.shape, 1. / self._n_outputs)
-        self._delta = tf.reduce_mean(keras.losses.kl_divergence(self._D, uni))
+        uni = ops.full(ops.shape(self._D), 1. / self._n_outputs)
+        self._delta = ops.mean(keras.losses.kl_divergence(self._D, uni))
 
 
 @keras.saving.register_keras_serializable()

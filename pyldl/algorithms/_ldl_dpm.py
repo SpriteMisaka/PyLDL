@@ -9,6 +9,9 @@ EPS = np.finfo(np.float64).eps
 
 
 class LDL_DPM(BaseLDL):
+    """:class:`LDL-DPM <pyldl.algorithms.LDL_DPM>` is proposed in paper :cite:`2026:wang`. 
+    DPM refers to *Dirichlet process mixture* (model).
+    """
 
     def __init__(self, concentration=1., strength=3., max_k=15,
                  alpha=1e-6, beta=1e-6, **kwargs):

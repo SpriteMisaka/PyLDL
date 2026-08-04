@@ -1,4 +1,5 @@
 from typing import Optional
+from inspect import signature
 from functools import wraps, singledispatch
 
 import numpy as np
@@ -26,7 +27,10 @@ def _clip(func):
         D_pred = np.clip(D_pred, EPS, 1.)
         return func(D, D_pred, **kwargs)
 
-    return wraps(func)(_wrapper)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return _wrapper(*args, **kwargs)
+    return wrapper
 
 
 def _reduction(func):
@@ -60,7 +64,10 @@ def _1d(func):
         results = func(X, Y, **kwargs)
         return np.squeeze(results, axis=0)
 
-    return wraps(func)(_wrapper)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return _wrapper(*args, **kwargs)
+    return wrapper
 
 
 @_reduction

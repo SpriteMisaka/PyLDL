@@ -18,9 +18,17 @@ EPS = np.finfo(np.float32).eps
 class RG4LDL(BaseEnsemble):
     """:class:`RG4LDL <pyldl.algorithms.RG4LDL>` is proposed in paper :cite:`2025:tan`. 
     RG refers to *renormalization group*.
+
+    This algorithm works well on the artificial dataset.
     """
 
     def __init__(self, estimator=None, *, n_hidden: int = 64, **kwargs):
+        """
+        :param estimator: The base estimator to be used for the final prediction. If None, :class:`SA-BFGS <pyldl.algorithms.SA_BFGS>` is used.
+        :type estimator: :class:`BaseLDL <pyldl.algorithms.BaseLDL>`
+        :param n_hidden: The number of hidden units in the restricted Boltzmann machine, default to 64.
+        :type n_hidden: int
+        """
         from ._specialized_algorithms import SA_BFGS
         if estimator is None:
             estimator = SA_BFGS()
