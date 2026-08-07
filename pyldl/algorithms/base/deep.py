@@ -268,26 +268,6 @@ class BaseGD(BaseDeep):
 
         callbacks.on_train_end()
 
-    @staticmethod
-    def _split_validation_data(validation_split, *arrays):
-        if not 0. <= validation_split < 1.:
-            raise ValueError("validation_split must be between 0 and 1.")
-        if validation_split == 0.:
-            return arrays, tuple(None for _ in arrays)
-
-        n_samples = arrays[0].shape[0]
-        if any(array.shape[0] != n_samples for array in arrays[1:]):
-            raise ValueError("All sample-aligned arrays must have the same number of samples.")
-        n_val = int(np.ceil(n_samples * validation_split))
-        if n_val == 0 or n_val >= n_samples:
-            raise ValueError("validation_split must leave at least one training and one validation sample.")
-        indices = np.random.permutation(n_samples)
-        val_indices = indices[:n_val]
-        train_indices = indices[n_val:]
-        train = tuple(array[train_indices] for array in arrays)
-        val = tuple(array[val_indices] for array in arrays)
-        return train, val
-
     def _prepare_validation_data(self, X, Y, validation_split):
         (X, Y), (X_val, Y_val) = self._split_validation_data(validation_split, X, Y)
         D_val = Y_val if issubclass(self.__class__, BaseDeepLDL) else None

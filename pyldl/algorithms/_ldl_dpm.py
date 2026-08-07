@@ -3,7 +3,7 @@ import numpy as np
 import keras
 import keras.ops as ops
 
-from pyldl.algorithms.base import BaseLDL
+from pyldl.algorithms.base import BaseIter, BaseLDL
 from pyldl.algorithms.utils import log_gamma
 
 
@@ -50,7 +50,7 @@ class _DPMParameters(keras.Model):
         return nll + reg
 
 
-class LDL_DPM(BaseLDL):
+class LDL_DPM(BaseIter, BaseLDL):
     """:class:`LDL-DPM <pyldl.algorithms.LDL_DPM>` is proposed in paper :cite:`2026:wang`.
     DPM refers to *Dirichlet process mixture* (model).
     """
@@ -115,7 +115,7 @@ class LDL_DPM(BaseLDL):
         self._build_parameters(theta, gamma)
 
     def _update_Theta_and_Gamma(self, X, D):
-        self._parameters.train_on_batch((X, D, self._w_tensor))
+        return self._parameters.train_on_batch((X, D, self._w_tensor))
 
     def _slice_gibbs(self, X, D, z, u):
         from scipy.special import gammaln
@@ -155,10 +155,11 @@ class LDL_DPM(BaseLDL):
         mu = ops.stack(mu, axis=1)
         return ops.convert_to_numpy(ops.sum(ops.expand_dims(pi, -1) * mu, axis=1))
 
-    def fit(self, X, D, *, outer_iterations=100, inner_iterations=100, batch_size=None):
-        super().fit(X, D)
+    def _before_train(self, inner_iterations=100, batch_size=None, **kwargs):
         if batch_size is None:
             batch_size = self._n_samples
+        self._inner_iterations = inner_iterations
+        self._batch_size = batch_size
         self.k = 1
         self._set_v(np.random.beta(1., self.concentration, size=1).astype(np.float32))
         theta = np.random.normal(
@@ -166,15 +167,35 @@ class LDL_DPM(BaseLDL):
         ).astype(np.float32)
         gamma = np.zeros((self._n_features + 1, 1), dtype=np.float32)
         self._build_parameters(theta, gamma)
-        z = np.zeros(self._n_samples, dtype=np.int32)
-        u = np.random.rand(self._n_samples) * self._w[0]
-        X_tensor = ops.convert_to_tensor(X, dtype="float32")
-        D_tensor = ops.convert_to_tensor(D, dtype="float32")
-        for _ in range(outer_iterations):
-            self._update_v(z, u)
-            z, u = self._slice_gibbs(self._X, self._D, z, u)
-            for _ in range(inner_iterations):
-                for start in range(0, self._n_samples, batch_size):
-                    end = min(start + batch_size, self._n_samples)
-                    self._update_Theta_and_Gamma(X_tensor[start:end], D_tensor[start:end])
-        return self
+        self._z = np.zeros(self._n_samples, dtype=np.int32)
+        self._u = np.random.rand(self._n_samples) * self._w[0]
+        self._X_tensor = ops.convert_to_tensor(self._X, dtype="float32")
+        self._D_tensor = ops.convert_to_tensor(self._D, dtype="float32")
+
+    def _run_iteration(self):
+        self._update_v(self._z, self._u)
+        self._z, self._u = self._slice_gibbs(
+            self._X, self._D, self._z, self._u
+        )
+        losses = []
+        for _ in range(self._inner_iterations):
+            for start in range(0, self._n_samples, self._batch_size):
+                end = min(start + self._batch_size, self._n_samples)
+                loss = self._update_Theta_and_Gamma(
+                    self._X_tensor[start:end], self._D_tensor[start:end]
+                )
+                losses.append(float(np.asarray(loss)))
+        return float(np.mean(losses)), False
+
+    def get_weights(self):
+        return {
+            'k': self.k,
+            'v': self._v.copy(),
+            'Theta': ops.convert_to_numpy(self._Theta).copy(),
+            'Gamma': ops.convert_to_numpy(self._Gamma).copy(),
+        }
+
+    def set_weights(self, state):
+        self.k = state['k']
+        self._set_v(state['v'].copy())
+        self._build_parameters(state['Theta'], state['Gamma'])

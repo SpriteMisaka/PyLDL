@@ -12,6 +12,7 @@ _MODULE_MAP = {
             "BaseLDL",
             "BaseLE",
             "BaseGLD",
+            "BaseIter",
             "BaseADMM",
             "BaseIncomLDL",
             "BaseLDLClassifier",

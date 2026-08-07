@@ -4,7 +4,7 @@ from scipy.optimize import minimize, fsolve
 
 from sklearn.covariance import LedoitWolf
 
-from pyldl.algorithms.base import Base, BaseLDL, BaseGLD
+from pyldl.algorithms.base import Base, BaseIter, BaseLDL, BaseGLD
 from pyldl.algorithms.utils import kl_divergence
 
 
@@ -26,6 +26,12 @@ class _SA(Base):
 
     def _call(self, X):
         return softmax(X @ self._W, axis=1)
+
+    def get_weights(self):
+        return self._W.copy()
+
+    def set_weights(self, weights):
+        self._W = weights.copy()
 
     def fit(self, X, target, max_iterations=500, convergence_criterion=1e-7):
         super().fit(X, target)
@@ -67,7 +73,7 @@ class SA_BFGS(_SA, BaseLDL):
         return self
 
 
-class SA_IIS(_SA, BaseLDL):
+class SA_IIS(BaseIter, _SA, BaseLDL):
     """:class:`SA-IIS <pyldl.algorithms.SA_IIS>` is proposed in paper :cite:`2016:geng`.
 
     :term:`IIS` is used as optimization algorithm.
@@ -84,34 +90,32 @@ class SA_IIS(_SA, BaseLDL):
         2010:geng
     """
 
-    def fit(self, X, D, **kwargs):
-        super().fit(X, D, **kwargs)
+    def fit(self, X, D, max_iterations=500, *args, **kwargs):
+        return super().fit(
+            X, D, max_iterations=max_iterations, *args, **kwargs
+        )
 
-        flag = True
-        counter = 1
-        D_pred = self._call(self._X)
+    def _before_train(self, **kwargs):
+        self._D_pred = self._call(self._X)
+        self._XD = self._X.T @ self._D
+        self._absX = np.sum(np.abs(self._X), axis=1)
 
-        XD = self._X.T @ self._D
-        absX = np.sum(np.abs(self._X), axis=1)
+    def _run_iteration(self):
+        delta = np.empty(shape=(self._n_features, self._n_outputs), dtype=np.float32)
+        for k in range(self._n_features):
+            z = np.sign(self._X[:, k]) * self._absX
+            for j in range(self._n_outputs):
+                def func(x):
+                    return self._XD[k, j] - np.sum(
+                        self._D_pred[:, j] * self._X[:, k] * np.exp(x * z)
+                    )
+                delta[k][j] = fsolve(func, .0)[0]
 
-        while flag:
-            delta = np.empty(shape=(self._n_features, self._n_outputs), dtype=np.float32)
-            for k in range(self._n_features):
-                z = np.sign(self._X[:, k]) * absX
-                for j in range(self._n_outputs):
-                    def func(x):
-                        return XD[k, j] - np.sum(D_pred[:, j] * self._X[:, k] * np.exp(x * z))
-                    delta[k][j] = fsolve(func, .0)[0]
-
-            l2 = self._loss_function(self._D, D_pred)
-            self._W += delta
-            D_pred = self._call(self._X)
-            l1 = self._loss_function(self._D, D_pred)
-
-            if l2 - l1 < self._convergence_criterion or counter >= self._max_iterations:
-                flag = False
-            counter += 1
-        return self
+        previous_loss = self._loss_function(self._D, self._D_pred)
+        self._W += delta
+        self._D_pred = self._call(self._X)
+        loss = self._loss_function(self._D, self._D_pred)
+        return loss, previous_loss - loss < self._convergence_criterion
 
 
 class GLD_BFGS(_SA, BaseGLD):
@@ -170,7 +174,7 @@ class GLD_BFGS(_SA, BaseGLD):
         return self
 
 
-class LALOT(_SA, BaseLDL):
+class LALOT(BaseIter, _SA, BaseLDL):
     """:class:`LALOT <pyldl.algorithms.LALOT>` is proposed in paper :cite:`2018:zhao`.
     """
 
@@ -190,46 +194,46 @@ class LALOT(_SA, BaseLDL):
         X1 = np.concatenate((X, np.ones((X.shape[0], 1))), axis=1)
         return softmax(X1 @ self._W, axis=1)
 
-    def fit(self, X, D, sinkhorn_iterations=200, learning_rate=1e-4, **kwargs):
-        super().fit(X, D, **kwargs)
+    def fit(self, X, D, max_iterations=500, *args, **kwargs):
+        return super().fit(
+            X, D, max_iterations=max_iterations, *args, **kwargs
+        )
+
+    def _before_train(self, sinkhorn_iterations=200, learning_rate=1e-4, **kwargs):
+        self._sinkhorn_iterations = sinkhorn_iterations
+        self._learning_rate = learning_rate
         self._W = np.random.random((self._n_features + 1, self._n_outputs))
-        K0 = self._D.T @ self._D
-        K1 = K0 / np.max(K0)
+        self._K0 = self._D.T @ self._D
+        self._K1 = self._K0 / np.max(self._K0)
+        self._D_pred = self._call(self._X)
 
-        flag = True
-        counter = 1
-        D_pred = self._call(self._X)
-        while flag:
-            M = self._compute_metric(K1)
-            K = np.exp(-self.alpha * M - 1)
-            P = np.zeros((self._n_outputs, self._n_outputs), dtype=np.float32)
-            G = np.zeros((self._n_outputs, self._n_features + 1), dtype=np.float32)
+    def _run_iteration(self):
+        M = self._compute_metric(self._K1)
+        K = np.exp(-self.alpha * M - 1)
+        P = np.zeros((self._n_outputs, self._n_outputs), dtype=np.float32)
+        G = np.zeros((self._n_outputs, self._n_features + 1), dtype=np.float32)
 
-            for i in range(self._n_samples):
-                x = np.concatenate((self._X[i], [1]), axis=0)
-                d = self._D[i]
-                d_pred = D_pred[i]
-                u = np.ones(self._n_outputs, dtype=np.float32)
-                for _ in range(sinkhorn_iterations):
-                    u = d_pred / (K @ (d / (K.T @ u)))
-                v = d / (K.T @ u)
-                P += np.diag(u) @ K @ np.diag(v)
+        for i in range(self._n_samples):
+            x = np.concatenate((self._X[i], [1]), axis=0)
+            d = self._D[i]
+            d_pred = self._D_pred[i]
+            u = np.ones(self._n_outputs, dtype=np.float32)
+            for _ in range(self._sinkhorn_iterations):
+                u = d_pred / (K @ (d / (K.T @ u)))
+            v = d / (K.T @ u)
+            P += np.diag(u) @ K @ np.diag(v)
 
-                Glh = np.log(u) / self.alpha - np.log(u).sum() / (self.alpha * self._n_outputs)
-                Gi = ((np.eye(self._n_outputs) - d_pred) @ Glh)[:, None] * d_pred[:, None] * x[None, :]
-                G += Gi
+            Glh = np.log(u) / self.alpha - np.log(u).sum() / (self.alpha * self._n_outputs)
+            Gi = ((np.eye(self._n_outputs) - d_pred) @ Glh)[:, None] * d_pred[:, None] * x[None, :]
+            G += Gi
 
-            l2 = self._loss_function(self._D, D_pred)
-            self._W -= learning_rate * G.T
-            D_pred = self._call(self._X)
-            l1 = self._loss_function(self._D, D_pred)
+        previous_loss = self._loss_function(self._D, self._D_pred)
+        self._W -= self._learning_rate * G.T
+        self._D_pred = self._call(self._X)
+        loss = self._loss_function(self._D, self._D_pred)
 
-            Gfk = -2 * P - np.diag(np.diag(-2 * P)) + np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
-            K1 = K0 - (1 / self.beta) * Gfk
-            Sigma, UK = np.linalg.eig((K1 + K1.T) / 2)
-            K1 = UK @ np.diag(np.maximum(Sigma, 0)) @ UK.T
-
-            if l2 - l1 < self._convergence_criterion or counter >= self._max_iterations:
-                flag = False
-            counter += 1
-        return self
+        Gfk = -2 * P - np.diag(np.diag(-2 * P)) + np.diag(np.sum(P, axis=1) + np.sum(P, axis=0) - 2 * np.diag(P))
+        self._K1 = self._K0 - (1 / self.beta) * Gfk
+        Sigma, UK = np.linalg.eig((self._K1 + self._K1.T) / 2)
+        self._K1 = UK @ np.diag(np.maximum(Sigma, 0)) @ UK.T
+        return loss, previous_loss - loss < self._convergence_criterion

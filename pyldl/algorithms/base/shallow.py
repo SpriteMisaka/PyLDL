@@ -45,6 +45,26 @@ class _Base:
         self._n_outputs = Y.shape[1]
         return self
 
+    @staticmethod
+    def _split_validation_data(validation_split, *arrays):
+        if not 0. <= validation_split < 1.:
+            raise ValueError("validation_split must be between 0 and 1.")
+        if validation_split == 0.:
+            return arrays, tuple(None for _ in arrays)
+
+        n_samples = arrays[0].shape[0]
+        if any(array.shape[0] != n_samples for array in arrays[1:]):
+            raise ValueError("All sample-aligned arrays must have the same number of samples.")
+        n_val = int(np.ceil(n_samples * validation_split))
+        if n_val == 0 or n_val >= n_samples:
+            raise ValueError("validation_split must leave at least one training and one validation sample.")
+        indices = np.random.permutation(n_samples)
+        val_indices = indices[:n_val]
+        train_indices = indices[n_val:]
+        train = tuple(array[train_indices] for array in arrays)
+        val = tuple(array[val_indices] for array in arrays)
+        return train, val
+
     @_path_suffix(".pkl")
     def dump(self, file: str):
         """Save the model to a file.
@@ -304,6 +324,44 @@ class Base(_Base):
             BaseGLD.fit(self, X, Y, **kwargs)
         else:
             raise TypeError("The model must be a subclass of BaseLDL, BaseLE or BaseGLD.")
+
+
+class BaseIter(Base):
+
+    def _before_train(self):
+        pass
+
+    def _run_iteration(self):
+        raise NotImplementedError
+
+    def fit(self, X, Y, max_iterations=100, *, convergence_criterion=1e-7,
+            validation_split=0., callbacks=None, metrics=None, verbose=0, **kwargs):
+        import keras
+        (X, Y), (X_val, Y_val) = self._split_validation_data(validation_split, X, Y)
+        super().fit(X, Y, **kwargs)
+        self._max_iterations = max_iterations
+        self._convergence_criterion = convergence_criterion
+        self._metrics = list(metrics or [])
+        self._verbose = verbose
+        self.stop_training = False
+        self._before_train()
+
+        callback_list = keras.callbacks.CallbackList(
+            callbacks, model=self, epochs=self._max_iterations, verbose=verbose
+        )
+        callback_list.on_train_begin()
+        for iteration in range(self._max_iterations):
+            self._current_iteration = iteration + 1
+            loss, converged = self._run_iteration()
+            scores = {}
+            if X_val is not None and self._metrics:
+                scores = self.score(X_val, Y_val, metrics=self._metrics, return_dict=True)
+            logs = {'loss': float(loss), **scores}
+            callback_list.on_epoch_end(iteration, logs)
+            if converged or self.stop_training:
+                break
+        callback_list.on_train_end()
+        return self
 
 
 class BaseADMM(Base):
