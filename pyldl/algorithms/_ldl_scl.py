@@ -39,7 +39,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
 
     def _before_train(self):
         self._P = ops.convert_to_tensor(
-            KMeans(n_clusters=self.n_clusters).fit(self._D).cluster_centers_,
+            KMeans(n_clusters=self.n_clusters).fit(self._to_numpy(self._D)).cluster_centers_,
             dtype="float32"
         )
         self._C = self.add_weight(
@@ -70,13 +70,13 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         C = np.zeros((X.shape[0], old_C.shape[1]))
         for i in range(old_C.shape[1]):
             lr = LinearRegression()
-            lr.fit(old_X, old_C.numpy()[:, i].reshape(-1))
+            lr.fit(old_X, old_C[:, i].reshape(-1))
             C[:, i] = lr.predict(X).reshape(1, -1)
         return ops.convert_to_tensor(C, dtype="float32")
 
     _serialize_objects = ['_model', '_X', '_C', '_W']
     def predict(self, X):
-        C = self.construct_C(X, self._X, self._C)
+        C = self.construct_C(self._to_numpy(X), self._to_numpy(self._X), self._to_numpy(self._C))
         return self._to_numpy(
             keras.activations.softmax(self._model(X) + ops.matmul(C, self._W))
         )

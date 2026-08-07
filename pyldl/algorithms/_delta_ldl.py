@@ -2,14 +2,12 @@ import numpy as np
 
 import keras
 import keras.ops as ops
-import tensorflow as tf
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
+from pyldl.algorithms.utils import digamma, inv_digamma, regularized_incomplete_beta
 
 
 EPS = np.finfo(np.float32).eps
-
-EULER_GAMMA = np.euler_gamma
 
 
 @keras.saving.register_keras_serializable()
@@ -55,7 +53,6 @@ class Delta_LDL(BaseAdam, BaseDeepLDL):
 class ApxC_LDL(Delta_LDL):
 
     @staticmethod
-    @tf.function
     def _js_divergence(D, D_pred):
         m = (D + D_pred) / 2.
         term1 = keras.losses.kl_divergence(D, m)
@@ -63,39 +60,36 @@ class ApxC_LDL(Delta_LDL):
         return (term1 + term2) / 2.
 
     @staticmethod
-    @tf.function
     def _shannon_entropy(x):
-        return -tf.reduce_sum(x * tf.math.log(x + EPS), axis=-1)
+        return -ops.sum(x * ops.log(x + EPS), axis=-1)
 
     @staticmethod
-    @tf.function
     def jsd_dirichlet_expectation(alpha, beta):
-        alpha0 = tf.reduce_sum(alpha)
-        beta0  = tf.reduce_sum(beta)
+        alpha0 = ops.sum(alpha)
+        beta0 = ops.sum(beta)
         gamma = .5 * (alpha / alpha0 + beta / beta0)
 
         var_alpha = alpha * (alpha0 - alpha) / (alpha0**2 * (alpha0 + 1))
         var_beta  = beta  * (beta0 - beta)  / (beta0**2 * (beta0 + 1))
 
         term1 = ApxC_LDL._shannon_entropy(gamma)
-        term2 = -.125 * tf.reduce_sum((var_alpha + var_beta) / gamma)
-        term3 = .5 * tf.reduce_sum(alpha / alpha0 * (tf.math.digamma(alpha + 1) - tf.math.digamma(alpha0 + 1)))
-        term4 = .5 * tf.reduce_sum(beta / beta0  * (tf.math.digamma(beta + 1)  - tf.math.digamma(beta0 + 1)))
+        term2 = -.125 * ops.sum((var_alpha + var_beta) / gamma)
+        term3 = .5 * ops.sum(alpha / alpha0 * (digamma(alpha + 1) - digamma(alpha0 + 1)))
+        term4 = .5 * ops.sum(beta / beta0 * (digamma(beta + 1) - digamma(beta0 + 1)))
         return term1 + term2 + term3 + term4
 
     @staticmethod
-    @tf.function
     def jsd_dirichlet_variance(alpha, beta):
-        alpha0 = tf.reduce_sum(alpha)
-        beta0 = tf.reduce_sum(beta)
+        alpha0 = ops.sum(alpha)
+        beta0 = ops.sum(beta)
 
         mu = alpha / alpha0
         nu = beta / beta0
         gamma = 0.5 * (mu + nu)
 
-        g_alpha = 0.5 * tf.math.log(mu / gamma + 1e-10)
-        g_beta = 0.5 * tf.math.log(nu / gamma + 1e-10)
-        g = tf.concat([g_alpha, g_beta], axis=0)
+        g_alpha = .5 * ops.log(mu / gamma + 1e-10)
+        g_beta = .5 * ops.log(nu / gamma + 1e-10)
+        g = ops.concatenate([g_alpha, g_beta], axis=0)
 
         a_diag = 0.5/mu - 0.25/gamma
         b_diag = -0.25/gamma
@@ -105,31 +99,31 @@ class ApxC_LDL(Delta_LDL):
         denom_b = beta0**2 * (beta0 + 1)
 
         def compute_sigma(params, denom):
-            params_outer = tf.reshape(params, (-1, 1)) * tf.reshape(params, (1, -1))
-            params_sum = tf.reduce_sum(params)
+            params_outer = ops.reshape(params, (-1, 1)) * ops.reshape(params, (1, -1))
+            params_sum = ops.sum(params)
             sigma = -params_outer / denom
-            sigma = sigma + tf.linalg.diag(params * params_sum / denom)
+            sigma = sigma + ops.diag(params * params_sum / denom)
             return sigma
         
         Sigma_d = compute_sigma(alpha, denom_a)
         Sigma_t = compute_sigma(beta, denom_b)
 
-        c = tf.shape(alpha)[0]
-        zeros_cc = tf.zeros((c, c), dtype=tf.float32)
+        c = alpha.shape[0]
+        zeros_cc = ops.zeros((c, c), dtype=alpha.dtype)
 
-        Sigma = tf.concat([
-            tf.concat([Sigma_d, zeros_cc], axis=1),
-            tf.concat([zeros_cc, Sigma_t], axis=1)
+        Sigma = ops.concatenate([
+            ops.concatenate([Sigma_d, zeros_cc], axis=1),
+            ops.concatenate([zeros_cc, Sigma_t], axis=1)
         ], axis=0)
 
-        H = tf.concat([
-            tf.concat([tf.linalg.diag(a_diag), tf.linalg.diag(b_diag)], axis=1),
-            tf.concat([tf.linalg.diag(b_diag), tf.linalg.diag(c_diag)], axis=1)
+        H = ops.concatenate([
+            ops.concatenate([ops.diag(a_diag), ops.diag(b_diag)], axis=1),
+            ops.concatenate([ops.diag(b_diag), ops.diag(c_diag)], axis=1)
         ], axis=0)
-        SH = tf.matmul(Sigma, H)
+        SH = ops.matmul(Sigma, H)
 
-        term1 = tf.reduce_sum(g * tf.squeeze(tf.matmul(Sigma, tf.reshape(g, (-1, 1)))))
-        term2 = 0.5 * tf.linalg.trace(tf.matmul(SH, SH))
+        term1 = ops.sum(g * ops.squeeze(ops.matmul(Sigma, ops.reshape(g, (-1, 1)))))
+        term2 = .5 * ops.trace(ops.matmul(SH, SH))
         return term1 + term2
 
     @staticmethod
@@ -141,17 +135,22 @@ class ApxC_LDL(Delta_LDL):
         var = var / (np.log(2) * np.log(2))
 
         var_max = mean * (1 - mean)**2 / (min_beta + 1 - mean)
-        var = tf.minimum(var, var_max)
+        var = ops.minimum(var, var_max)
 
         nu = mean * (1 - mean) / var - 1.0
         alpha_ = mean * nu
         beta_ = (1 - mean) * nu
 
-        def f(delta):
-            return tf.math.betainc(alpha_, beta_, delta / np.log(2))
-
-        init = Delta_LDL._simpson(f, 0, np.log(2))
-        res = Delta_LDL._asr(f, 0, np.log(2), EPS, init, 5)
+        nodes = ops.cast(
+            ops.convert_to_tensor(np.linspace(0., np.log(2), 33, dtype=np.float32)),
+            alpha_.dtype
+        )
+        weights = np.ones(33, dtype=np.float32)
+        weights[1:-1:2] = 4.
+        weights[2:-1:2] = 2.
+        weights = ops.cast(ops.convert_to_tensor(weights), alpha_.dtype)
+        values = regularized_incomplete_beta(alpha_, beta_, nodes / np.log(2))
+        res = np.log(2) / 32. / 3. * ops.sum(weights * values)
         res /= np.log(2)
 
         return res
@@ -160,42 +159,38 @@ class ApxC_LDL(Delta_LDL):
     def acr(D, D_pred):
         js = ApxC_LDL._js_divergence(D, D_pred)
         def f(delta):
-            return tf.reduce_mean(keras.activations.sigmoid(js - delta))
+            return ops.mean(keras.activations.sigmoid(js - delta))
         init = Delta_LDL._simpson(f, 0, np.log(2))
         res = Delta_LDL._asr(f, 0, np.log(2), EPS, init, 5)
         res /= np.log(2)
         return res
 
     @staticmethod
-    @tf.function
-    def inv_digamma(y):
-        return tf.where(y >= -2.22, tf.exp(y) + .5, -1. / (y + EULER_GAMMA))
-
-    @staticmethod
-    @tf.function
     def estimate_alpha(D, max_iter=100, tol=1e-7):
-        log_p_bar = tf.reduce_mean(tf.math.log(D), axis=0)
-        alpha = tf.ones(tf.shape(D)[1], dtype=tf.float32)
-        i = tf.constant(0)
+        log_p_bar = ops.mean(ops.log(D), axis=0)
+        alpha = ops.ones_like(log_p_bar)
+        i = ops.zeros((), dtype="int32")
 
         def cond(i, _):
             return i < max_iter
 
         def body(i, alpha):
-            alpha0 = tf.reduce_sum(alpha)
-            y = tf.math.digamma(alpha0) + log_p_bar
-            alpha_new = ApxC_LDL.inv_digamma(y)
-            diff = tf.reduce_max(tf.abs(alpha_new - alpha))
-            alpha = tf.clip_by_value(tf.where(diff < tol, alpha, alpha_new), EPS, 1e7)
+            alpha0 = ops.sum(alpha)
+            y = digamma(alpha0) + log_p_bar
+            alpha_new = inv_digamma(y)
+            diff = ops.max(ops.abs(alpha_new - alpha))
+            alpha = ops.clip(ops.where(diff < tol, alpha, alpha_new), EPS, 1e7)
             return i + 1, alpha
 
-        _, alpha = tf.while_loop(cond, body, [i, alpha])
+        _, alpha = ops.while_loop(
+            cond, body, (i, alpha), maximum_iterations=max_iter
+        )
 
         return alpha
 
     def _loss(self, X, D, *_):
         D_pred = self._model(X)
-        beta = ApxC_LDL.estimate_alpha(D_pred)
+        beta = ApxC_LDL.estimate_alpha(ops.stop_gradient(D_pred))
 
         self._l_up = ApxC_LDL.acr(D, D_pred)
         self._l_down = 1 - ApxC_LDL.random_acr(self._alpha_, beta)
@@ -204,7 +199,7 @@ class ApxC_LDL(Delta_LDL):
 
     def train_step(self, *args, **kwargs):
         super().train_step(*args, **kwargs)
-        self._lambda = self._l_up / (self._l_down + EPS)
+        self._lambda = ops.stop_gradient(self._l_up / (self._l_down + EPS))
 
     def _before_train(self):
         self._lambda = 1.

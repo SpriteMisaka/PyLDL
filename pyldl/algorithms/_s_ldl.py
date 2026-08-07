@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 from scipy.spatial.distance import cosine, pdist
 
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseEnsemble, BaseAdam, BaseDeepLDL
 
@@ -97,25 +97,25 @@ class Shallow_S_LDL(_S_LDL, BaseEnsemble):
         return self._estimator[0].predict(Z)
 
 
-class _DeepSLDL(_S_LDL, BaseAdam, BaseDeepLDL):
+class _Deep_S_LDL(_S_LDL, BaseAdam, BaseDeepLDL):
 
     @staticmethod
-    @tf.function
     def loss_function(D, D_pred):
-        return tf.math.reduce_mean(keras.losses.kl_divergence(D, D_pred))
+        return ops.mean(keras.losses.kl_divergence(D, D_pred))
 
     def __init__(self, *, combi=None, t=10, lam=0.2, n_hidden=64,
                  mu=.1, spec_function=None, **kwargs):
         _S_LDL.__init__(self, combi, t, lam)
         n_latent = self.nested_len(combi) if combi else None
         BaseDeepLDL.__init__(self, n_hidden, n_latent, **kwargs)
+        self._setup_backend()
         self._mu = mu
         self._spec_function = spec_function
 
     def _call(self, X):
         rep = self._model["encoder"](X)
         latent = self._model["decoder_S"](rep)
-        features = tf.concat([rep, latent], axis=1)
+        features = ops.concatenate([rep, latent], axis=1)
         outputs = self._model["decoder"](features)
         return rep, latent, features, outputs
 
@@ -128,7 +128,7 @@ class _DeepSLDL(_S_LDL, BaseAdam, BaseDeepLDL):
 
     def _before_train(self):
         if self._combi is None:
-            self._generate_subtasks(self._D)
+            self._generate_subtasks(self._to_numpy(self._D))
         if self._n_latent is None:
             self._n_latent = self.nested_len(self._combi) if self._combi else 0
 
@@ -141,9 +141,9 @@ class _DeepSLDL(_S_LDL, BaseAdam, BaseDeepLDL):
             else:
                 raise ValueError(f"Unsupported spec_function: {self._spec_function}")
 
-        temp = [tf.clip_by_value(tf.gather(self._D, axis=1, indices=c), 1e-7, 1.0) for c in self._combi]
-        self._real_task = [i / (tf.reshape(tf.reduce_sum(i, axis=1), (-1, 1))) for i in temp]
-        self._weights = [tf.math.reduce_sum(tf.gather(self._D, axis=1, indices=c), axis=1) for c in self._combi]
+        temp = [ops.clip(ops.take(self._D, c, axis=1), 1e-7, 1.0) for c in self._combi]
+        self._real_task = [i / ops.reshape(ops.sum(i, axis=1), (-1, 1)) for i in temp]
+        self._weights = [ops.sum(ops.take(self._D, c, axis=1), axis=1) for c in self._combi]
 
     def _spec_pred(self, outputs, start, end):
         return keras.activations.softmax(outputs)
@@ -151,7 +151,6 @@ class _DeepSLDL(_S_LDL, BaseAdam, BaseDeepLDL):
     def _spec_loss(self, D_pred, start, end):
         return 0.
 
-    @tf.function
     def _loss(self, X, D, start, end):
         _, latent, _, outputs = self._call(X)
         le, ls, sub_start = 0., 0., 0
@@ -162,17 +161,17 @@ class _DeepSLDL(_S_LDL, BaseAdam, BaseDeepLDL):
         for i in range(len(self._combi)):
             temp = keras.activations.softmax(latent[:, sub_start:sub_start+len(self._combi[i])])
             mae = keras.losses.mean_absolute_error(self._real_task[i][start:end], temp)
-            ls += tf.math.reduce_mean(self._weights[i][start:end] * mae)
+            ls += ops.mean(self._weights[i][start:end] * mae)
             sub_start += len(self._combi[i])
         l = self.loss_function(D, D_pred)
         return l + le + self._mu * ls
 
     def predict(self, X):
         _, _, _, outputs = self._call(X)
-        return keras.activations.softmax(outputs)
+        return self._to_numpy(keras.activations.softmax(outputs))
 
 
-class S_LRR(_DeepSLDL):
+class S_LRR(_Deep_S_LDL):
 
     def __init__(self, alpha=1e-3, **kwargs):
         super().__init__(spec_function='LRR', **kwargs)
@@ -182,11 +181,11 @@ class S_LRR(_DeepSLDL):
         return self._alpha * LDL_LRR.ranking_loss(D_pred, self._P[start:end], self._W[start:end])
 
 
-class S_SCL(_DeepSLDL):
+class S_SCL(_Deep_S_LDL):
 
     def __init__(self, n_clusters=5, alpha=1e-3, beta=1e-6, **kwargs):
         super().__init__(spec_function='SCL', **kwargs)
-        self._n_clusters = n_clusters
+        self.n_clusters = n_clusters
         self._alpha = alpha
         self._beta = beta
 
@@ -199,23 +198,23 @@ class S_SCL(_DeepSLDL):
 
     def predict(self, X):
         _, _, _, outputs = self._call(X)
-        C = LDL_SCL.construct_C(X, self._X, self._C)
-        return keras.activations.softmax(outputs + C @ self._W)
+        C = LDL_SCL.construct_C(self._to_numpy(X), self._to_numpy(self._X), self._to_numpy(self._C))
+        return self._to_numpy(keras.activations.softmax(outputs + C @ self._W))
 
 
-class S_KLD(_DeepSLDL):
+class S_KLD(_Deep_S_LDL):
 
     def __init__(self, **kwargs):
         super().__init__(spec_function=None, **kwargs)
 
 
-class S_QFD2(_DeepSLDL):
+class S_QFD2(_Deep_S_LDL):
 
     def __init__(self, **kwargs):
         super().__init__(spec_function=qfd2, **kwargs)
 
 
-class S_CJS(_DeepSLDL):
+class S_CJS(_Deep_S_LDL):
 
     def __init__(self, **kwargs):
         super().__init__(spec_function=cjs, **kwargs)

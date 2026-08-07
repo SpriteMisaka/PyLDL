@@ -1,5 +1,5 @@
 from typing import Optional
-from inspect import signature
+
 from functools import wraps, singledispatch
 
 import numpy as np
@@ -10,6 +10,101 @@ EPS = np.finfo(np.float64).eps
 DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", "intersection"]
 
 DEFAULT_METRICS_GLD = ['clark', 'mu', 'hamming', 'subset_accuracy', 'spearman', 'kendallT', 'ood_error']
+
+
+def log_gamma(x):
+    import keras.ops as ops
+    coefficients = (
+        676.5203681218851, -1259.1392167224028,
+        771.32342877765313, -176.61502916214059,
+        12.507343278686905, -0.13857109526572012,
+        9.9843695780195716e-6, 1.5056327351493116e-7,
+    )
+    z = x + 7.
+    a = ops.ones_like(z) * .99999999999980993
+    for i, coefficient in enumerate(coefficients, 1):
+        a = a + coefficient / (z + i)
+    t = z + 7.5
+    result = .5 * ops.log(2. * np.pi) + (z + .5) * ops.log(t) - t + ops.log(a)
+    for i in range(8):
+        result -= ops.log(x + i)
+    return result
+
+
+def digamma(x):
+    import keras.ops as ops
+    result = ops.zeros_like(x)
+    for _ in range(8):
+        mask = x < 8.
+        result -= ops.where(mask, 1. / x, 0.)
+        x = ops.where(mask, x + 1., x)
+    inv = 1. / x
+    inv2 = inv * inv
+    return result + ops.log(x) - .5 * inv - inv2 * (
+        1. / 12. - inv2 * (1. / 120. - inv2 * (1. / 252. - inv2 / 240.))
+    )
+
+
+def inv_digamma(y):
+    import keras.ops as ops
+    return ops.where(y >= -2.22, ops.exp(y) + .5, -1. / (y + np.euler_gamma))
+
+
+def _beta_continued_fraction(alpha, beta, x, max_iter=100):
+    import keras.ops as ops
+    dtype = alpha.dtype
+    beta = ops.cast(beta, dtype)
+    x = ops.cast(x, dtype)
+    tiny = ops.cast(np.finfo(np.float32).tiny, dtype)
+    qab = alpha + beta
+    qap = alpha + 1.
+    qam = alpha - 1.
+    c = ops.ones_like(x)
+    d = 1. - qab * x / qap
+    d = ops.where(ops.abs(d) < tiny, tiny, d)
+    d = 1. / d
+    result = d
+    for iteration in range(1, max_iter + 1):
+        iteration = ops.cast(iteration, dtype)
+        doubled = 2. * iteration
+        coefficient = iteration * (beta - iteration) * x / (
+            (qam + doubled) * (alpha + doubled)
+        )
+        d = 1. + coefficient * d
+        d = ops.where(ops.abs(d) < tiny, tiny, d)
+        c = 1. + coefficient / c
+        c = ops.where(ops.abs(c) < tiny, tiny, c)
+        d = 1. / d
+        result = result * d * c
+        coefficient = -(alpha + iteration) * (qab + iteration) * x / (
+            (alpha + doubled) * (qap + doubled)
+        )
+        d = 1. + coefficient * d
+        d = ops.where(ops.abs(d) < tiny, tiny, d)
+        c = 1. + coefficient / c
+        c = ops.where(ops.abs(c) < tiny, tiny, c)
+        d = 1. / d
+        result = result * d * c
+    return result
+
+
+def regularized_incomplete_beta(alpha, beta, x):
+    import keras.ops as ops
+    dtype = alpha.dtype
+    beta = ops.cast(beta, dtype)
+    x = ops.cast(x, dtype)
+    epsilon = ops.cast(np.finfo(np.float32).eps, dtype)
+    safe_x = ops.clip(x, epsilon, 1. - epsilon)
+    log_scale = (
+        log_gamma(alpha + beta) - log_gamma(alpha) - log_gamma(beta)
+        + alpha * ops.log(safe_x) + beta * ops.log(1. - safe_x)
+    )
+    scale = ops.exp(log_scale)
+    direct = scale * _beta_continued_fraction(alpha, beta, safe_x) / alpha
+    reflected = 1. - scale * _beta_continued_fraction(beta, alpha, 1. - safe_x) / beta
+    threshold = (alpha + 1.) / (alpha + beta + 2.)
+    result = ops.clip(ops.where(safe_x < threshold, direct, reflected), 0., 1.)
+    return ops.where(x <= 0., 0., ops.where(x >= 1., 1., result))
 
 
 def _clip(func):
@@ -326,15 +421,6 @@ def pairwise_pearsonr(X, Y=None):
         return np.corrcoef(X) if Y is None else np.corrcoef(X, Y)[:X.shape[0], X.shape[0]:]
 
     return _pairwise(X, Y)
-
-
-def csr2sparse(A):
-    import tensorflow as tf
-    coo = A.tocoo()
-    indices = np.asmatrix([coo.row, coo.col]).transpose()
-    return tf.sparse.reorder(
-        tf.SparseTensor(indices, coo.data.astype(np.float32), coo.shape)
-    )
 
 
 def kernel(X, Y=None, gamma: Optional[float] = None):

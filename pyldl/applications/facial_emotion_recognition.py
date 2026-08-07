@@ -209,12 +209,23 @@ class LDL_ALSG(BaseGD, BaseFacialEmotionRecognition):
         au = self._aux_loss(self._au_graphs[i], D_pred)
         return ce + self._alpha * (fp + au)
 
-    def fit(self, X, L, fps, aus, alpha=5e-4,
-            fp_sigma=68., au_sigma=1., batch_size=None, L_val=None, **kwargs):
+    def _prepare_validation_data(self, X, L, validation_split):
+        (X, L, fps, aus), (X_val, L_val, _, _) = self._split_validation_data(
+            validation_split, X, L, self._fps, self._aus
+        )
         self._fps = tf.cast(fps, tf.float32)
         self._aus = tf.cast(aus, tf.float32)
+        self._batch_size = self._batch_size or X.shape[0]
+        return X, L, X_val, L_val, None
+
+    def fit(self, X, L, fps, aus, alpha=5e-4,
+            fp_sigma=68., au_sigma=1., batch_size=None,
+            validation_split=0., **kwargs):
+        self._fps = fps
+        self._aus = aus
         self._alpha = alpha
         self._fp_sigma = fp_sigma
         self._au_sigma = au_sigma
         self._batch_size = batch_size
-        return super().fit(X, L, batch_size=self._batch_size, D_val=L_val, **kwargs)
+        return super().fit(X, L, batch_size=batch_size,
+                           validation_split=validation_split, **kwargs)

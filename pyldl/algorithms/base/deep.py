@@ -18,11 +18,13 @@ class _BaseDeep(keras.Model):
             keras.utils.set_random_seed(random_state)
         self._model = None
 
+        self._to_numpy = ops.convert_to_numpy
+
         backend = keras.backend.backend()
         if backend == 'tensorflow':
-            self._to_numpy = lambda tensor: tensor.numpy()
+            self._gradient_step_impl = self._tf_gradient_step
         elif backend == 'torch':
-            self._to_numpy = lambda tensor: tensor.detach().cpu().numpy()
+            self._gradient_step_impl = self._torch_gradient_step
 
     _serialize_objects = ['_model']
 
@@ -46,7 +48,9 @@ class _BaseDeep(keras.Model):
     @staticmethod
     def _l2_reg(model):
         if isinstance(model, keras.Model):
-            return ops.sum([ops.sum(ops.square(v)) for v in model.trainable_variables]) / 2.
+            model = model.trainable_variables
+        if isinstance(model, (list, tuple)):
+            return sum(ops.sum(ops.square(v)) for v in model) / 2.
         else:
             return ops.sum(ops.square(model)) / 2.
 
@@ -74,6 +78,24 @@ class _BaseDeep(keras.Model):
 
     def _before_train(self):
         pass
+
+    def _tf_gradient_step(self, loss, variables, optimizer):
+        import tensorflow as tf
+        with tf.GradientTape() as tape:
+            value = loss()
+        gradients = tape.gradient(value, variables)
+        optimizer.apply_gradients(zip(gradients, variables))
+        return value
+
+    def _torch_gradient_step(self, loss, variables, optimizer):
+        import torch
+        value = loss()
+        gradients = torch.autograd.grad(value, [var.value for var in variables])
+        optimizer.apply_gradients(zip(gradients, variables))
+        return value
+
+    def _gradient_step(self, loss, variables, optimizer):
+        return self._gradient_step_impl(loss, variables, optimizer)
 
     def _loss(self, X, Y, start, end):
         Y_pred = self._call(X)
@@ -169,10 +191,8 @@ class BaseGD(BaseDeep):
     def _setup_backend(self):
         backend = keras.backend.backend()
         if backend == 'tensorflow':
-            self._train_step_impl = self._tf_train_step
             self._make_dataset = self._tf_make_dataset
         elif backend == 'torch':
-            self._train_step_impl = self._torch_train_step
             self._make_dataset = self._torch_make_dataset
 
     def _get_default_optimizer(self):
@@ -197,29 +217,14 @@ class BaseGD(BaseDeep):
             return score(val, val_pred, metrics=self._metrics, return_dict=True)
         return {}
 
-    def _tf_train_step(self, pair, batch, loss, start, end):
-        import tensorflow as tf
-        trainable_variables, optimizer = pair
-        X, Y = batch
-        with tf.GradientTape() as tape:
-            l = loss(X, Y, start, end)
-            self.total_loss += l
-        gradients = tape.gradient(l, trainable_variables)
-        optimizer.apply_gradients(zip(gradients, trainable_variables))
-
-    def _torch_train_step(self, pair, batch, loss, start, end):
-        trainable_variables, optimizer = pair
-        X, Y = batch
-        for var in trainable_variables:
-            var.value.grad = None
-        l = loss(X, Y, start, end)
-        self.total_loss += float(l)
-        l.backward()
-        grads = [var.value.grad for var in trainable_variables]
-        optimizer.apply_gradients(zip(grads, trainable_variables))
-
     def train_step(self, pair, batch, loss, start, end):
-        return self._train_step_impl(pair, batch, loss, start, end)
+        trainable_variables, optimizer = pair
+        X, Y = batch
+        l = self._gradient_step(
+            lambda: loss(X, Y, start, end),
+            trainable_variables, optimizer
+        )
+        self.total_loss += float(ops.convert_to_numpy(l))
 
     def _tf_make_dataset(self, X, Y):
         import tensorflow as tf
@@ -263,8 +268,37 @@ class BaseGD(BaseDeep):
 
         callbacks.on_train_end()
 
+    @staticmethod
+    def _split_validation_data(validation_split, *arrays):
+        if not 0. <= validation_split < 1.:
+            raise ValueError("validation_split must be between 0 and 1.")
+        if validation_split == 0.:
+            return arrays, tuple(None for _ in arrays)
+
+        n_samples = arrays[0].shape[0]
+        if any(array.shape[0] != n_samples for array in arrays[1:]):
+            raise ValueError("All sample-aligned arrays must have the same number of samples.")
+        n_val = int(np.ceil(n_samples * validation_split))
+        if n_val == 0 or n_val >= n_samples:
+            raise ValueError("validation_split must leave at least one training and one validation sample.")
+        indices = np.random.permutation(n_samples)
+        val_indices = indices[:n_val]
+        train_indices = indices[n_val:]
+        train = tuple(array[train_indices] for array in arrays)
+        val = tuple(array[val_indices] for array in arrays)
+        return train, val
+
+    def _prepare_validation_data(self, X, Y, validation_split):
+        (X, Y), (X_val, Y_val) = self._split_validation_data(validation_split, X, Y)
+        D_val = Y_val if issubclass(self.__class__, BaseDeepLDL) else None
+        L_val = Y_val if issubclass(self.__class__, BaseDeepLE) else None
+        return X, Y, X_val, D_val, L_val
+
     def fit(self, X, Y, *, epochs=1000, batch_size=None, optimizer=None,
-            X_val=None, D_val=None, L_val=None, callbacks=None, **kwargs):
+            validation_split=0., callbacks=None, **kwargs):
+        X, Y, X_val, D_val, L_val = self._prepare_validation_data(
+            X, Y, validation_split
+        )
         super().fit(X, Y, **kwargs)
 
         self._batch_size = batch_size or self._n_samples

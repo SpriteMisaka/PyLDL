@@ -1,7 +1,7 @@
 import numpy as np
 
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDLClassifier, BaseGD, BaseBFGS
 
@@ -19,22 +19,21 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
         self._beta = beta
         self._rho = rho
 
-    @tf.function
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
-        top2 = tf.gather(D_pred, self._top2, axis=1, batch_dims=1)
-        margin = tf.reduce_sum(
-            tf.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho)
+        top2 = ops.take_along_axis(D_pred, self._top2, axis=1)
+        margin = ops.sum(
+            ops.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho)
         )
         mae = keras.losses.mean_absolute_error(self._D, D_pred)
-        return tf.reduce_sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(theta)
+        return ops.sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(theta)
 
     def _before_train(self):
-        self._top2 = tf.math.top_k(self._D, k=2)[1]
-        self._entropy = tf.cast(
-            -tf.reduce_sum(self._D * tf.math.log(self._D) + EPS, axis=1),
-            dtype=tf.float32)
+        _, self._top2 = ops.top_k(self._D, k=2)
+        self._entropy = ops.cast(
+            -ops.sum(self._D * ops.log(self._D + EPS), axis=1),
+            dtype="float32")
 
 
 class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
@@ -48,31 +47,30 @@ class LDL_HR(BaseBFGS, BaseDeepLDLClassifier):
         self._gamma = gamma
         self._rho = rho
 
-    @tf.function
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
 
-        highest = tf.gather(D_pred, self._highest, axis=1, batch_dims=1)
-        rest = tf.gather(D_pred, self._rest, axis=1, batch_dims=1)
-        margin = tf.reduce_sum(
-            tf.maximum(0., 1. - (highest - rest) / self._rho)
+        highest = ops.take_along_axis(D_pred, self._highest, axis=1)
+        rest = ops.take_along_axis(D_pred, self._rest, axis=1)
+        margin = ops.sum(
+            ops.maximum(0., 1. - (highest - rest) / self._rho)
         )
 
-        real_rest = tf.gather(self._D, self._rest, axis=1, batch_dims=1)
-        rest_mae = tf.reduce_sum(
+        real_rest = ops.take_along_axis(self._D, self._rest, axis=1)
+        rest_mae = ops.sum(
             keras.losses.mean_absolute_error(real_rest, rest)
         )
 
-        mae = tf.reduce_sum(keras.losses.mean_absolute_error(self._L, D_pred))
+        mae = ops.sum(keras.losses.mean_absolute_error(self._L, D_pred))
 
         return mae + self._alpha * margin + self._beta * rest_mae + self._gamma * self._l2_reg(theta)
 
     def _before_train(self):
-        temp = tf.math.top_k(self._D, k=self._n_outputs)[1]
+        _, temp = ops.top_k(self._D, k=self._n_outputs)
         self._highest = temp[:, 0:1]
         self._rest = temp[:, 1:]
-        self._L = tf.one_hot(tf.reshape(self._highest, -1), self._n_outputs)
+        self._L = ops.one_hot(ops.reshape(self._highest, (-1,)), self._n_outputs)
 
 
 class LDLM(BaseGD, BaseDeepLDLClassifier):
@@ -86,30 +84,29 @@ class LDLM(BaseGD, BaseDeepLDLClassifier):
         self._gamma = gamma
         self._rho = rho
 
-    @tf.function
     def _loss(self, X, D, start, end):
         D_pred = self._model(X)
 
-        pred_margin = tf.reduce_sum(
-            tf.clip_by_value(
-                tf.reduce_sum(
-                    tf.abs(self._L[start:end] - D_pred), axis=1
+        pred_margin = ops.sum(
+            ops.clip(
+                ops.sum(
+                    ops.abs(self._L[start:end] - D_pred), axis=1
                 ) - self._rho, 0., float('inf')
             )
         )
 
-        highest = tf.gather(
-            D_pred, self._highest[start:end], axis=1, batch_dims=1
+        highest = ops.take_along_axis(
+            D_pred, self._highest[start:end], axis=1
         )
-        rest = tf.gather(D_pred, self._rest[start:end], axis=1, batch_dims=1)
-        label_margin = tf.reduce_sum(
-            tf.maximum(0., 1. - (highest - rest) / self._rho)
+        rest = ops.take_along_axis(D_pred, self._rest[start:end], axis=1)
+        label_margin = ops.sum(
+            ops.maximum(0., 1. - (highest - rest) / self._rho)
         )
 
-        second_margin = tf.reduce_sum(
-            tf.clip_by_value(
-                tf.reduce_sum(
-                    tf.abs((D - D_pred) * self._neg_L[start:end]), axis=1
+        second_margin = ops.sum(
+            ops.clip(
+                ops.sum(
+                    ops.abs((D - D_pred) * self._neg_L[start:end]), axis=1
                 ) - self._second_margin[start:end], 0., float('inf')
             )
         )
@@ -119,17 +116,16 @@ class LDLM(BaseGD, BaseDeepLDLClassifier):
             self._gamma * self._l2_reg(self._model)
 
     def _before_train(self):
-        temp = tf.math.top_k(self._D, k=self._n_outputs)[1]
+        _, temp = ops.top_k(self._D, k=self._n_outputs)
         self._highest = temp[:, 0:1]
         self._rest = temp[:, 1:]
 
-        temp = tf.math.top_k(
-            tf.gather(self._D, self._rest, axis=1, batch_dims=1), k=2
-        )[0]
+        rest = ops.take_along_axis(self._D, self._rest, axis=1)
+        temp, _ = ops.top_k(rest, k=2)
         self._second_margin = temp[:, 0] - temp[:, 1]
 
-        self._L = tf.one_hot(tf.reshape(self._highest, -1), self._n_outputs)
-        self._neg_L = tf.where(tf.equal(self._L, 0.), 1., 0.)
+        self._L = ops.one_hot(ops.reshape(self._highest, (-1,)), self._n_outputs)
+        self._neg_L = ops.where(ops.equal(self._L, 0.), 1., 0.)
 
     def _get_default_model(self):
         return self.get_2layer_model(self._n_features, self._n_outputs)

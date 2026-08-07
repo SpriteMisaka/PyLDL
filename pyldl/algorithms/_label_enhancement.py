@@ -12,8 +12,7 @@ from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.manifold._locally_linear import barycenter_kneighbors_graph
 
 import keras
-import tensorflow as tf
-import tensorflow_probability as tfp
+import keras.ops as ops
 
 from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseGD, BaseAdam, BaseBFGS
 from pyldl.algorithms.utils import pairwise_cosine
@@ -130,57 +129,58 @@ class GLLE(BaseBFGS, BaseDeepLE):
         self._beta = beta
         self._sigma = sigma
 
-    @tf.function
     def _E_loss(self, D):
         E_loss = 0.
-        groups = tf.dynamic_partition(D, tf.constant(self._cluster_results), self._n_clusters)
         for i in range(self._n_clusters):
-            E_loss += tf.linalg.trace(
-                tf.transpose(groups[i]) @ self._E[i] @ tf.transpose(self._E[i]) @ groups[i]
+            group = ops.take(D, self._cluster_indices[i], axis=0)
+            E_loss += ops.trace(
+                ops.transpose(group) @ self._E[i] @ ops.transpose(self._E[i]) @ group
             )
         return E_loss
 
     def _loss(self, params_1d):
-        with tf.GradientTape() as tape:
-            D = self._P @ self._params2model(params_1d)[0]
-            E_loss = self._E_loss(D)
-        E_gradients = tape.gradient(E_loss, self._E)
-        self._E_optimizer.apply_gradients(zip(E_gradients, self._E))
+        D = self._P @ self._params2model(params_1d)[0]
+        self._gradient_step(lambda: self._E_loss(D), self._E, self._E_optimizer)
 
         for i in range(self._n_clusters):
-            Ei_norm = tf.linalg.norm(self._E[i], axis=1, keepdims=True)
+            Ei_norm = ops.norm(self._E[i], axis=1, keepdims=True)
             self._E[i].assign(self._E[i] / Ei_norm)
 
         D = self._P @ self._params2model(params_1d)[0]
-        mse = tf.reduce_sum((self._L - D)**2)
-        lap = tf.linalg.trace(tf.transpose(D) @ self._G @ D)
+        mse = ops.sum((self._L - D)**2)
+        lap = ops.trace(ops.transpose(D) @ self._G @ D)
         return mse + self._alpha * lap + self._beta * self._E_loss(D)
 
     @staticmethod
     def _construct_P(X):
         gamma = 1. / (2. * np.mean(pdist(X)) ** 2)
-        return tf.cast(rbf_kernel(X, gamma=gamma), dtype=tf.float32)
+        return ops.convert_to_tensor(rbf_kernel(X, gamma=gamma), dtype="float32")
 
     def _before_train(self):
-        self._P = self._construct_P(self._X)
+        self._P = self._construct_P(self._to_numpy(self._X))
 
         self._nn = NearestNeighbors(n_neighbors=self._n_outputs+1)
-        self._nn.fit(self._X)
+        self._nn.fit(self._to_numpy(self._X))
         graph = self._nn.kneighbors_graph()
 
-        A = tf.exp(-(cdist(self._X, self._X) ** 2) / (2 * self._sigma ** 2))
-        A = tf.cast(A * graph.toarray(), dtype=tf.float32)
-        A_hat = tf.linalg.diag(tf.reduce_sum(A, axis=1))
+        A = np.exp(-(cdist(self._to_numpy(self._X), self._to_numpy(self._X)) ** 2) / (2 * self._sigma ** 2))
+        A = ops.convert_to_tensor(A * graph.toarray(), dtype="float32")
+        A_hat = ops.diag(ops.sum(A, axis=1))
 
-        self._G = tf.cast(A_hat - A, dtype=tf.float32)
+        self._G = ops.cast(A_hat - A, dtype="float32")
 
         k_means = KMeans()
-        self._cluster_results = k_means.fit_predict(self._X)
+        self._cluster_results = k_means.fit_predict(self._to_numpy(self._X))
         self._n_clusters = k_means.n_clusters
-        cluster_counts = tf.math.bincount(self._cluster_results)
-
-        self._E = [tf.Variable(tf.random.normal((cluster_counts[i], cluster_counts[i])),
-                               trainable=True) for i in range(self._n_clusters)]
+        self._cluster_indices = [
+            np.flatnonzero(self._cluster_results == i) for i in range(self._n_clusters)
+        ]
+        self._E = [
+            self.add_weight(
+                name=f'E_{i}', shape=(len(indices), len(indices)),
+                initializer=keras.initializers.RandomNormal(), trainable=True
+            ) for i, indices in enumerate(self._cluster_indices)
+        ]
         self._E_optimizer = keras.optimizers.SGD()
 
     def _get_default_model(self):
@@ -188,7 +188,7 @@ class GLLE(BaseBFGS, BaseDeepLE):
 
     def transform(self, X=None, L=None):
         P = self._P if X is None else self._construct_P(X)
-        return keras.activations.softmax(self._call(P)).numpy()
+        return self._to_numpy(keras.activations.softmax(self._call(P)))
 
 
 class LEVI(BaseAdam, BaseDeepLE):
@@ -209,32 +209,27 @@ class LEVI(BaseAdam, BaseDeepLE):
         self._alpha = alpha
 
     def _call(self, X, L, transform=False):
-        inputs = tf.concat((X, L), axis=1)
+        inputs = ops.concatenate((X, L), axis=1)
 
         latent = self._model["encoder"](inputs)
         mean = latent[:, :self._n_outputs]
         if transform:
             return mean
 
-        var = tf.math.softplus(latent[:, self._n_outputs:])
-
-        d = tfp.distributions.Normal(loc=mean, scale=var)
-        std_d = tfp.distributions.Normal(loc=np.zeros(self._n_outputs, dtype=np.float32),
-                                         scale=np.ones(self._n_outputs, dtype=np.float32))
-
-        samples = d.sample()
+        var = ops.softplus(latent[:, self._n_outputs:])
+        samples = mean + var * keras.random.normal(ops.shape(mean))
         X_hat = self._model["decoder_X"](samples)
         L_hat = self._model["decoder_L"](samples)
 
-        return d, std_d, samples, X_hat, L_hat
+        return mean, var, samples, X_hat, L_hat
 
     def _loss(self, X, L, start, end):
-        d, std_d, samples, X_hat, L_hat = self._call(X, L)
-        kl = tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1)
+        mean, var, samples, X_hat, L_hat = self._call(X, L)
+        kl = ops.mean(.5 * (ops.square(mean) + ops.square(var) - 1. - ops.log(ops.square(var))), axis=1)
         rec_X = keras.losses.mean_squared_error(X, X_hat)
         rec_L = keras.losses.binary_crossentropy(L, L_hat)
 
-        return tf.reduce_sum((L - samples)**2) + self._alpha * tf.math.reduce_sum(kl + rec_X + rec_L)
+        return ops.sum((L - samples)**2) + self._alpha * ops.sum(kl + rec_X + rec_L)
 
     def _get_default_model(self):
         encoder = self.get_3layer_model(self._n_features + self._n_outputs, self._n_hidden, self._n_outputs*2,
@@ -248,7 +243,7 @@ class LEVI(BaseAdam, BaseDeepLE):
     def transform(self, X=None, L=None):
         if X is None and L is None:
             X, L = self._X, self._L
-        return keras.activations.softmax(self._call(X, L, transform=True)).numpy()
+        return self._to_numpy(keras.activations.softmax(self._call(X, L, transform=True)))
 
 
 class LIBLE(BaseAdam, BaseDeepLE):
@@ -266,24 +261,19 @@ class LIBLE(BaseAdam, BaseDeepLE):
         if transform:
             return self._model["decoder_D"](mean)
 
-        var = tf.math.softplus(latent[:, self._n_latent:])
-
-        d = tfp.distributions.Normal(loc=mean, scale=var)
-        std_d = tfp.distributions.Normal(loc=np.zeros(self._n_latent, dtype=np.float32),
-                                         scale=np.ones(self._n_latent, dtype=np.float32))
-
-        h = d.sample()
+        var = ops.softplus(latent[:, self._n_latent:])
+        h = mean + var * keras.random.normal(ops.shape(mean))
         L_hat = self._model["decoder_L"](h)
         D_hat = self._model["decoder_D"](h)
         g = self._model["decoder_g"](h)
 
-        return d, std_d, L_hat, D_hat, g
+        return mean, var, L_hat, D_hat, g
 
     def _loss(self, X, L, start, end):
-        d, std_d, L_hat, D_hat, g = self._call(X)
-        kl = tf.reduce_sum(tf.math.reduce_mean(tfp.distributions.kl_divergence(d, std_d), axis=1))
-        rec_L = tf.reduce_sum((L - L_hat)**2)
-        rec_D = tf.reduce_sum(g**(-2) * (L - D_hat)**2 + tf.math.log(tf.abs(g**2)))
+        mean, var, L_hat, D_hat, g = self._call(X)
+        kl = ops.sum(ops.mean(.5 * (ops.square(mean) + ops.square(var) - 1. - ops.log(ops.square(var))), axis=1))
+        rec_L = ops.sum((L - L_hat)**2)
+        rec_D = ops.sum(g**(-2) * (L - D_hat)**2 + ops.log(ops.abs(g**2)))
 
         return rec_L + self._alpha * kl + self._beta * rec_D
 
@@ -300,7 +290,7 @@ class LIBLE(BaseAdam, BaseDeepLE):
 
     def transform(self, X=None, L=None):
         X = self._X if X is None else X
-        return keras.activations.softmax(self._call(X, transform=True)).numpy()
+        return self._to_numpy(keras.activations.softmax(self._call(X, transform=True)))
 
 
 class ConLE(BaseGD, BaseDeepLE):
@@ -318,30 +308,24 @@ class ConLE(BaseGD, BaseDeepLE):
     def _call(self, X, L, transform=False):
         Z = self._model["encoder_Z"](X)
         Q = self._model["encoder_Q"](L)
-        H = tf.concat((Z, Q), axis=1)
+        H = ops.concatenate((Z, Q), axis=1)
         D = self._model["decoder"](H)
         return D if transform else (Z, Q, D)
 
     @staticmethod
-    @tf.function
     def _con(X, Y, tau):
-        C = tf.exp(pairwise_cosine(X, Y) / tau)
-        CX = tf.exp((pairwise_cosine(X, X) - tf.eye(X.shape[0])) / tau)
-        n = tf.shape(X)[0]
-        con = 0.
-        for i in range(n):
-            numerator = C[i, i]
-            denominator = tf.reduce_sum(CX[i]) + tf.reduce_sum(C[i]) - C[i, i]
-            con += -tf.math.log(numerator / denominator)
-        return con / tf.cast(n, tf.float32)
+        C = ops.exp(pairwise_cosine(X, Y) / tau)
+        CX = ops.exp((pairwise_cosine(X, X) - ops.eye(X.shape[0])) / tau)
+        numerator = ops.diagonal(C)
+        denominator = ops.sum(CX, axis=1) + ops.sum(C, axis=1) - numerator
+        return ops.mean(-ops.log(numerator / denominator))
 
-    @tf.function
     def _loss(self, X, L, start, end):
         Z, Q, D = self._call(X, L)
         con = self._con(Z, Q, self._tau) + self._con(Q, Z, self._tau)
-        dis = tf.reduce_sum((L - D)**2)
-        thr = tf.reduce_mean(tf.maximum(
-            tf.reduce_max(D * (1 - L), axis=1) - tf.reduce_min(D * L + 1 - L, axis=1) + self._threshold, 0)
+        dis = ops.sum((L - D)**2)
+        thr = ops.mean(ops.maximum(
+            ops.max(D * (1 - L), axis=1) - ops.min(D * L + 1 - L, axis=1) + self._threshold, 0)
         )
         return con + self._alpha * dis + self._beta * thr
 
@@ -357,4 +341,4 @@ class ConLE(BaseGD, BaseDeepLE):
     def transform(self, X=None, L=None):
         if X is None and L is None:
             X, L = self._X, self._L
-        return keras.activations.softmax(self._call(X, L, transform=True)).numpy()
+        return self._to_numpy(keras.activations.softmax(self._call(X, L, transform=True)))

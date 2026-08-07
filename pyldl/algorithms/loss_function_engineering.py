@@ -1,7 +1,7 @@
 import numpy as np
 
 import keras
-import tensorflow as tf
+import keras.ops as ops
 
 from pyldl.algorithms.utils import _clip
 
@@ -9,71 +9,60 @@ from pyldl.algorithms.utils import _clip
 EPS = np.finfo(np.float64).eps
 
 
-@tf.function
 def cad(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
-    @tf.function
     def _cad(D, D_pred):
-        return tf.reduce_mean(tf.abs(
-            tf.cumsum(D, axis=1) - tf.cumsum(D_pred, axis=1)
+        return ops.mean(ops.abs(
+            ops.cumsum(D, axis=1) - ops.cumsum(D_pred, axis=1)
         ), axis=1)
-    return tf.math.reduce_sum(
-        tf.map_fn(lambda i: _cad(D[:, :i], D_pred[:, :i]),
-                  tf.range(1, D.shape[1] + 1),
-                  fn_output_signature=tf.float32)
-    )
+    return ops.sum(ops.stack([
+        _cad(D[:, :i], D_pred[:, :i])
+        for i in range(1, D.shape[1] + 1)
+    ]))
 
 
-@tf.function
 def qfd2(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
     Q = D - D_pred
-    j = tf.reshape(tf.range(D.shape[1]), [D.shape[1], 1])
-    k = tf.reshape(tf.range(D.shape[1]), [1, D.shape[1]])
-    A = tf.cast(1 - tf.abs(j - k) / (D.shape[1] - 1), dtype=tf.float32)
-    return tf.math.reduce_mean(
-        tf.linalg.diag_part(tf.matmul(tf.matmul(Q, A), tf.transpose(Q)))
-    )
+    j = ops.reshape(ops.arange(D.shape[1]), [D.shape[1], 1])
+    k = ops.reshape(ops.arange(D.shape[1]), [1, D.shape[1]])
+    A = ops.cast(1 - ops.abs(j - k) / (D.shape[1] - 1), dtype="float32")
+    return ops.mean(ops.sum(ops.matmul(Q, A) * Q, axis=1))
 
 
-@tf.function
 @_clip
 def cjs(D, D_pred):
     """This loss function is proposed in paper :cite:`2023:wen`.
     """
-    @tf.function
     def _cjs(D, D_pred):
         m = 0.5 * (D + D_pred)
         js = 0.5 * (keras.losses.kl_divergence(D, m) + keras.losses.kl_divergence(D_pred, m))
-        return tf.reduce_mean(js)
-    return tf.math.reduce_sum(
-        tf.map_fn(lambda i: _cjs(D[:, :i], D_pred[:, :i]),
-                  tf.range(1, D.shape[1] + 1),
-                  fn_output_signature=tf.float32)
-    )
+        return ops.mean(js)
+    return ops.sum(ops.stack([
+        _cjs(D[:, :i], D_pred[:, :i])
+        for i in range(1, D.shape[1] + 1)
+    ]))
 
 
-@tf.function
 def unimodal_loss(y, D_pred):
     """This loss function is proposed in paper :cite:`2022:li`.
     """
-    diff = (D_pred - tf.roll(D_pred, shift=-1, axis=1))[:, :-1]
-    seq = tf.range(1, tf.shape(D_pred)[1], dtype=y.dtype)
-    sgn = tf.cast(
-        tf.sign(seq[tf.newaxis, :] - tf.reshape(y, (-1, 1))),
-        dtype=tf.float32
+    diff = (D_pred - ops.roll(D_pred, shift=-1, axis=1))[:, :-1]
+    seq = ops.arange(1, D_pred.shape[1], dtype=y.dtype)
+    sgn = ops.cast(
+        ops.sign(seq[None, :] - ops.reshape(y, (-1, 1))),
+        dtype="float32"
     )
-    return tf.reduce_mean(tf.reduce_sum(tf.maximum(0, -diff * sgn), axis=1))
+    return ops.mean(ops.sum(ops.maximum(0, -diff * sgn), axis=1))
 
 
-@tf.function
 @_clip
 def concentrated_loss(y, D_pred):
     """This loss function is proposed in paper :cite:`2022:li`.
     """
-    seq = tf.range(1, tf.shape(D_pred)[1] + 1, dtype=tf.float32)
-    y_pred = tf.reduce_sum(D_pred * seq[tf.newaxis, :], axis=1)
-    v = tf.reduce_sum(D_pred * ((seq[tf.newaxis, :] - y_pred[:, tf.newaxis]) ** 2), axis=1)
-    return tf.reduce_mean(.5 * tf.math.log(v + EPS) + (y_pred - y) ** 2 / (2 * v + EPS) + .5 * tf.math.log(2 * np.pi))
+    seq = ops.arange(1, D_pred.shape[1] + 1, dtype="float32")
+    y_pred = ops.sum(D_pred * seq[None, :], axis=1)
+    v = ops.sum(D_pred * ((seq[None, :] - y_pred[:, None]) ** 2), axis=1)
+    return ops.mean(.5 * ops.log(v + EPS) + (y_pred - y) ** 2 / (2 * v + EPS) + .5 * np.log(2 * np.pi))

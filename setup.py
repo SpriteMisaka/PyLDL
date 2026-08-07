@@ -35,15 +35,20 @@ setuptools.setup(
 
     install_requires=[
         "matplotlib",
+        "keras>=3",
+        "numba",
         "numpy",
         "qpsolvers",
         "quadprog",
         "scikit-fuzzy",
         "scikit-learn",
-        "scipy",
-        "tensorflow",
-        "tensorflow-probability"
+        "scipy"
     ],
+
+    extras_require={
+        "tensorflow": ["tensorflow", "tensorflow-probability[tf]"],
+        "torch": ["torch"]
+    },
 
     python_requires='>=3',
     ext_modules=cythonize(glob.glob("pyldl/algorithms/*.pyx"), annotate=True),
