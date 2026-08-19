@@ -11,7 +11,18 @@ from pyldl.algorithms.base import BaseLDL, BaseLE, BaseGLD
 from pyldl.algorithms.utils import normalize, proj, softmax, binaryzation
 
 
-def load_dataset(name, dir='dataset', mode='D'):
+def load_dataset(name, dir='datasets', mode='D'):
+    r"""Load a dataset from a local ``.mat`` file, downloading it when necessary. 
+    If the dataset is not found in the directory, and it is available in the PyLDL GitHub repository, it will be downloaded automatically.
+
+    :param name: Name of the dataset (without the ``.mat`` extension).
+    :type name: str
+    :param dir: Directory where the dataset is stored (or will be downloaded to), defaults to 'datasets'.
+    :type dir: str
+    :param mode: Mode of the dataset to load, defaults to 'D'. 
+        'D' is for label distribution, and 'G' is for generalized label distribution.
+    :type mode: {'D', 'G'}
+    """
     if not os.path.exists(dir):
         logging.info(f'Directory {dir} does not exist, creating it.')
         os.makedirs(dir)
@@ -42,7 +53,14 @@ def load_dataset(name, dir='dataset', mode='D'):
 
 
 def download_dataset(name, dataset_path):
-    url = f'https://raw.githubusercontent.com/SpriteMisaka/PyLDL/main/dataset/{name}.mat'
+    r"""Download a named ``.mat`` dataset from the PyLDL GitHub repository.
+
+    :param name: Name of the dataset (without the ``.mat`` extension).
+    :type name: str
+    :param dataset_path: Local path where the downloaded dataset is saved.
+    :type dataset_path: str
+    """
+    url = f'https://raw.githubusercontent.com/SpriteMisaka/PyLDL/main/datasets/{name}.mat'
     response = requests.get(url)
     if response.status_code != 200:
         raise ValueError(f'Failed to download {name}.mat')
@@ -51,8 +69,40 @@ def download_dataset(name, dataset_path):
     logging.info(f'Dataset {name}.mat downloaded successfully.')
 
 
-def gaussian_noise(D: np.ndarray, mean: float = 0., std: float = .1):
-    return proj(D + np.random.normal(loc=mean, scale=std, size=D.shape))
+def gaussian_noise(D: np.ndarray, mode=None, mean: float = 0., std: float = .1, p: float = 5.):
+    r"""Add Gaussian noise to label distributions and renormalize them.
+
+    :param D: Label distribution matrix.
+    :type D: np.ndarray
+    :param mode: Noise mode, defaults to None. 
+        Mode 'gcia' refers to *Generative Calibration of Inaccurate Annotators*. See the following reference for details:
+
+        .. bibliography:: bib/others/noisy/references.bib
+            :filter: False
+            :labelprefix: NOISE-
+            :keyprefix: noise-
+
+            2024:he
+
+    :type mode: {None, 'gcia'}
+    :param mean: Mean of the noise in the default mode, defaults to 0.
+    :type mean: float
+    :param std: Standard deviation of the noise in the default mode, defaults to 0.1.
+    :type std: float
+    :param p: Annotator professionalism level in GCIA mode, defaults to 5.; larger values produce more noise.
+    :type p: float
+    :return: Noisy label distribution matrix.
+    :rtype: np.ndarray
+    """
+    if mode is None:
+        return proj(D + np.random.normal(loc=mean, scale=std, size=D.shape))
+    elif mode == 'gcia':
+        if p <= 0:
+            raise ValueError("p must be positive.")
+        variance = D / D.shape[1] * p
+        return proj(np.random.normal(loc=D, scale=np.sqrt(variance)))
+    else:
+        raise ValueError(f"Unknown mode: {mode}.")
 
 
 def _random_mask(D, rate, weighted):
@@ -72,6 +122,29 @@ def _weighted_mask(D, rate):
 
 
 def random_missing(D, rate=.8, weighted=False, return_mask=True):
+    r"""Randomly set entries of label distributions to zero.
+    This setting is useful for simulating incomplete label distributions. See :cite:`2017:xu` for details.
+
+    :param D: Label distribution matrix.
+    :type D: np.ndarray
+    :param rate: Proportion of entries to remove, in the range (0, 1), defaults to 0.8.
+    :type rate: float
+    :param weighted: Whether to select entries according to value-based weights, defaults to False.
+        This setting can refer to:
+
+        .. bibliography:: bib/incomldl/references.bib
+            :filter: False
+            :labelprefix: NOISE-
+            :keyprefix: noise-
+
+            2024:li
+
+    :type weighted: bool
+    :param return_mask: Whether to return the missing-entry mask, defaults to True.
+    :type return_mask: bool
+    :return: The incomplete distribution, optionally together with its boolean mask.
+    :rtype: np.ndarray or tuple[np.ndarray, np.ndarray]
+    """
     mask = _random_mask(D, rate, weighted)
     missing = D.copy()
     missing[mask] = .0
@@ -123,6 +196,23 @@ def artificial(X, a=1., b=.5, c=.2, d=1.,
                w2=np.array([[1., 2., 4.]]),
                w3=np.array([[1., 4., 2.]]),
                lambda1=.01, lambda2=.01):
+    r"""Generate artificial label distributions from polynomial feature interactions. 
+    The generation process is provided in :cite:`2016:geng`.
+
+    :param X: Feature matrix.
+    :type X: np.ndarray
+    :param a: Coefficient of the linear term, defaults to 1.
+    :param b: Coefficient of the quadratic term, defaults to 0.5.
+    :param c: Coefficient of the cubic term, defaults to 0.2.
+    :param d: Constant term, defaults to 1.
+    :param w1: Weights for the first label, defaults to ``[[4., 2., 1.]]``.
+    :param w2: Weights for the second label, defaults to ``[[1., 2., 4.]]``.
+    :param w3: Weights for the third label, defaults to ``[[1., 4., 2.]]``.
+    :param lambda1: Coupling coefficient for the second label, defaults to 0.01.
+    :param lambda2: Coupling coefficient for the third label, defaults to 0.01.
+    :return: Artificial label distribution matrix.
+    :rtype: np.ndarray
+    """
     t = a * X + b * X**2 + c * X**3 + d
     psi1 = np.matmul(t, w1.T)**2
     psi2 = (np.matmul(t, w2.T) + lambda1 * psi1)**2
@@ -132,15 +222,38 @@ def artificial(X, a=1., b=.5, c=.2, d=1.,
 
 
 def make_ldl(n_samples=200, random_state=None, **kwargs):
-    if random_state is not None:
-        np.random.seed(random_state)
-    X = np.random.uniform(-1, 1, (n_samples, 3))
+    r"""Generate random features and artificial label distributions using the :func:`artificial` function.
+
+    :param n_samples: Number of samples to generate, defaults to 200.
+    :type n_samples: int
+    :param random_state: Seed for NumPy's random number generator, defaults to None.
+    :type random_state: int or None
+    :param kwargs: Additional keyword arguments passed to :func:`artificial`.
+    :return: Generated feature matrix and label distribution matrix.
+    :rtype: tuple[np.ndarray, np.ndarray]
+    """
+    rng = np.random.default_rng(random_state)
+    X = rng.uniform(-1, 1, (n_samples, 3))
     D = artificial(X, **kwargs)
     return X, D
 
 
-def plot_artificial(n_samples=50, model=None, file_name=None, *,
+def plot_artificial(grid_size=50, model=None, file_name=None, *,
                     noise=False, noise_func_args=None, **kwargs):
+    r"""Plot predictions or perturbations on the artificial LDL dataset as a 3D color surface.
+
+    :param grid_size: Number of points along each feature axis, defaults to 50.
+    :type grid_size: int
+    :param model: Optional LDL or LE model used to generate predictions, defaults to None.
+    :type model: BaseLDL or BaseLE or None
+    :param file_name: Output file name without extension; if None, display the figure, defaults to None.
+    :type file_name: str or None
+    :param noise: Whether to apply the default noise transformations, defaults to False.
+    :type noise: bool
+    :param noise_func_args: Noise functions and their keyword arguments, defaults to None.
+    :type noise_func_args: list or None
+    :param kwargs: Additional keyword arguments passed to :func:`artificial`.
+    """
 
     if noise:
         noise_func_args = noise_func_args or [
@@ -152,8 +265,8 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
     else:
         noise_func_args = [[lambda x: x, {}]]
 
-    x1 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
-    x2 = np.linspace(-1, 1, n_samples).reshape(-1, 1)
+    x1 = np.linspace(-1, 1, grid_size).reshape(-1, 1)
+    x2 = np.linspace(-1, 1, grid_size).reshape(-1, 1)
 
     a1, a2 = np.meshgrid(x1, x2)
     a3 = np.sin((a1 + a2) * np.pi)
@@ -164,12 +277,12 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
 
     X = np.concatenate([bb, cc], axis=1)
 
-    colors = np.zeros((n_samples, n_samples, 3))
+    colors = np.zeros((grid_size, grid_size, 3))
 
-    n_batch = n_samples // len(noise_func_args)
+    n_batch = grid_size // len(noise_func_args)
     for i, n in enumerate(noise_func_args):
         start = i * n_batch
-        end = (i + 1) * n_batch if i != len(noise_func_args) - 1 else n_samples
+        end = (i + 1) * n_batch if i != len(noise_func_args) - 1 else grid_size
 
         if isinstance(model, BaseLDL):
             X_train, D_train = make_ldl()
@@ -189,7 +302,7 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
         hsv[:, :, 1] *= 1.75
         hsv[:, :, 1] = np.clip(hsv[:, :, 1], 0., 1.)
         c = hsv_to_rgb(hsv) ** .4545
-        colors[start:end, :, :] = c.reshape(n_samples, n_samples, 3)[start:end, :, :]
+        colors[start:end, :, :] = c.reshape(grid_size, grid_size, 3)[start:end, :, :]
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
     ax.xaxis._axinfo['grid']['linestyle'] = '--'
@@ -216,6 +329,13 @@ def plot_artificial(n_samples=50, model=None, file_name=None, *,
 
 
 def regressor2ldl(regressor) -> BaseLDL:
+    r"""Wrap a scikit-learn regressor as a PyLDL label distribution learner.
+
+    :param regressor: Scikit-learn regressor used for multi-output prediction.
+    :type regressor: sklearn.base.RegressorMixin
+    :return: A PyLDL model backed by the supplied regressor.
+    :rtype: BaseLDL
+    """
     from pyldl.algorithms._problem_transformation import _Reg2LDL
     class Reg2LDL(_Reg2LDL):
         def _get_default_model(self):
