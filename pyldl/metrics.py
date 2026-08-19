@@ -34,7 +34,7 @@ def chebyshev(D, D_pred):
 
     .. math::
 
-        \text{Cheby.}(\boldsymbol{u}, \, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}
+        \text{Cheby.}(\boldsymbol{u}, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}
     """
     return np.max(np.abs(D - D_pred), 1)
 
@@ -48,7 +48,7 @@ def clark(D, D_pred):
 
     .. math::
 
-        \text{Clark}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}
+        \text{Clark}(\boldsymbol{u}, \boldsymbol{v}) = \sqrt{\sum^c_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}
     """
     return np.sqrt(np.sum(np.power(D - D_pred, 2) / np.power(D + D_pred, 2), 1))
 
@@ -62,7 +62,7 @@ def canberra(D, D_pred):
 
     .. math::
 
-        \text{Can.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}
+        \text{Can.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}
     """
     return np.sum(np.abs(D - D_pred) / (D + D_pred), 1)
 
@@ -80,7 +80,7 @@ def js_divergence(D, D_pred):
 
     .. math::
 
-        \text{JSD}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}
+        \text{JSD}(\boldsymbol{u}, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}
 
     """
     M = .5 * (D + D_pred)
@@ -95,7 +95,7 @@ def cosine(D, D_pred):
 
     .. math::
 
-        \text{Cosine}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}u_j v_j}{\sqrt{\sum^l_{j=1}u_j^2}\sqrt{\sum^l_{j=1}v_j^2}}\text{.}
+        \text{Cosine}(\boldsymbol{u}, \boldsymbol{v}) = \frac{\sum^c_{j=1}u_j v_j}{\sqrt{\sum^c_{j=1}u_j^2}\sqrt{\sum^c_{j=1}v_j^2}}\text{.}
     """
     from sklearn.metrics.pairwise import paired_cosine_distances
     return 1 - paired_cosine_distances(D, D_pred)
@@ -109,7 +109,7 @@ def intersection(D, D_pred):
 
     .. math::
 
-        \text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}
+        \text{Int.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1} \min\left(u_j, v_j\right)\text{.}
     """
     return 1 - 0.5 * np.sum(np.abs(D - D_pred), 1)
 
@@ -122,7 +122,7 @@ def euclidean(D, D_pred):
 
     .. math::
 
-        \text{Eucl.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\left( u_j - v_j \right)^2}\text{.}
+        \text{Eucl.}(\boldsymbol{u}, \boldsymbol{v}) = \sqrt{\sum^c_{j=1}\left( u_j - v_j \right)^2}\text{.}
     """
     return np.sqrt(np.sum((D - D_pred) ** 2, 1))
 
@@ -139,7 +139,7 @@ def sorensen(D, D_pred):
 
     .. math::
 
-        \text{S}\phi\text{ren.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}\left\vert u_j - v_j \right\vert}{\sum^l_{j=1}\left( u_j + v_j \right)}\text{.}
+        \text{S}\phi\text{ren.}(\boldsymbol{u}, \boldsymbol{v}) = \frac{\sum^c_{j=1}\left\vert u_j - v_j \right\vert}{\sum^c_{j=1}\left( u_j + v_j \right)}\text{.}
     """
     return (np.sum(np.abs(D - D_pred), 1) / np.sum(D + D_pred, 1))
 
@@ -153,7 +153,7 @@ def chi2(D, D_pred):
 
     .. math::
 
-        \chi^2(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}
+        \chi^2(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}
     """
     return np.sum((D - D_pred) ** 2 / (D + D_pred), 1)
 
@@ -167,7 +167,7 @@ def wave_hedges(D, D_pred):
 
     .. math::
 
-        \text{WHD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, \, v_j)}\text{.}
+        \text{WHD}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, v_j)}\text{.}
     """
     return np.sum(np.abs(D - D_pred) / np.maximum(D, D_pred), 1)
 
@@ -180,7 +180,7 @@ def fidelity(D, D_pred):
 
     .. math::
 
-        \text{Fid.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \sqrt{u_j v_j}\text{.}
+        \text{Fid.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1} \sqrt{u_j v_j}\text{.}
     """
     return np.sum(np.sqrt(D * D_pred), 1)
 
@@ -193,7 +193,7 @@ def spearman(D, D_pred, transpose=False):
 
     .. math::
 
-        \text{Spear.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{l} (\rho(u_j) - \rho(v_j))^2 }{l(l^2 - 1)}\text{,}
+        \text{Spear.}(\boldsymbol{u}, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{c} (\rho(u_j) - \rho(v_j))^2 }{c(c^2 - 1)}\text{,}
 
     where :math:`\rho(\cdot)` is the rank of the element in the vector.
     """
@@ -213,7 +213,7 @@ def kendall(D, D_pred, transpose=False):
 
     .. math::
 
-        \text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j < k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}
+        \text{Ken.}(\boldsymbol{u}, \boldsymbol{v}) = \frac{2 \sum_{j < k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{c (c-1)}\text{.}
     """
     D, D_pred = map(lambda X: np.transpose(X) if transpose else X, [D, D_pred])
     return np.array([stats.kendalltau(D[i], D_pred[i], variant='b')[0] for i in range(D.shape[0])])
@@ -231,7 +231,7 @@ def dpa(D, D_pred):
 
     .. math::
 
-        \text{DPA}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{l} \sum_{j=1}^{l} u_j \rho(v_j)\text{,}
+        \text{DPA}(\boldsymbol{u}, \boldsymbol{v}) = \frac{1}{c} \sum_{j=1}^{c} u_j \rho(v_j)\text{,}
 
     where :math:`\rho(\cdot)` is the rank of the element in the vector.
     """
@@ -253,9 +253,9 @@ def mu(D, D_pred):
 
     .. math::
 
-        \mu(\boldsymbol{U}, \, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}
+        \mu(\boldsymbol{U}, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}
 
-    where :math:`\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{c})]` and :math:`\boldsymbol{c}` is a uniform vector.
+    where :math:`\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \boldsymbol{c})]` and :math:`\boldsymbol{c}` is a uniform vector.
     """
     x0 = kl_divergence(D, _uniform_vector(D.shape))
     kld = kl_divergence(D, D_pred, reduction=None)
@@ -263,6 +263,8 @@ def mu(D, D_pred):
 
 
 def jsd_dirichlet_expectation(alpha, beta):
+    r"""Estimate the Jensen-Shannon divergence expectation of two Dirichlet distributions.
+    """
     from scipy.special import digamma
     from pyldl.algorithms.utils import shannon_entropy
 
@@ -281,6 +283,8 @@ def jsd_dirichlet_expectation(alpha, beta):
 
 
 def jsd_dirichlet_variance(alpha, beta):
+    r"""Estimate the Jensen-Shannon divergence variance of two Dirichlet distributions.
+    """
     alpha0 = np.sum(alpha)
     beta0 = np.sum(beta)
     c = len(alpha)
@@ -403,9 +407,9 @@ def zero_one_loss(D, D_pred):
 
     .. math::
 
-        \text{0/1 loss}(\boldsymbol{u}, \, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \, \arg\max(\boldsymbol{v}))\text{,}
+        \text{0/1 loss}(\boldsymbol{u}, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \arg\max(\boldsymbol{v}))\text{,}
 
-    where :math:`\delta(\cdot, \, \cdot)` is the Kronecker delta function.
+    where :math:`\delta(\cdot, \cdot)` is the Kronecker delta function.
     """
     return 1 - (np.argmax(D, 1) == np.argmax(D_pred, 1))
 
@@ -418,7 +422,7 @@ def error_probability(D, D_pred):
 
     .. math::
 
-        \text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}
+        \text{Err. prob.}(\boldsymbol{u}, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}
     """
     return 1 - D[np.arange(D.shape[0]), np.argmax(D_pred, 1)]
 
@@ -565,6 +569,7 @@ NAME_TO_TYPE = {name: prefix for name, (prefix, _) in _METRIC_REGISTRY.items()}
 
 def score(target: np.ndarray, pred: np.ndarray,
           metrics: Optional[list] = None, return_dict: bool = False):
+    r"""Evaluate one or more metrics for targets and predictions."""
     if metrics is None:
         metrics = DEFAULT_METRICS
     scores = tuple((eval(i)(target, pred) if isinstance(i, str) else i(target, pred) for i in metrics))

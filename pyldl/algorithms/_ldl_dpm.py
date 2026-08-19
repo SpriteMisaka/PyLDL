@@ -4,7 +4,7 @@ import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseIter, BaseLDL
-from pyldl.algorithms.utils import log_gamma
+from pyldl.algorithms.utils import gammaln
 
 
 EPS = np.finfo(np.float64).eps
@@ -39,8 +39,8 @@ class _DPMParameters(keras.Model):
         dirichlet_alpha = ops.stack(alpha_values, axis=1)
         safe_d = ops.expand_dims(D, axis=1)
         log_pdf = (
-            log_gamma(ops.sum(dirichlet_alpha, axis=-1))
-            - ops.sum(log_gamma(dirichlet_alpha), axis=-1)
+            gammaln(ops.sum(dirichlet_alpha, axis=-1))
+            - ops.sum(gammaln(dirichlet_alpha), axis=-1)
             + ops.sum((dirichlet_alpha - 1.) * ops.log(safe_d + EPS), axis=-1)
         )
         log_mix = ops.logsumexp(ops.log(pi) + log_pdf, axis=1)

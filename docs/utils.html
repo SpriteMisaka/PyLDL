@@ -46,14 +46,6 @@
 <dd></dd></dl>
 
 </section>
-<section id="beta-continued-fraction">
-<h2><cite>_beta_continued_fraction</cite><a class="headerlink" href="#beta-continued-fraction" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyldl.algorithms.utils._beta_continued_fraction">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">_beta_continued_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils._beta_continued_fraction" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
 <section id="clip">
 <h2><cite>_clip</cite><a class="headerlink" href="#clip" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -70,6 +62,30 @@
 <dd></dd></dl>
 
 </section>
+<section id="betainc">
+<h2><cite>betainc</cite><a class="headerlink" href="#betainc" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.betainc">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">betainc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.betainc" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the regularized incomplete beta function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – First beta-shape parameter.</p></li>
+<li><p><strong>beta</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – Second beta-shape parameter.</p></li>
+<li><p><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – Evaluation points.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Beta cumulative distribution values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="binaryzation">
 <h2><cite>binaryzation</cite><a class="headerlink" href="#binaryzation" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -79,7 +95,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>D</strong> (<em>np.ndarray</em>) – Label distribution matrix (shape: <span class="math notranslate nohighlight">\([n,\, l]\)</span>).</p></li>
+<li><p><strong>D</strong> (<em>np.ndarray</em>) – Label distribution matrix (shape: <span class="math notranslate nohighlight">\([n, c]\)</span>).</p></li>
 <li><p><strong>method</strong> (<em>{'threshold'</em><em>, </em><em>'topk'}</em><em>, </em><em>optional</em>) – <p>Type of binaryzation method, defaults to ‘threshold’. The options are ‘threshold’ and ‘topk’, which can refer to:</p>
 <div class="docutils container" id="id1">
 <div role="list" class="citation-list">
@@ -90,11 +106,11 @@
 </div>
 </div>
 </p></li>
-<li><p><strong>param</strong> (<em>any</em><em>, </em><em>optional</em>) – Parameter of binaryzation method, defaults to None. If None, the default value is .5 for ‘threshold’ and <span class="math notranslate nohighlight">\(\lfloor l / 2 \rfloor\)</span> for ‘topk’.</p></li>
+<li><p><strong>param</strong> (<em>any</em><em>, </em><em>optional</em>) – Parameter of binaryzation method, defaults to None. If None, the default value is .5 for ‘threshold’ and <span class="math notranslate nohighlight">\(\lfloor c / 2 \rfloor\)</span> for ‘topk’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Logical label matrix (shape: <span class="math notranslate nohighlight">\([n,\, l]\)</span>).</p>
+<dd class="field-even"><p>Logical label matrix (shape: <span class="math notranslate nohighlight">\([n, c]\)</span>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
@@ -108,7 +124,19 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.digamma">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">digamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.digamma" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Approximate the digamma function of an input array or tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – Input array or tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Element-wise digamma values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="estimate-alpha">
@@ -116,7 +144,43 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.estimate_alpha">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">estimate_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_criterion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.estimate_alpha" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate Dirichlet concentration parameters from label distributions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>D</strong> (<em>np.ndarray</em>) – Label distribution matrix.</p></li>
+<li><p><strong>max_iterations</strong> (<em>int</em>) – Maximum number of fixed-point iterations, defaults to 100.</p></li>
+<li><p><strong>convergence_criterion</strong> (<em>float</em>) – Convergence threshold, defaults to 1e-7.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated Dirichlet concentration vector.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="gammaln">
+<h2><cite>gammaln</cite><a class="headerlink" href="#gammaln" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.gammaln">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">gammaln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.gammaln" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the natural logarithm of the gamma function using a Lanczos approximation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – Input array or tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Element-wise log-gamma values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="inv-digamma">
@@ -124,7 +188,19 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.inv_digamma">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">inv_digamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.inv_digamma" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the inverse digamma function using Newton iterations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>np.ndarray</em><em> or </em><em>tensor</em>) – Digamma values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Inverse-digamma values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="kernel">
@@ -132,7 +208,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.kernel">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kernel" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute an RBF kernel matrix between rows of two matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – First input matrix.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Second input matrix; if None, use <code class="docutils literal notranslate"><span class="pre">X</span></code>, defaults to None.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em><em> or </em><em>None</em>) – RBF kernel coefficient; if None, estimate it from pairwise distances, defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RBF kernel matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="kl-divergence-downarrow">
@@ -142,7 +234,7 @@
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kl_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Kullback-Leibler divergence. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{KLD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}\]</div>
+\[\text{KLD}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -154,20 +246,24 @@
 <dd></dd></dl>
 
 </section>
-<section id="log-gamma">
-<h2><cite>log_gamma</cite><a class="headerlink" href="#log-gamma" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyldl.algorithms.utils.log_gamma">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">log_gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.log_gamma" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
 <section id="non-diagonal">
 <h2><cite>non_diagonal</cite><a class="headerlink" href="#non-diagonal" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.non_diagonal">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">non_diagonal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.non_diagonal" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set the diagonal entries of a square matrix to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>np.ndarray</em>) – Input square matrix.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Matrix with zero diagonal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="normalize">
@@ -175,7 +271,19 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.normalize">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.normalize" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Normalize each row of a matrix to sum to one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Input matrix.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row-normalized matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="pairwise-cosine">
@@ -183,7 +291,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_cosine">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'similarity'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_cosine" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute pairwise cosine similarities or distances between rows of two matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – First input matrix.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Second input matrix; if None, use <code class="docutils literal notranslate"><span class="pre">X</span></code>, defaults to None.</p></li>
+<li><p><strong>mode</strong> (<em>{'similarity'</em><em>, </em><em>'distance'}</em>) – Return mode, either <code class="docutils literal notranslate"><span class="pre">'similarity'</span></code> or <code class="docutils literal notranslate"><span class="pre">'distance'</span></code>, defaults to <code class="docutils literal notranslate"><span class="pre">'similarity'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise cosine similarity or distance matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="pairwise-euclidean">
@@ -191,7 +315,22 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_euclidean">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_euclidean" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute pairwise Euclidean distances between rows of two matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – First input matrix.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Second input matrix; if None, use <code class="docutils literal notranslate"><span class="pre">X</span></code>, defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise Euclidean distance matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="pairwise-pearsonr">
@@ -199,7 +338,22 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.pairwise_pearsonr">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_pearsonr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.pairwise_pearsonr" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute pairwise Pearson correlation coefficients between rows of two matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – First input matrix.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Second input matrix; if None, use <code class="docutils literal notranslate"><span class="pre">X</span></code>, defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pairwise Pearson correlation matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="proj">
@@ -210,7 +364,7 @@
 <dd><p>This approach is proposed in paper <span id="id47">[<a class="reference internal" href="#id68" title="Laurent Condat. Fast projection onto the simplex and the l1 ball. Mathematical Programming, 158(1):575–585, 2016. URL: https://doi.org/10.1007/s10107-015-0946-6.">Con16</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Matrix <span class="math notranslate nohighlight">\(\boldsymbol{D}\)</span>.</p>
+<dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Input matrix.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The projection onto the probability simplex.</p>
@@ -222,20 +376,24 @@
 </dd></dl>
 
 </section>
-<section id="regularized-incomplete-beta">
-<h2><cite>regularized_incomplete_beta</cite><a class="headerlink" href="#regularized-incomplete-beta" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyldl.algorithms.utils.regularized_incomplete_beta">
-<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">regularized_incomplete_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.regularized_incomplete_beta" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</section>
 <section id="shannon-entropy">
 <h2><cite>shannon_entropy</cite><a class="headerlink" href="#shannon-entropy" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.shannon_entropy">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">shannon_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.shannon_entropy" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the Shannon entropy of a label distribution matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Label distribution matrix.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shannon entropy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="soft-thresholding">
@@ -244,7 +402,7 @@
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.soft_thresholding">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">soft_thresholding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.soft_thresholding" title="Link to this definition">¶</a></dt>
 <dd><p>Soft thresholding operation.
-It is defined as <span class="math notranslate nohighlight">\(\text{soft}(\boldsymbol{A}, \, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace\)</span>,
+It is defined as <span class="math notranslate nohighlight">\(\text{soft}(\boldsymbol{A}, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace\)</span>,
 where <span class="math notranslate nohighlight">\(\odot\)</span> denotes element-wise multiplication.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -268,7 +426,19 @@ where <span class="math notranslate nohighlight">\(\odot\)</span> denotes elemen
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.softmax">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.softmax" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Apply the softmax function to each row of a matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>D</strong> (<em>np.ndarray</em>) – Input matrix.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row-wise softmax values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="solvel21">
@@ -278,7 +448,7 @@ where <span class="math notranslate nohighlight">\(\odot\)</span> denotes elemen
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">solvel21</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.solvel21" title="Link to this definition">¶</a></dt>
 <dd><p>This approach is proposed in paper <span id="id48">[<a class="reference internal" href="#id69" title="Jinhui Chen and Jian Yang. Robust subspace segmentation via low-rank representation. IEEE Transactions on Cybernetics, 44(8):1432–1445, 2014. URL: https://doi.org/10.1109/TCYB.2013.2286106.">CY14</a>]</span>.</p>
 <p>The solution to the optimization problem
-<span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,\,1}\)</span>
+<span class="math notranslate nohighlight">\(\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,1}\)</span>
 is given by the following formula:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\vec{x}_{\bullet j}^{\ast} = \left\{
@@ -328,6 +498,26 @@ where <span class="math notranslate nohighlight">\(\boldsymbol{A} = \boldsymbol{
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="trigamma">
+<h2><cite>trigamma</cite><a class="headerlink" href="#trigamma" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.trigamma">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">trigamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.trigamma" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the trigamma function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>tensor</em>) – Input tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Element-wise trigamma values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -610,7 +800,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">canberra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.canberra" title="Link to this definition">¶</a></dt>
 <dd><p>Canberra distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Can.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}\]</div>
+\[\text{Can.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left\vert u_j - v_j \right\vert}{u_j + v_j}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -621,7 +811,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chebyshev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.chebyshev" title="Link to this definition">¶</a></dt>
 <dd><p>Chebyshev distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Cheby.}(\boldsymbol{u}, \, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}\]</div>
+\[\text{Cheby.}(\boldsymbol{u}, \boldsymbol{v}) = \max_j \left\vert u_j - v_j \right\vert\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -632,7 +822,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">chi2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.chi2" title="Link to this definition">¶</a></dt>
 <dd><p>Chi-squared distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\chi^2(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}\]</div>
+\[\chi^2(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left( u_j - v_j \right)^2}{u_j + v_j}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -643,7 +833,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">clark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.clark" title="Link to this definition">¶</a></dt>
 <dd><p>Clark distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Clark}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}\]</div>
+\[\text{Clark}(\boldsymbol{u}, \boldsymbol{v}) = \sqrt{\sum^c_{j=1}\frac{\left( u_j - v_j \right)^2}{\left( u_j + v_j \right)^2}}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -654,7 +844,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">cosine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.cosine" title="Link to this definition">¶</a></dt>
 <dd><p>Cosine similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Cosine}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}u_j v_j}{\sqrt{\sum^l_{j=1}u_j^2}\sqrt{\sum^l_{j=1}v_j^2}}\text{.}\]</div>
+\[\text{Cosine}(\boldsymbol{u}, \boldsymbol{v}) = \frac{\sum^c_{j=1}u_j v_j}{\sqrt{\sum^c_{j=1}u_j^2}\sqrt{\sum^c_{j=1}v_j^2}}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -673,7 +863,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">dpa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.dpa" title="Link to this definition">¶</a></dt>
 <dd><p>Degree percentile average (DPA) is proposed in paper <span id="id65">[<a class="reference internal" href="ldl.html#id292" title="Xiuyi Jia, Tian Qin, Yunan Lu, and Weiwei Li. Adaptive weighted ranking-oriented label distribution learning. IEEE Transactions on Neural Networks and Learning Systems, 35(8):11302-11316, 2024. URL: https://doi.org/10.1109/TNNLS.2023.3258976.">LDL-JQLL24</a>]</span>. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{DPA}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{l} \sum_{j=1}^{l} u_j \rho(v_j)\text{,}\]</div>
+\[\text{DPA}(\boldsymbol{u}, \boldsymbol{v}) = \frac{1}{c} \sum_{j=1}^{c} u_j \rho(v_j)\text{,}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the rank of the element in the vector.</p>
 </dd></dl>
 
@@ -685,7 +875,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">error_probability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.error_probability" title="Link to this definition">¶</a></dt>
 <dd><p>Error probability. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Err. prob.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}\]</div>
+\[\text{Err. prob.}(\boldsymbol{u}, \boldsymbol{v}) = 1 - u_{\arg\max(\boldsymbol{v})}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -696,7 +886,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.euclidean" title="Link to this definition">¶</a></dt>
 <dd><p>Euclidean distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Eucl.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sqrt{\sum^l_{j=1}\left( u_j - v_j \right)^2}\text{.}\]</div>
+\[\text{Eucl.}(\boldsymbol{u}, \boldsymbol{v}) = \sqrt{\sum^c_{j=1}\left( u_j - v_j \right)^2}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -707,7 +897,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">fidelity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.fidelity" title="Link to this definition">¶</a></dt>
 <dd><p>Fidelity similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Fid.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \sqrt{u_j v_j}\text{.}\]</div>
+\[\text{Fid.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1} \sqrt{u_j v_j}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -726,7 +916,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.intersection" title="Link to this definition">¶</a></dt>
 <dd><p>Intersection similarity. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Int.}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1} \min\left(u_j, \, v_j\right)\text{.}\]</div>
+\[\text{Int.}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1} \min\left(u_j, v_j\right)\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -745,7 +935,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">js_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.js_divergence" title="Link to this definition">¶</a></dt>
 <dd><p>Jensen-Shannon divergence. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{JSD}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}\]</div>
+\[\text{JSD}(\boldsymbol{u}, \boldsymbol{v}) = \frac{1}{2}\text{KLD}\left(\boldsymbol{u} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right) + \frac{1}{2}\text{KLD}\left(\boldsymbol{v} \bigg\Vert \frac{1}{2}(\boldsymbol{u} + \boldsymbol{v}) \right)\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -754,7 +944,8 @@ This setting can refer to:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.jsd_dirichlet_expectation">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jsd_dirichlet_expectation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jsd_dirichlet_expectation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the Jensen-Shannon divergence expectation of two Dirichlet distributions.</p>
+</dd></dl>
 
 </section>
 <section id="jsd-dirichlet-variance">
@@ -762,7 +953,8 @@ This setting can refer to:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.jsd_dirichlet_variance">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">jsd_dirichlet_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.jsd_dirichlet_variance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Estimate the Jensen-Shannon divergence variance of two Dirichlet distributions.</p>
+</dd></dl>
 
 </section>
 <section id="kendall-uparrow">
@@ -772,7 +964,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">kendall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.kendall" title="Link to this definition">¶</a></dt>
 <dd><p>Kendall’s rank correlation coefficient. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Ken.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{2 \sum_{j &lt; k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{l (l-1)}\text{.}\]</div>
+\[\text{Ken.}(\boldsymbol{u}, \boldsymbol{v}) = \frac{2 \sum_{j &lt; k} \text{sgn}(u_j - u_k) \text{sgn}(v_j - v_k) }{c (c-1)}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -823,8 +1015,8 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.mu" title="Link to this definition">¶</a></dt>
 <dd><p>The <span class="math notranslate nohighlight">\(\mu\)</span> metric is proposed in paper <span id="id66">[<a class="reference internal" href="ldl.html#id287" title="Weiwei Li, Haitao Wu, Yunan Lu, and Xiuyi Jia. Approximately correct label distribution learning. In Proceedings of the International Conference on Machine Learning, 36298–36309. 2025.">LDL-LWLJ25</a>]</span>. Its KL-divergence-based form is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\mu(\boldsymbol{U}, \, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}\]</div>
-<p>where <span class="math notranslate nohighlight">\(\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \, \boldsymbol{c})]\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{c}\)</span> is a uniform vector.</p>
+\[\mu(\boldsymbol{U}, \boldsymbol{V}) = \frac{1}{\delta_0} \int_0^{\delta_0} \frac{1}{n} \sum_{i=1}^{n} \mathbb{I} (\text{KLD}(\boldsymbol{u}_i, \boldsymbol{v}_i) \le \delta) \mathrm{d}\delta\text{,}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\delta_0 = \mathbb{E}_n[\text{KLD}(\boldsymbol{u}_i, \boldsymbol{c})]\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{c}\)</span> is a uniform vector.</p>
 </dd></dl>
 
 </section>
@@ -873,7 +1065,8 @@ This setting can refer to:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.metrics.score">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.score" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate one or more metrics for targets and predictions.</p>
+</dd></dl>
 
 </section>
 <section id="sensitivity-uparrow">
@@ -890,7 +1083,7 @@ This setting can refer to:</p>
 <dt class="sig sig-object py" id="pyldl.metrics.sorensen">
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">sorensen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.sorensen" title="Link to this definition">¶</a></dt>
 <dd>S&oslash;rensen's distance. It is defined as:<div class="math notranslate nohighlight">
-\[\text{S}\phi\text{ren.}(\boldsymbol{u}, \, \boldsymbol{v}) = \frac{\sum^l_{j=1}\left\vert u_j - v_j \right\vert}{\sum^l_{j=1}\left( u_j + v_j \right)}\text{.}\]</div>
+\[\text{S}\phi\text{ren.}(\boldsymbol{u}, \boldsymbol{v}) = \frac{\sum^c_{j=1}\left\vert u_j - v_j \right\vert}{\sum^c_{j=1}\left( u_j + v_j \right)}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -901,7 +1094,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">spearman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.spearman" title="Link to this definition">¶</a></dt>
 <dd><p>Spearman’s rank correlation coefficient. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{Spear.}(\boldsymbol{u}, \, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{l} (\rho(u_j) - \rho(v_j))^2 }{l(l^2 - 1)}\text{,}\]</div>
+\[\text{Spear.}(\boldsymbol{u}, \boldsymbol{v}) = 1 - \frac{6 \sum_{j=1}^{c} (\rho(u_j) - \rho(v_j))^2 }{c(c^2 - 1)}\text{,}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the rank of the element in the vector.</p>
 </dd></dl>
 
@@ -945,7 +1138,7 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">wave_hedges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.wave_hedges" title="Link to this definition">¶</a></dt>
 <dd><p>Wave-Hedges distance. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{WHD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, \, v_j)}\text{.}\]</div>
+\[\text{WHD}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}\frac{\left| u_j - v_j \right|}{\max (u_j, v_j)}\text{.}\]</div>
 </dd></dl>
 
 </section>
@@ -972,8 +1165,8 @@ This setting can refer to:</p>
 <span class="sig-prename descclassname"><span class="pre">pyldl.metrics.</span></span><span class="sig-name descname"><span class="pre">zero_one_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/metrics.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.metrics.zero_one_loss" title="Link to this definition">¶</a></dt>
 <dd><p>0/1 loss. It is defined as:</p>
 <div class="math notranslate nohighlight">
-\[\text{0/1 loss}(\boldsymbol{u}, \, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \, \arg\max(\boldsymbol{v}))\text{,}\]</div>
-<p>where <span class="math notranslate nohighlight">\(\delta(\cdot, \, \cdot)\)</span> is the Kronecker delta function.</p>
+\[\text{0/1 loss}(\boldsymbol{u}, \boldsymbol{v}) = \delta(\arg\max(\boldsymbol{u}), \arg\max(\boldsymbol{v}))\text{,}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\delta(\cdot, \cdot)\)</span> is the Kronecker delta function.</p>
 </dd></dl>
 
 </section>
@@ -1024,29 +1217,29 @@ This setting can refer to:</p>
 <li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Utils &amp; Metrics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#d"><cite>_1d</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#beta-continued-fraction"><cite>_beta_continued_fraction</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#clip"><cite>_clip</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reduction"><cite>_reduction</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#betainc"><cite>betainc</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#digamma"><cite>digamma</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#estimate-alpha"><cite>estimate_alpha</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gammaln"><cite>gammaln</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#inv-digamma"><cite>inv_digamma</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kernel"><cite>kernel</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kl-divergence-downarrow"><cite>kl_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#locass-proj"><cite>locass_proj</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#log-gamma"><cite>log_gamma</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-diagonal"><cite>non_diagonal</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#normalize"><cite>normalize</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-euclidean"><cite>pairwise_euclidean</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-pearsonr"><cite>pairwise_pearsonr</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#proj"><cite>proj</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#regularized-incomplete-beta"><cite>regularized_incomplete_beta</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#shannon-entropy"><cite>shannon_entropy</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#soft-thresholding"><cite>soft_thresholding</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#softmax"><cite>softmax</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#solvel21"><cite>solvel21</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#svt"><cite>svt</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigamma"><cite>trigamma</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#random-mask"><cite>_random_mask</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#weighted-mask"><cite>_weighted_mask</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#artificial"><cite>artificial</cite></a></li>

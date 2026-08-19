@@ -4,7 +4,7 @@ import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
-from pyldl.algorithms.utils import log_gamma
+from pyldl.algorithms.utils import gammaln
 
 
 EPS = np.finfo(np.float32).eps
@@ -23,8 +23,8 @@ class SNEFY_LDL(BaseAdam, BaseDeepLDL):
         temp = self._b + features
         F = ops.expand_dims(temp, axis=1) + ops.expand_dims(temp, axis=2)
         W = ops.expand_dims(self._W, axis=1) + ops.expand_dims(self._W, axis=2)
-        log_numerator = ops.sum(log_gamma(W + 1), axis=0)
-        log_denominator = log_gamma(
+        log_numerator = ops.sum(gammaln(W + 1), axis=0)
+        log_denominator = gammaln(
             ops.cast(self._n_outputs, "float32") + ops.sum(W, axis=0)
         )
         return ops.reshape(

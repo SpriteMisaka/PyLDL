@@ -12,99 +12,204 @@ DEFAULT_METRICS = ["chebyshev", "clark", "canberra", "kl_divergence", "cosine", 
 DEFAULT_METRICS_GLD = ['clark', 'mu', 'hamming', 'subset_accuracy', 'spearman', 'kendallT', 'ood_error']
 
 
-def log_gamma(x):
-    import keras.ops as ops
-    coefficients = (
-        676.5203681218851, -1259.1392167224028,
-        771.32342877765313, -176.61502916214059,
-        12.507343278686905, -0.13857109526572012,
-        9.9843695780195716e-6, 1.5056327351493116e-7,
-    )
-    z = x + 7.
-    a = ops.ones_like(z) * .99999999999980993
-    for i, coefficient in enumerate(coefficients, 1):
-        a = a + coefficient / (z + i)
-    t = z + 7.5
-    result = .5 * ops.log(2. * np.pi) + (z + .5) * ops.log(t) - t + ops.log(a)
-    for i in range(8):
-        result -= ops.log(x + i)
-    return result
+def gammaln(x):
+    r"""Compute the natural logarithm of the gamma function using a Lanczos approximation.
+
+    :param x: Input array or tensor.
+    :type x: np.ndarray or tensor
+    :return: Element-wise log-gamma values.
+    :rtype: np.ndarray or tensor
+    """
+    @singledispatch
+    def _log_gamma(x):
+        import keras.ops as ops
+
+        coefficients = (
+            676.5203681218851, -1259.1392167224028,
+            771.32342877765313, -176.61502916214059,
+            12.507343278686905, -0.13857109526572012,
+            9.9843695780195716e-6, 1.5056327351493116e-7,
+        )
+        z = x + 7.
+        a = ops.ones_like(z) * .99999999999980993
+        for i, coefficient in enumerate(coefficients, 1):
+            a = a + coefficient / (z + i)
+        t = z + 7.5
+        result = .5 * ops.log(2. * np.pi) + (z + .5) * ops.log(t) - t + ops.log(a)
+        for i in range(8):
+            result -= ops.log(x + i)
+        return result
+
+    @_log_gamma.register(np.ndarray)
+    def _(x: np.ndarray):
+        from scipy.special import gammaln
+        return gammaln(x)
+
+    return _log_gamma(x)
 
 
 def digamma(x):
-    import keras.ops as ops
-    result = ops.zeros_like(x)
-    for _ in range(8):
-        mask = x < 8.
-        result -= ops.where(mask, 1. / x, 0.)
-        x = ops.where(mask, x + 1., x)
-    inv = 1. / x
-    inv2 = inv * inv
-    return result + ops.log(x) - .5 * inv - inv2 * (
-        1. / 12. - inv2 * (1. / 120. - inv2 * (1. / 252. - inv2 / 240.))
-    )
+    r"""Approximate the digamma function of an input array or tensor.
+
+    :param x: Input array or tensor.
+    :type x: np.ndarray or tensor
+    :return: Element-wise digamma values.
+    :rtype: np.ndarray or tensor
+    """
+    @singledispatch
+    def _digamma(x):
+        import keras.ops as ops
+
+        result = ops.zeros_like(x)
+        for _ in range(8):
+            mask = x < 8.
+            result -= ops.where(mask, 1. / x, 0.)
+            x = ops.where(mask, x + 1., x)
+        inv = 1. / x
+        inv2 = inv * inv
+        return result + ops.log(x) - .5 * inv - inv2 * (
+            1. / 12. - inv2 * (1. / 120. - inv2 * (1. / 252. - inv2 / 240.))
+        )
+
+    @_digamma.register(np.ndarray)
+    def _(x: np.ndarray):
+        from scipy.special import digamma
+        return digamma(x)
+
+    return _digamma(x)
+
+
+def trigamma(x):
+    r"""Compute the trigamma function.
+
+    :param x: Input tensor.
+    :type x: tensor
+    :return: Element-wise trigamma values.
+    :rtype: tensor
+    """
+    @singledispatch
+    def _trigamma(x):
+        import keras.ops as ops
+
+        result = ops.zeros_like(x)
+        for _ in range(8):
+            mask = x < 8.
+            result += ops.where(mask, 1. / x**2, 0.)
+            x = ops.where(mask, x + 1., x)
+        inv = 1. / x
+        inv2 = inv * inv
+        return result + inv + .5 * inv2 + inv * inv2 * (
+            1. / 6. - inv2 * (1. / 30. - inv2 * (1. / 42. - inv2 / 30.))
+        )
+
+    @_trigamma.register(np.ndarray)
+    def _(x: np.ndarray):
+        from scipy.special import polygamma
+        return polygamma(1, x)
+
+    return _trigamma(x)
 
 
 def inv_digamma(y):
-    import keras.ops as ops
-    return ops.where(y >= -2.22, ops.exp(y) + .5, -1. / (y + np.euler_gamma))
+    r"""Compute the inverse digamma function using Newton iterations.
+
+    :param y: Digamma values.
+    :type y: np.ndarray or tensor
+    :return: Inverse-digamma values.
+    :rtype: np.ndarray or tensor
+    """
+    @singledispatch
+    def _inverse(y):
+        import keras.ops as ops
+
+        x = ops.where(y >= -2.22, ops.exp(y) + .5, -1. / (y + np.euler_gamma))
+        for _ in range(5):
+            x -= (digamma(x) - y) / trigamma(x)
+        return x
+
+    @_inverse.register(np.ndarray)
+    def _(y: np.ndarray):
+        x = np.where(y >= -2.22, np.exp(y) + .5, -1. / (y + np.euler_gamma))
+        for _ in range(5):
+            x -= (digamma(x) - y) / trigamma(x)
+        return x
+
+    return _inverse(y)
 
 
-def _beta_continued_fraction(alpha, beta, x, max_iter=100):
-    import keras.ops as ops
-    dtype = alpha.dtype
-    beta = ops.cast(beta, dtype)
-    x = ops.cast(x, dtype)
-    tiny = ops.cast(np.finfo(np.float32).tiny, dtype)
-    qab = alpha + beta
-    qap = alpha + 1.
-    qam = alpha - 1.
-    c = ops.ones_like(x)
-    d = 1. - qab * x / qap
-    d = ops.where(ops.abs(d) < tiny, tiny, d)
-    d = 1. / d
-    result = d
-    for iteration in range(1, max_iter + 1):
-        iteration = ops.cast(iteration, dtype)
-        doubled = 2. * iteration
-        coefficient = iteration * (beta - iteration) * x / (
-            (qam + doubled) * (alpha + doubled)
+def betainc(alpha, beta, x):
+    r"""Compute the regularized incomplete beta function.
+
+    :param alpha: First beta-shape parameter.
+    :type alpha: np.ndarray or tensor
+    :param beta: Second beta-shape parameter.
+    :type beta: np.ndarray or tensor
+    :param x: Evaluation points.
+    :type x: np.ndarray or tensor
+    :return: Beta cumulative distribution values.
+    :rtype: np.ndarray or tensor
+    """
+    @singledispatch
+    def _beta_cdf(alpha, beta, x):
+        import keras.ops as ops
+        def _beta_continued_fraction(alpha, beta, x, max_iter=100):
+            dtype = alpha.dtype
+            beta = ops.cast(beta, dtype)
+            x = ops.cast(x, dtype)
+            tiny = ops.cast(np.finfo(np.float32).tiny, dtype)
+            qab = alpha + beta
+            qap = alpha + 1.
+            qam = alpha - 1.
+            c = ops.ones_like(x)
+            d = 1. - qab * x / qap
+            d = ops.where(ops.abs(d) < tiny, tiny, d)
+            d = 1. / d
+            result = d
+            for iteration in range(1, max_iter + 1):
+                iteration = ops.cast(iteration, dtype)
+                doubled = 2. * iteration
+                coefficient = iteration * (beta - iteration) * x / (
+                    (qam + doubled) * (alpha + doubled)
+                )
+                d = 1. + coefficient * d
+                d = ops.where(ops.abs(d) < tiny, tiny, d)
+                c = 1. + coefficient / c
+                c = ops.where(ops.abs(c) < tiny, tiny, c)
+                d = 1. / d
+                result = result * d * c
+                coefficient = -(alpha + iteration) * (qab + iteration) * x / (
+                    (alpha + doubled) * (qap + doubled)
+                )
+                d = 1. + coefficient * d
+                d = ops.where(ops.abs(d) < tiny, tiny, d)
+                c = 1. + coefficient / c
+                c = ops.where(ops.abs(c) < tiny, tiny, c)
+                d = 1. / d
+                result = result * d * c
+            return result
+
+        dtype = alpha.dtype
+        beta = ops.cast(beta, dtype)
+        x = ops.cast(x, dtype)
+        epsilon = ops.cast(np.finfo(np.float32).eps, dtype)
+        safe_x = ops.clip(x, epsilon, 1. - epsilon)
+        log_scale = (
+            gammaln(alpha + beta) - gammaln(alpha) - gammaln(beta)
+            + alpha * ops.log(safe_x) + beta * ops.log(1. - safe_x)
         )
-        d = 1. + coefficient * d
-        d = ops.where(ops.abs(d) < tiny, tiny, d)
-        c = 1. + coefficient / c
-        c = ops.where(ops.abs(c) < tiny, tiny, c)
-        d = 1. / d
-        result = result * d * c
-        coefficient = -(alpha + iteration) * (qab + iteration) * x / (
-            (alpha + doubled) * (qap + doubled)
-        )
-        d = 1. + coefficient * d
-        d = ops.where(ops.abs(d) < tiny, tiny, d)
-        c = 1. + coefficient / c
-        c = ops.where(ops.abs(c) < tiny, tiny, c)
-        d = 1. / d
-        result = result * d * c
-    return result
+        scale = ops.exp(log_scale)
+        direct = scale * _beta_continued_fraction(alpha, beta, safe_x) / alpha
+        reflected = 1. - scale * _beta_continued_fraction(beta, alpha, 1. - safe_x) / beta
+        threshold = (alpha + 1.) / (alpha + beta + 2.)
+        result = ops.clip(ops.where(safe_x < threshold, direct, reflected), 0., 1.)
+        return ops.where(x <= 0., 0., ops.where(x >= 1., 1., result))
 
+    @_beta_cdf.register(np.ndarray)
+    def _(alpha: np.ndarray, beta: np.ndarray, x: np.ndarray):
+        from scipy.special import betainc
+        return betainc(alpha, beta, x)
 
-def regularized_incomplete_beta(alpha, beta, x):
-    import keras.ops as ops
-    dtype = alpha.dtype
-    beta = ops.cast(beta, dtype)
-    x = ops.cast(x, dtype)
-    epsilon = ops.cast(np.finfo(np.float32).eps, dtype)
-    safe_x = ops.clip(x, epsilon, 1. - epsilon)
-    log_scale = (
-        log_gamma(alpha + beta) - log_gamma(alpha) - log_gamma(beta)
-        + alpha * ops.log(safe_x) + beta * ops.log(1. - safe_x)
-    )
-    scale = ops.exp(log_scale)
-    direct = scale * _beta_continued_fraction(alpha, beta, safe_x) / alpha
-    reflected = 1. - scale * _beta_continued_fraction(beta, alpha, 1. - safe_x) / beta
-    threshold = (alpha + 1.) / (alpha + beta + 2.)
-    result = ops.clip(ops.where(safe_x < threshold, direct, reflected), 0., 1.)
-    return ops.where(x <= 0., 0., ops.where(x >= 1., 1., result))
+    return _beta_cdf(alpha, beta, x)
 
 
 def _clip(func):
@@ -173,7 +278,7 @@ def kl_divergence(D, D_pred):
 
     .. math::
 
-        \text{KLD}(\boldsymbol{u}, \, \boldsymbol{v}) = \sum^l_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}
+        \text{KLD}(\boldsymbol{u}, \boldsymbol{v}) = \sum^c_{j=1}u_j \ln \frac{u_j}{v_j}\text{.}
     """
     return np.sum(D * (np.log(D) - np.log(D_pred)), 1)
 
@@ -193,7 +298,7 @@ def sort_loss(D, D_pred):
 
 def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     r"""Soft thresholding operation.
-    It is defined as :math:`\text{soft}(\boldsymbol{A}, \, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace`, 
+    It is defined as :math:`\text{soft}(\boldsymbol{A}, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace`,
     where :math:`\odot` denotes element-wise multiplication.
 
     :param A: Matrix :math:`\boldsymbol{A}`.
@@ -209,9 +314,9 @@ def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
 def svt(A: np.ndarray, tau: float) -> np.ndarray:
     r"""Singular value thresholding (SVT) is proposed in paper :cite:`2010:cai`.
 
-    The solution to the optimization problem 
-    :math:`\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{\ast}` 
-    is given by :math:`\boldsymbol{U} \max \lbrace \boldsymbol{\Sigma} - \tau, 0 \rbrace \boldsymbol{V}^\top`, 
+    The solution to the optimization problem
+    :math:`\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{\ast}`
+    is given by :math:`\boldsymbol{U} \max \lbrace \boldsymbol{\Sigma} - \tau, 0 \rbrace \boldsymbol{V}^\top`,
     where :math:`\boldsymbol{A} = \boldsymbol{U} \boldsymbol{\Sigma} \boldsymbol{V}^\top` is the singular value decomposition of matrix :math:`\boldsymbol{A}`.
 
     :param A: Matrix :math:`\boldsymbol{A}`.
@@ -229,9 +334,9 @@ def svt(A: np.ndarray, tau: float) -> np.ndarray:
 def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
     r"""This approach is proposed in paper :cite:`2014:chen`.
 
-    The solution to the optimization problem 
-    :math:`\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,\,1}` 
-    is given by the following formula: 
+    The solution to the optimization problem
+    :math:`\mathop{\arg\min}_{\boldsymbol{X}} \Vert \boldsymbol{X} - \boldsymbol{A} \Vert_\text{F}^2 + \tau \Vert \boldsymbol{X} \Vert_{2,1}`
+    is given by the following formula:
 
     .. math::
 
@@ -242,7 +347,7 @@ def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
         \end{aligned}
         \right.\text{.}
 
-    where :math:`\vec{x}_{\bullet j}` is the :math:`j`-th column of matrix :math:`\boldsymbol{X}`, 
+    where :math:`\vec{x}_{\bullet j}` is the :math:`j`-th column of matrix :math:`\boldsymbol{X}`,
     and :math:`\vec{a}_{\bullet j}` is the :math:`j`-th column of matrix :math:`\boldsymbol{A}`.
 
     :param A: Matrix :math:`\boldsymbol{A}`.
@@ -257,13 +362,20 @@ def solvel21(A: np.ndarray, tau: float) -> np.ndarray:
 
 
 def normalize(D: np.ndarray) -> np.ndarray:
+    r"""Normalize each row of a matrix to sum to one.
+
+    :param D: Input matrix.
+    :type D: np.ndarray
+    :return: Row-normalized matrix.
+    :rtype: np.ndarray
+    """
     return D / np.sum(D, axis=1, keepdims=True)
 
 
 def proj(D: np.ndarray) -> np.ndarray:
     r"""This approach is proposed in paper :cite:`2016:condat`.
 
-    :param D: Matrix :math:`\boldsymbol{D}`.
+    :param D: Input matrix.
     :type D: np.ndarray
     :return: The projection onto the probability simplex.
     :rtype: np.ndarray
@@ -286,22 +398,41 @@ def locass_proj(D, k):
 
 
 def softmax(D: np.ndarray) -> np.ndarray:
+    r"""Apply the softmax function to each row of a matrix.
+
+    :param D: Input matrix.
+    :type D: np.ndarray
+    :return: Row-wise softmax values.
+    :rtype: np.ndarray
+    """
     from scipy.special import softmax as scipy_softmax
     return scipy_softmax(D, axis=1)
 
 
 def shannon_entropy(D: np.ndarray):
+    r"""Compute the Shannon entropy of a label distribution matrix.
+
+    :param D: Label distribution matrix.
+    :type D: np.ndarray
+    :return: Shannon entropy.
+    :rtype: float
+    """
     return -np.sum(D * np.log(D + EPS))
 
 
 def estimate_alpha(D: np.ndarray, max_iterations: int = 100, convergence_criterion=1e-7):
-    from scipy.special import digamma, polygamma
+    r"""Estimate Dirichlet concentration parameters from label distributions.
 
-    def inv_digamma(y: np.ndarray) -> np.ndarray:
-        x = np.where(y >= -2.22, np.exp(y) + .5, -1. / (y + np.euler_gamma))
-        for _ in range(5):
-            x = x - (digamma(x) - y) / polygamma(1, x)
-        return x
+    :param D: Label distribution matrix.
+    :type D: np.ndarray
+    :param max_iterations: Maximum number of fixed-point iterations, defaults to 100.
+    :type max_iterations: int
+    :param convergence_criterion: Convergence threshold, defaults to 1e-7.
+    :type convergence_criterion: float
+    :return: Estimated Dirichlet concentration vector.
+    :rtype: np.ndarray
+    """
+    from scipy.special import digamma
 
     log_D_bar = np.mean(np.log(D + EPS), axis=0)
     alpha = np.ones(D.shape[1], dtype=np.float64)
@@ -321,7 +452,7 @@ def estimate_alpha(D: np.ndarray, max_iterations: int = 100, convergence_criteri
 def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.ndarray:
     r"""Transform label distribution matrix to logical label matrix.
 
-    :param D: Label distribution matrix (shape: :math:`[n,\, l]`).
+    :param D: Label distribution matrix (shape: :math:`[n, c]`).
     :type D: np.ndarray
     :param method: Type of binaryzation method, defaults to 'threshold'. The options are 'threshold' and 'topk', which can refer to:
 
@@ -333,9 +464,9 @@ def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.nda
             2024:kou
 
     :type method: {'threshold', 'topk'}, optional
-    :param param: Parameter of binaryzation method, defaults to None. If None, the default value is .5 for 'threshold' and :math:`\lfloor l / 2 \rfloor` for 'topk'.
+    :param param: Parameter of binaryzation method, defaults to None. If None, the default value is .5 for 'threshold' and :math:`\lfloor c / 2 \rfloor` for 'topk'.
     :type param: any, optional
-    :return: Logical label matrix (shape: :math:`[n,\, l]`).
+    :return: Logical label matrix (shape: :math:`[n, c]`).
     :rtype: np.ndarray
     """
     r = np.argsort(np.argsort(D))
@@ -365,6 +496,15 @@ def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.nda
 
 @_1d
 def pairwise_euclidean(X, Y=None):
+    r"""Compute pairwise Euclidean distances between rows of two matrices.
+
+    :param X: First input matrix.
+    :type X: np.ndarray
+    :param Y: Second input matrix; if None, use ``X``, defaults to None.
+    :type Y: np.ndarray or None
+    :return: Pairwise Euclidean distance matrix.
+    :rtype: np.ndarray
+    """
 
     @singledispatch
     def _pairwise(X, Y):
@@ -381,6 +521,17 @@ def pairwise_euclidean(X, Y=None):
 
 @_1d
 def pairwise_cosine(X, Y=None, mode: str = 'similarity'):
+    r"""Compute pairwise cosine similarities or distances between rows of two matrices.
+
+    :param X: First input matrix.
+    :type X: np.ndarray
+    :param Y: Second input matrix; if None, use ``X``, defaults to None.
+    :type Y: np.ndarray or None
+    :param mode: Return mode, either ``'similarity'`` or ``'distance'``, defaults to ``'similarity'``.
+    :type mode: {'similarity', 'distance'}
+    :return: Pairwise cosine similarity or distance matrix.
+    :rtype: np.ndarray
+    """
 
     @singledispatch
     def _pairwise(X, Y):
@@ -404,6 +555,15 @@ def pairwise_cosine(X, Y=None, mode: str = 'similarity'):
 
 @_1d
 def pairwise_pearsonr(X, Y=None):
+    r"""Compute pairwise Pearson correlation coefficients between rows of two matrices.
+
+    :param X: First input matrix.
+    :type X: np.ndarray
+    :param Y: Second input matrix; if None, use ``X``, defaults to None.
+    :type Y: np.ndarray or None
+    :return: Pairwise Pearson correlation matrix.
+    :rtype: np.ndarray
+    """
 
     @singledispatch
     def _pairwise(X, Y):
@@ -424,6 +584,17 @@ def pairwise_pearsonr(X, Y=None):
 
 
 def kernel(X, Y=None, gamma: Optional[float] = None):
+    r"""Compute an RBF kernel matrix between rows of two matrices.
+
+    :param X: First input matrix.
+    :type X: np.ndarray
+    :param Y: Second input matrix; if None, use ``X``, defaults to None.
+    :type Y: np.ndarray or None
+    :param gamma: RBF kernel coefficient; if None, estimate it from pairwise distances, defaults to None.
+    :type gamma: float or None
+    :return: RBF kernel matrix.
+    :rtype: np.ndarray
+    """
     from sklearn.metrics.pairwise import rbf_kernel
     Y = X if Y is None else Y
     if gamma is None:
@@ -432,6 +603,13 @@ def kernel(X, Y=None, gamma: Optional[float] = None):
 
 
 def non_diagonal(X):
+    r"""Set the diagonal entries of a square matrix to zero.
+
+    :param X: Input square matrix.
+    :type X: np.ndarray
+    :return: Matrix with zero diagonal.
+    :rtype: np.ndarray
+    """
 
     @singledispatch
     def _non_diagonal(X):

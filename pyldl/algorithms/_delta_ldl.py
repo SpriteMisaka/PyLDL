@@ -4,7 +4,7 @@ import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
-from pyldl.algorithms.utils import digamma, inv_digamma, regularized_incomplete_beta
+from pyldl.algorithms.utils import digamma, inv_digamma, betainc
 
 
 EPS = np.finfo(np.float32).eps
@@ -141,16 +141,11 @@ class ApxC_LDL(Delta_LDL):
         alpha_ = mean * nu
         beta_ = (1 - mean) * nu
 
-        nodes = ops.cast(
-            ops.convert_to_tensor(np.linspace(0., np.log(2), 33, dtype=np.float32)),
-            alpha_.dtype
-        )
-        weights = np.ones(33, dtype=np.float32)
-        weights[1:-1:2] = 4.
-        weights[2:-1:2] = 2.
-        weights = ops.cast(ops.convert_to_tensor(weights), alpha_.dtype)
-        values = regularized_incomplete_beta(alpha_, beta_, nodes / np.log(2))
-        res = np.log(2) / 32. / 3. * ops.sum(weights * values)
+        def f(delta):
+            return betainc(alpha_, beta_, delta / np.log(2))
+
+        init = Delta_LDL._simpson(f, 0., np.log(2))
+        res = Delta_LDL._asr(f, 0., np.log(2), EPS, init, 5)
         res /= np.log(2)
 
         return res
