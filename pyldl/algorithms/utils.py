@@ -110,11 +110,13 @@ def trigamma(x):
     return _trigamma(x)
 
 
-def inv_digamma(y):
+def inv_digamma(y, max_iterations: int = 2):
     r"""Compute the inverse digamma function using Newton iterations.
 
     :param y: Digamma values.
     :type y: np.ndarray or tensor
+    :param max_iterations: Maximum number of Newton iterations, defaults to 2.
+    :type max_iterations: int
     :return: Inverse-digamma values.
     :rtype: np.ndarray or tensor
     """
@@ -123,14 +125,14 @@ def inv_digamma(y):
         import keras.ops as ops
 
         x = ops.where(y >= -2.22, ops.exp(y) + .5, -1. / (y + np.euler_gamma))
-        for _ in range(5):
+        for _ in range(max_iterations):
             x -= (digamma(x) - y) / trigamma(x)
         return x
 
     @_inverse.register(np.ndarray)
     def _(y: np.ndarray):
         x = np.where(y >= -2.22, np.exp(y) + .5, -1. / (y + np.euler_gamma))
-        for _ in range(5):
+        for _ in range(max_iterations):
             x -= (digamma(x) - y) / trigamma(x)
         return x
 
@@ -420,33 +422,68 @@ def shannon_entropy(D: np.ndarray):
     return -np.sum(D * np.log(D + EPS))
 
 
-def estimate_alpha(D: np.ndarray, max_iterations: int = 100, convergence_criterion=1e-7):
+def estimate_alpha(D, max_iterations: int = 100, convergence_criterion=1e-7):
     r"""Estimate Dirichlet concentration parameters from label distributions.
 
     :param D: Label distribution matrix.
-    :type D: np.ndarray
+    :type D: np.ndarray or tensor
     :param max_iterations: Maximum number of fixed-point iterations, defaults to 100.
     :type max_iterations: int
     :param convergence_criterion: Convergence threshold, defaults to 1e-7.
     :type convergence_criterion: float
     :return: Estimated Dirichlet concentration vector.
-    :rtype: np.ndarray
+    :rtype: np.ndarray or tensor
     """
-    from scipy.special import digamma
+    @singledispatch
+    def _estimate(D):
+        import keras.ops as ops
 
-    log_D_bar = np.mean(np.log(D + EPS), axis=0)
-    alpha = np.ones(D.shape[1], dtype=np.float64)
+        log_p_bar = ops.mean(ops.log(D), axis=0)
+        alpha = ops.ones_like(log_p_bar)
+        i = ops.zeros((), dtype="int32")
 
-    for _ in range(max_iterations):
-        alpha0 = np.sum(alpha)
-        y = digamma(alpha0) + log_D_bar
-        alpha_new = inv_digamma(y)
+        def cond(i, _):
+            return i < max_iterations
 
-        if np.max(np.abs(alpha_new - alpha)) < convergence_criterion:
-            return alpha_new
-        alpha = alpha_new
+        def body(i, alpha):
+            alpha0 = ops.sum(alpha)
+            y = digamma(alpha0) + log_p_bar
+            alpha_new = inv_digamma(y, max_iterations=0)
+            diff = ops.max(ops.abs(alpha_new - alpha))
+            alpha = ops.clip(
+                ops.where(diff < convergence_criterion, alpha, alpha_new),
+                EPS,
+                1e7
+            )
+            return i + 1, alpha
 
-    return alpha
+        _, alpha = ops.while_loop(
+            cond,
+            body,
+            (i, alpha),
+            maximum_iterations=max_iterations
+        )
+        return alpha
+
+    @_estimate.register(np.ndarray)
+    def _(D: np.ndarray):
+        from scipy.special import digamma
+
+        log_D_bar = np.mean(np.log(D + EPS), axis=0)
+        alpha = np.ones(D.shape[1], dtype=np.float64)
+
+        for _ in range(max_iterations):
+            alpha0 = np.sum(alpha)
+            y = digamma(alpha0) + log_D_bar
+            alpha_new = inv_digamma(y)
+
+            if np.max(np.abs(alpha_new - alpha)) < convergence_criterion:
+                return alpha_new
+            alpha = alpha_new
+
+        return alpha
+
+    return _estimate(D)
 
 
 def binaryzation(D: np.ndarray, method='threshold', param: any = None) -> np.ndarray:

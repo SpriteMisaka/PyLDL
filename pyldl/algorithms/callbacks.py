@@ -25,7 +25,7 @@ class LDLEarlyStopping(keras.callbacks.Callback):
                 self.model._metrics.append(self._monitor)
             self._prev_pred = self.model.predict(self.model._X)
             self._pc = []
-        self._best = np.inf if self._smaller else 0.
+        self._best = np.inf if self._smaller else -np.inf
 
     def _wave_value(self):
         cur_pred = self.model.predict(self.model._X)

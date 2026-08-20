@@ -191,17 +191,19 @@ class LALOT(BaseIter, _SA, BaseLDL):
         return M
 
     def _call(self, X):
+        from pyldl.algorithms.utils import normalize
         X1 = np.concatenate((X, np.ones((X.shape[0], 1))), axis=1)
-        return softmax(X1 @ self._W, axis=1)
+        return normalize(X1 @ self._W)
 
-    def fit(self, X, D, max_iterations=500, *args, **kwargs):
+    def fit(self, X, D, max_iterations=500, sinkhorn_iterations=200,
+            learning_rate=1e-4, *args, **kwargs):
+        self._sinkhorn_iterations = sinkhorn_iterations
+        self._learning_rate = learning_rate
         return super().fit(
             X, D, max_iterations=max_iterations, *args, **kwargs
         )
 
-    def _before_train(self, sinkhorn_iterations=200, learning_rate=1e-4, **kwargs):
-        self._sinkhorn_iterations = sinkhorn_iterations
-        self._learning_rate = learning_rate
+    def _before_train(self):
         self._W = np.random.random((self._n_features + 1, self._n_outputs))
         self._K0 = self._D.T @ self._D
         self._K1 = self._K0 / np.max(self._K0)

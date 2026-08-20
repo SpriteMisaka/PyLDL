@@ -4,7 +4,7 @@ import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseDeepLDL, BaseAdam
-from pyldl.algorithms.utils import digamma, inv_digamma, betainc
+from pyldl.algorithms.utils import digamma, estimate_alpha, betainc
 
 
 EPS = np.finfo(np.float32).eps
@@ -19,30 +19,27 @@ class Delta_LDL(BaseAdam, BaseDeepLDL):
 
     @staticmethod
     def _simpson(f, l, r):
-        c = (l + r) / 2.
-        h = (r - l) / 6.
-        return h * (f(l) + 4. * f(c) + f(r))
+        nodes = ops.convert_to_tensor(np.linspace(0., 1., 33, dtype=np.float32))
+        weights = np.ones(33, dtype=np.float32)
+        weights[1:-1:2] = 4.
+        weights[2:-1:2] = 2.
+        weights = ops.convert_to_tensor(weights)
+        values = f(l + (r - l) * nodes)
+        return (r - l) / 32. / 3. * ops.sum(weights * values)
 
     @staticmethod
-    def _asr(f, l, r, eps, ans, depth):
-        mid = (l + r) / 2.
-        fl = Delta_LDL._simpson(f, l, mid)
-        fr = Delta_LDL._simpson(f, mid, r)
-        if abs(fl + fr - ans) <= 15. * eps or depth <= 0:
-            return fl + fr + (fl + fr - ans) / 15.
-        term1 = Delta_LDL._asr(f, l, mid, eps / 2., fl, depth - 1)
-        term2 = Delta_LDL._asr(f, mid, r, eps / 2., fr, depth - 1)
-        return term1 + term2
+    def _f(values, delta):
+        return ops.mean(
+            keras.activations.sigmoid(
+                ops.expand_dims(values, axis=-1) - delta
+            ),
+            axis=0
+        )
 
     def _loss(self, X, D, *_):
         D_pred = self._model(X)
         kl = keras.losses.kl_divergence(D, D_pred)
-
-        def f(delta):
-            return ops.mean(keras.activations.sigmoid(kl - delta))
-
-        init = Delta_LDL._simpson(f, 0., self._delta)
-        return Delta_LDL._asr(f, 0., self._delta, EPS, init, 5)
+        return Delta_LDL._simpson(lambda delta: Delta_LDL._f(kl, delta), 0., self._delta)
 
     def _before_train(self):
         uni = ops.full(ops.shape(self._D), 1. / self._n_outputs)
@@ -144,8 +141,7 @@ class ApxC_LDL(Delta_LDL):
         def f(delta):
             return betainc(alpha_, beta_, delta / np.log(2))
 
-        init = Delta_LDL._simpson(f, 0., np.log(2))
-        res = Delta_LDL._asr(f, 0., np.log(2), EPS, init, 5)
+        res = Delta_LDL._simpson(f, 0., np.log(2))
         res /= np.log(2)
 
         return res
@@ -153,39 +149,13 @@ class ApxC_LDL(Delta_LDL):
     @staticmethod
     def acr(D, D_pred):
         js = ApxC_LDL._js_divergence(D, D_pred)
-        def f(delta):
-            return ops.mean(keras.activations.sigmoid(js - delta))
-        init = Delta_LDL._simpson(f, 0, np.log(2))
-        res = Delta_LDL._asr(f, 0, np.log(2), EPS, init, 5)
+        res = Delta_LDL._simpson(lambda delta: Delta_LDL._f(js, delta), 0., np.log(2))
         res /= np.log(2)
         return res
 
-    @staticmethod
-    def estimate_alpha(D, max_iter=100, tol=1e-7):
-        log_p_bar = ops.mean(ops.log(D), axis=0)
-        alpha = ops.ones_like(log_p_bar)
-        i = ops.zeros((), dtype="int32")
-
-        def cond(i, _):
-            return i < max_iter
-
-        def body(i, alpha):
-            alpha0 = ops.sum(alpha)
-            y = digamma(alpha0) + log_p_bar
-            alpha_new = inv_digamma(y)
-            diff = ops.max(ops.abs(alpha_new - alpha))
-            alpha = ops.clip(ops.where(diff < tol, alpha, alpha_new), EPS, 1e7)
-            return i + 1, alpha
-
-        _, alpha = ops.while_loop(
-            cond, body, (i, alpha), maximum_iterations=max_iter
-        )
-
-        return alpha
-
     def _loss(self, X, D, *_):
         D_pred = self._model(X)
-        beta = ApxC_LDL.estimate_alpha(ops.stop_gradient(D_pred))
+        beta = estimate_alpha(ops.stop_gradient(D_pred))
 
         self._l_up = ApxC_LDL.acr(D, D_pred)
         self._l_down = 1 - ApxC_LDL.random_acr(self._alpha_, beta)
@@ -199,4 +169,4 @@ class ApxC_LDL(Delta_LDL):
     def _before_train(self):
         self._lambda = 1.
         self._n_dirichlet_samples = 100
-        self._alpha_ = ApxC_LDL.estimate_alpha(self._D)
+        self._alpha_ = estimate_alpha(self._D)

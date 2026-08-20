@@ -10,6 +10,79 @@ def _resolve_fit_args(algorithm, fit_args):
     return kwargs
 
 
+def _preprocessor_str(preprocessor):
+    from sklearn.base import TransformerMixin
+    from pyldl.algorithms import SSG_LDL
+
+    if preprocessor is None:
+        return ""
+    if isinstance(preprocessor, TransformerMixin):
+        return f"_{preprocessor.__class__.__name__}"
+    if isinstance(preprocessor, SSG_LDL):
+        return "_SSG_LDL"
+    if isinstance(preprocessor, list):
+        return "_Pipeline"
+
+
+def _preprocessing(preprocessor, X, D):
+    from sklearn.base import TransformerMixin
+    from pyldl.algorithms import SSG_LDL
+
+    if isinstance(preprocessor, TransformerMixin):
+        X = preprocessor.fit_transform(X)
+    elif isinstance(preprocessor, SSG_LDL):
+        X, D = preprocessor.fit_transform(X, D)
+    elif isinstance(preprocessor, list):
+        for processor in preprocessor:
+            X, D = _preprocessing(processor, X, D)
+    return X, D
+
+
+def _preprocessing_test(preprocessor, X):
+    from sklearn.base import TransformerMixin
+    from pyldl.algorithms import SSG_LDL
+
+    if isinstance(preprocessor, TransformerMixin):
+        X = preprocessor.transform(X)
+    elif isinstance(preprocessor, SSG_LDL):
+        pass
+    elif isinstance(preprocessor, list):
+        for processor in preprocessor:
+            X = _preprocessing_test(processor, X)
+    return X
+
+
+def _postprocessing(postprocessor, D):
+    if callable(postprocessor):
+        D = postprocessor(D)
+    elif isinstance(postprocessor, list):
+        for processor in postprocessor:
+            D = _postprocessing(processor, D)
+    return D
+
+
+def _postprocessor_str(postprocessor):
+    if postprocessor is None:
+        return ""
+    if isinstance(postprocessor, list):
+        return "_Pipeline"
+    if callable(postprocessor):
+        name = getattr(postprocessor, "__name__", postprocessor.__class__.__name__)
+        return f"_{name}"
+
+
+def _wrap_predict(model, postprocessor):
+    if postprocessor is None:
+        return model
+    predict = model.predict
+
+    def predict_with_postprocessing(X):
+        return _postprocessing(postprocessor, predict(X))
+
+    model.predict = predict_with_postprocessing
+    return model
+
+
 def run(
     algorithms, datasets, metrics=None,
     n_folds=10, n_repeats=10, preprocessors=None, postprocessors=None,
@@ -18,8 +91,6 @@ def run(
     import pandas as pd
     from tqdm import tqdm
     from sklearn.model_selection import KFold
-    from sklearn.base import TransformerMixin
-    from pyldl.algorithms import SSG_LDL
     if metrics is None:
         metrics = DEFAULT_METRICS
     if preprocessors is None:
@@ -36,15 +107,8 @@ def run(
             for dataset in datasets:
                 X, D = load_dataset(dataset)
 
-                if preprocessor is not None:
-                    if isinstance(preprocessor, TransformerMixin):
-                        pre_str = f"_{preprocessor.__class__.__name__}"
-                    elif isinstance(preprocessor, SSG_LDL):
-                        pre_str = "_SSG_LDL"
-                    elif isinstance(preprocessor, list):
-                        pre_str = "_Pipeline"
-                else:
-                    pre_str = ""
+                pre_str = _preprocessor_str(preprocessor)
+                post_str = _postprocessor_str(postprocessor)
 
                 for algorithm in algorithms:
                     alg_fit_args = _resolve_fit_args(algorithm, fit_args)
@@ -57,7 +121,7 @@ def run(
                         else:
                             init_str = ""
 
-                        setup = f"{algorithm.__name__}{pre_str}{init_str}"
+                        setup = f"{algorithm.__name__}{pre_str}{post_str}{init_str}"
                         tqdm.write(f"Running {setup} on {dataset}")
 
                         outer_pbar = tqdm(total=n_repeats*n_folds, position=0)
@@ -68,41 +132,22 @@ def run(
                             for train_index, test_index in kfold.split(X):
                                 j += 1
 
-                                def _preprocessing(p, X, D):
-                                    if isinstance(p, TransformerMixin):
-                                        X = p.fit_transform(X)
-                                    elif isinstance(p, SSG_LDL):
-                                        X, D = p.fit_transform(X, D)
-                                    elif isinstance(p, list):
-                                        for i in p:
-                                            X, D = _preprocessing(i, X, D)
-                                    return X, D
-                                X_train, D_train = _preprocessing(preprocessor, X[train_index], D[train_index])
+                                X_train, D_train = _preprocessing(
+                                    preprocessor,
+                                    X[train_index],
+                                    D[train_index]
+                                )
 
                                 model = algorithm(**alg_init_args)
                                 model.fit(X_train, D_train, **alg_fit_args)
 
-                                def _preprocessing_test(p, X):
-                                    if isinstance(p, TransformerMixin):
-                                        X = p.transform(X)
-                                    elif isinstance(p, SSG_LDL):
-                                        pass
-                                    elif isinstance(p, list):
-                                        for i in p:
-                                            X = _preprocessing_test(i, X)
-                                    return X
-                                X_test = _preprocessing_test(preprocessor, X[test_index])
+                                X_test = _preprocessing_test(
+                                    preprocessor,
+                                    X[test_index]
+                                )
 
-                                def _postprocessing(p, D):
-                                    if callable(p):
-                                        D = p(D)
-                                    elif isinstance(p, list):
-                                        for i in p:
-                                            D = _postprocessing(i, D)
-                                    return D
-                                D_test = _postprocessing(postprocessor, D[test_index])
-
-                                scores = model.score(X_test, D_test, metrics=metrics)
+                                model = _wrap_predict(model, postprocessor)
+                                scores = model.score(X_test, D[test_index], metrics=metrics)
                                 df.loc[len(df.index)] = (i, j) + scores
 
                                 means = df[metrics].mean()
