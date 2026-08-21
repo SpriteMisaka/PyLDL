@@ -13,6 +13,7 @@ PyLDL Documentation
    le
    incomldl
    ldl4c
+   gld
    others
    app
    utils

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GLD &#8212; PyLDL 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Others" href="others.html" />
+    <link rel="prev" title="LDL4C" href="ldl4c.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="gld">
+<h1>GLD<a class="headerlink" href="#gld" title="Link to this heading">¶</a></h1>
+<p>GLD refers to <em>generalized label distribution</em> (learning). It extends LDL by allowing the supervised target to be a generalized label distribution whose components are not required to lie on the probability simplex, as described in <span id="id1">[<a class="reference internal" href="#id6" title="Haitao Wu, Weiwei Li, Kun Yue, and Xiuyi Jia. Learning generalized label distributions. In Proceedings of the International Conference on Machine Learning. 2026. Early Access.">GLD-WLYJ26</a>]</span>.</p>
+<div class="toctree-wrapper compound">
+</div>
+<section id="basegld">
+<h2><cite>BaseGLD</cite><a class="headerlink" href="#basegld" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.base.BaseGLD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.base.</span></span><span class="sig-name descname"><span class="pre">BaseGLD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/base.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.base.BaseGLD" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for all GLD models in PyLDL.</p>
+</dd></dl>
+
+</section>
+<section id="gld-svr">
+<h2>GLD-SVR<a class="headerlink" href="#gld-svr" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.GLD_SVR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">GLD_SVR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.GLD_SVR" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.GLD_SVR" title="pyldl.algorithms.GLD_SVR"><code class="xref py py-class docutils literal notranslate"><span class="pre">GLD-SVR</span></code></a> is proposed in paper <span id="id2">[<a class="reference internal" href="#id6" title="Haitao Wu, Weiwei Li, Kun Yue, and Xiuyi Jia. Learning generalized label distributions. In Proceedings of the International Conference on Machine Learning. 2026. Early Access.">GLD-WLYJ26</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="gld-knn">
+<h2>GLD-<span class="math notranslate nohighlight">\(k\)</span>NN<a class="headerlink" href="#gld-knn" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.GLD_KNN">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">GLD_KNN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.GLD_KNN" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.GLD_KNN" title="pyldl.algorithms.GLD_KNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">GLD-kNN</span></code></a> is proposed in paper <span id="id3">[<a class="reference internal" href="#id6" title="Haitao Wu, Weiwei Li, Kun Yue, and Xiuyi Jia. Learning generalized label distributions. In Proceedings of the International Conference on Machine Learning. 2026. Early Access.">GLD-WLYJ26</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="gld-bfgs">
+<h2>GLD-BFGS<a class="headerlink" href="#gld-bfgs" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyldl.algorithms.GLD_BFGS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.</span></span><span class="sig-name descname"><span class="pre">GLD_BFGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.GLD_BFGS" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyldl.algorithms.GLD_BFGS" title="pyldl.algorithms.GLD_BFGS"><code class="xref py py-class docutils literal notranslate"><span class="pre">GLD-BFGS</span></code></a> is proposed in paper <span id="id4">[<a class="reference internal" href="#id6" title="Haitao Wu, Weiwei Li, Kun Yue, and Xiuyi Jia. Learning generalized label distributions. In Proceedings of the International Conference on Machine Learning. 2026. Early Access.">GLD-WLYJ26</a>]</span>.</p>
+</dd></dl>
+
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<div class="docutils container" id="id5">
+<div role="list" class="citation-list">
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>GLD-WLYJ26<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>,<a role="doc-backlink" href="#id4">4</a>)</span>
+<p>Haitao Wu, Weiwei Li, Kun Yue, and Xiuyi Jia. Learning generalized label distributions. In <em>Proceedings of the International Conference on Machine Learning</em>. 2026. Early Access.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyLDL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ldl.html">LDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GLD</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basegld"><cite>BaseGLD</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gld-svr">GLD-SVR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gld-knn">GLD-<span class="math notranslate nohighlight">\(k\)</span>NN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gld-bfgs">GLD-BFGS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024-2026, SpriteMisaka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/gld.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

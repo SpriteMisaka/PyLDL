@@ -1,0 +1,46 @@
+GLD
+---
+
+GLD refers to *generalized label distribution* (learning). It extends LDL by allowing the supervised target to be a generalized label distribution whose components are not required to lie on the probability simplex, as described in :cite:`2026:wu`.
+
+.. toctree::
+   :maxdepth: 2
+
+`BaseGLD`
+~~~~~~~~~~
+
+.. autoclass:: pyldl.algorithms.base.BaseGLD
+   :members:
+   :private-members:
+
+.. jinja:: gld_ctx
+
+   {% for class_name in all_gld_algs %}
+
+   {% if class_name == 'GLD_KNN' %}
+   GLD-:math:`k`\NN
+   ~~~~~~~~~~~~~~~~~~~
+   {% else %}
+   {{ class_name.replace('_', '-').lstrip('-') }}
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   {% endif %}
+
+   .. autoclass:: pyldl.algorithms.{{ class_name }}
+      :members:
+      :private-members:
+
+   {% endfor %}
+
+References
+~~~~~~~~~~
+
+.. bibliography:: bib/gld/references.bib
+   :labelprefix: GLD-
+   :cited:
+
+.. Further Reading
+.. ~~~~~~~~~~~~~~~
+
+.. .. bibliography:: bib/gld/references.bib
+..    :labelprefix: GLD-
+..    :notcited:

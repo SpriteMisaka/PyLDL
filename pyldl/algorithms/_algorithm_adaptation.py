@@ -35,6 +35,8 @@ class AA_KNN(_AA_KNN, BaseLDL):
 
 
 class GLD_KNN(_AA_KNN, BaseGLD):
+    """:class:`GLD-kNN <pyldl.algorithms.GLD_KNN>` is proposed in paper :cite:`2026:wu`.
+    """
     pass
 
 

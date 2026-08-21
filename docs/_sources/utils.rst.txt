@@ -12,7 +12,8 @@ Utils & Metrics
    {% endmacro %}
 
    {% for func_name in all_alg_utils %}
-   {% if func_name == 'sort_loss' %}
+   {% if func_name.startswith('_') %}
+   {% elif func_name == 'sort_loss' %}
    {% else %}
    {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.algorithms.utils.{{ func_name }}
@@ -20,7 +21,8 @@ Utils & Metrics
    {% endfor %}
 
    {% for func_name in all_utils %}
-   {% if func_name in all_alg_utils %}
+   {% if func_name.startswith('_') %}
+   {% elif func_name in all_alg_utils %}
    {% else %}
    {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.utils.{{ func_name }}
@@ -28,9 +30,8 @@ Utils & Metrics
    {% endfor %}
 
    {% for func_name in all_metrics %}
-   {% if func_name in all_alg_utils %}
-   {% elif func_name == '_calculate_match_m_top_k' %}
-   {% elif func_name == '_mean' %}
+   {% if func_name.startswith('_') %}
+   {% elif func_name in all_alg_utils %}
    {% else %}
    {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.metrics.{{ func_name }}

@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>LDL &#8212; PyLDL 0.0.3 documentation</title>
+    <title>LDL &#8212; PyLDL 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
-    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/documentation_options.js?v=01f34227"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -49,13 +49,21 @@ It is under the constraints of probability simplex, i.e., <span class="math notr
 the goal of LDL is to learn a mapping function <span class="math notranslate nohighlight">\(f: \mathcal{X} \to \Delta^{c-1}\)</span> that minimizes the discrepancy between predicted and true label distributions. The performance of <span class="math notranslate nohighlight">\(f\)</span> is ultimately evaluated on a test set, typically by distance/similarity measures.</p>
 </div></blockquote>
 <p>Here, we provide a quick start guide. You can use PyLDL’s algorithms in just a few steps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">SA_BFGS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+</div>
+</div>
 <ol class="arabic simple">
 <li><p>Load an algorithm</p></li>
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">SA_BFGS</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">SA_BFGS</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SA_BFGS</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -65,8 +73,7 @@ the goal of LDL is to learn a mapping function <span class="math notranslate noh
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyldl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;SJAFFE&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;SJAFFE&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -76,8 +83,7 @@ the goal of LDL is to learn a mapping function <span class="math notranslate noh
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">D_train</span><span class="p">,</span> <span class="n">D_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">D_train</span><span class="p">,</span> <span class="n">D_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span>
 <span class="p">)</span>
 </pre></div>
@@ -106,12 +112,12 @@ the goal of LDL is to learn a mapping function <span class="math notranslate noh
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>chebyshev: 0.0899
-clark: 0.3304
-canberra: 0.6615
-kl_divergence: 0.0402
-cosine: 0.9637
-intersection: 0.8900
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>chebyshev: 0.0916
+clark: 0.3509
+canberra: 0.7156
+kl_divergence: 0.0459
+cosine: 0.9591
+intersection: 0.8817
 </pre></div>
 </div>
 </div>
@@ -973,6 +979,7 @@ StructRF refers to <em>structured random forest</em>.</p>
 <li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gld.html">GLD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
 <li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
@@ -985,7 +992,7 @@ StructRF refers to <em>structured random forest</em>.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2024, SpriteMisaka.
+      &#169;2024-2026, SpriteMisaka.
       
       |
       Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>

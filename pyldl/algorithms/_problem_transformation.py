@@ -104,4 +104,6 @@ class LDSVR(_SVRMixin, _Reg2LDL):
 
 
 class GLD_SVR(_SVRMixin, _Reg2GLD):
+    """:class:`GLD-SVR <pyldl.algorithms.GLD_SVR>` is proposed in paper :cite:`2026:wu`.
+    """
     pass

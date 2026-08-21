@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>PyLDL Documentation &#8212; PyLDL 0.0.3 documentation</title>
+    <title>PyLDL Documentation &#8212; PyLDL 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
-    <script src="_static/documentation_options.js?v=47de8214"></script>
+    <script src="_static/documentation_options.js?v=01f34227"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -108,6 +108,14 @@
 <li class="toctree-l2"><a class="reference internal" href="ldl4c.html#further-reading">Further Reading</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="gld.html">GLD</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gld.html#basegld"><cite>BaseGLD</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="gld.html#gld-svr">GLD-SVR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gld.html#gld-knn">GLD-<span class="math notranslate nohighlight">\(k\)</span>NN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gld.html#gld-bfgs">GLD-BFGS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gld.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="others.html">Others</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="others.html#oversampling">Oversampling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="others.html#transfer-learning">Transfer Learning</a></li>
@@ -130,9 +138,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#d"><cite>_1d</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#clip"><cite>_clip</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#reduction"><cite>_reduction</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#betainc"><cite>betainc</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#binaryzation"><cite>binaryzation</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#digamma"><cite>digamma</cite></a></li>
@@ -154,8 +159,6 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#solvel21"><cite>solvel21</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#svt"><cite>svt</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#trigamma"><cite>trigamma</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#random-mask"><cite>_random_mask</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#weighted-mask"><cite>_weighted_mask</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#artificial"><cite>artificial</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#download-dataset"><cite>download_dataset</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#emphasize"><cite>emphasize</cite></a></li>
@@ -166,9 +169,6 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html#random-exchange"><cite>random_exchange</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#random-missing"><cite>random_missing</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#regressor2ldl"><cite>regressor2ldl</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#nu"><cite>_nu</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#register"><cite>_register</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html#uniform-vector"><cite>_uniform_vector</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#accuracy-uparrow"><cite>accuracy</cite><span class="math notranslate nohighlight">\(\uparrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#canberra-downarrow"><cite>canberra</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#chebyshev-downarrow"><cite>chebyshev</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
@@ -243,6 +243,7 @@
 <li class="toctree-l1"><a class="reference internal" href="le.html">LE</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incomldl.html">IncomLDL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ldl4c.html">LDL4C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gld.html">GLD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="others.html">Others</a></li>
 <li class="toctree-l1"><a class="reference internal" href="app.html">Applications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utils &amp; Metrics</a></li>
@@ -255,7 +256,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2024, SpriteMisaka.
+      &#169;2024-2026, SpriteMisaka.
       
       |
       Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>

@@ -34,6 +34,7 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
   + ([Tan et al. 2025](https://doi.org/10.1016/j.knosys.2025.113666)) [*KBS*]: `RG4LDL`.
   + ([Wu, Li, and Jia 2025](https://icml.cc/virtual/2025/poster/44379)) [*ICML*]: `S_LRR`, `S_SCL`, `S_KLD`, `S_CJS` and `S_QFD2`.
   + ([Li et al. 2025](https://icml.cc/virtual/2025/poster/46395)) [*ICML*]: `Delta_LDL`.
+  + ... and many more LDL algorithms are included! Discover them in the `pyldl.algorithms` module! 🚀
 + LE algorithms:
   + ([Xu, Liu, and Geng 2019](https://doi.org/10.1109/TKDE.2019.2947040)) [*TKDE*]: `FCM`, `KM`, `LP`, `ML`, and `GLLE`.
   + ([Xu et al. 2020](https://proceedings.mlr.press/v119/xu20g.html)) [*ICML*]: `LEVI`.
@@ -58,6 +59,15 @@ Label distribution learning (LDL) and label enhancement (LE) toolkit implemented
 > $^5$ To use domain adaptation methods for LDL, you need to provide the source domain data via parameters `sX` and `sy` of the `fit` method. [Here](https://github.com/SpriteMisaka/PyLDL/blob/main/demo/domain_adaptation.ipynb) is a demo on domain adaptation for LDL.
 
 > $^\dagger$ These methods involve imposing constraints on model parameters, like regularization. Therefore, it is recommended to carefully tune the hyperparameters and apply feature preprocessing techniques like `StandardScaler` or `MinMaxScaler` before conducting experiments to achieve the expected performance.
+
+## ❗ News
+
+- **0.1.0**: PyLDL now supports both TensorFlow and PyTorch backends through Keras 3. You can switch between the two backends by setting the `KERAS_BACKEND` environment variable:
+
+```python
+import os
+os.environ["KERAS_BACKEND"] = "torch"
+```
 
 ## Installation
 
@@ -180,6 +190,17 @@ quadprog
 scikit-fuzzy
 scikit-learn
 scipy
+```
+
+If you use TensorFlow backend, you also need to install:
+
+```
 tensorflow
 tensorflow-probability
+```
+
+If you use PyTorch backend, you also need to install:
+
+```
+torch
 ```

@@ -119,6 +119,8 @@ class SA_IIS(BaseIter, _SA, BaseLDL):
 
 
 class GLD_BFGS(_SA, BaseGLD):
+    """:class:`GLD-BFGS <pyldl.algorithms.GLD_BFGS>` is proposed in paper :cite:`2026:wu`.
+    """
 
     def _loss_function(self, G, G_pred):
         diff = G - G_pred
