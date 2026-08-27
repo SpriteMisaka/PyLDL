@@ -11,8 +11,8 @@ class _LRLDL(BaseADMM, BaseLDL):
     :term:`ADMM` is used as optimization algorithm.
     """
 
-    def __init__(self, mode='threshold', param=None, alpha=1e-3, beta=1e-3, random_state=None, **kwargs):
-        super().__init__(random_state, **kwargs)
+    def __init__(self, mode='threshold', param=None, alpha=1e-3, beta=1e-3, **kwargs):
+        super().__init__(**kwargs)
         self._mode = mode
         self._param = param
         self._alpha = alpha

@@ -25,9 +25,9 @@ class Duo_LDL(BaseAdam, BaseDeepLDL):
         , axis=1)
 
     def predict(self, X):
-        from pyldl.algorithms.utils import normalize
+        from pyldl.algorithms.utils import proj
         C_pred = self._call(X)
         shape = (X.shape[0], self._n_outputs - 1, self._n_outputs)
         C_pred_reshaped = ops.transpose(ops.reshape(C_pred, shape), (0, 2, 1))
         D_pred = self._to_numpy((ops.sum(C_pred_reshaped, axis=2) + 1) / self._n_outputs)
-        return normalize(D_pred)
+        return proj(D_pred)

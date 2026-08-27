@@ -40,6 +40,7 @@ setuptools.setup(
         "numpy",
         "qpsolvers",
         "quadprog",
+        "requests",
         "scikit-fuzzy",
         "scikit-learn",
         "scipy"

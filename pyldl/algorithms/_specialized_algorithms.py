@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.special import softmax
 from scipy.optimize import minimize, fsolve
 
 from sklearn.covariance import LedoitWolf
@@ -25,7 +24,8 @@ class _SA(Base):
         return kl_divergence(D, D_pred, reduction=np.sum)
 
     def _call(self, X):
-        return softmax(X @ self._W, axis=1)
+        from pyldl.algorithms.utils import softmax
+        return softmax(X @ self._W)
 
     def get_weights(self):
         return self._W.copy()
@@ -193,9 +193,9 @@ class LALOT(BaseIter, _SA, BaseLDL):
         return M
 
     def _call(self, X):
-        from pyldl.algorithms.utils import normalize
+        from pyldl.algorithms.utils import softmax
         X1 = np.concatenate((X, np.ones((X.shape[0], 1))), axis=1)
-        return normalize(X1 @ self._W)
+        return softmax(X1 @ self._W)
 
     def fit(self, X, D, max_iterations=500, sinkhorn_iterations=200,
             learning_rate=1e-4, *args, **kwargs):

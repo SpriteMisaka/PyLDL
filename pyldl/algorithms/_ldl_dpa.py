@@ -36,4 +36,4 @@ class LDL_DPA(BaseBFGS, BaseDeepLDL):
 
     def _before_train(self):
         from scipy.stats import rankdata
-        self._R = ops.cast(rankdata(self._D, axis=1), dtype="float32")
+        self._R = ops.cast(rankdata(self._to_numpy(self._D), axis=1), dtype="float32")
