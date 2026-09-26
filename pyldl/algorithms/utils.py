@@ -658,3 +658,10 @@ def non_diagonal(X):
         return X - np.diag(np.diag(X))
 
     return _non_diagonal(X)
+
+
+def copy_model(model):
+    from copy import deepcopy
+    clone = object.__new__(type(model))
+    clone.__dict__.update(deepcopy(model.__dict__, {id(model): clone}))
+    return clone

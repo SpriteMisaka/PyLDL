@@ -18,7 +18,7 @@ def _path_suffix(suffix):
     def decorator(func):
         @wraps(func)
         def wrapper(self, path: str, *args, **kwargs):
-            file = Path(path).with_suffix(suffix)
+            file = Path(path if str(path).endswith(suffix) else f"{path}{suffix}")
             os.makedirs(file.parent, exist_ok=True)
             return func(self, file, *args, **kwargs)
         return wrapper

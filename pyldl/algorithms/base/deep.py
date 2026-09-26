@@ -27,11 +27,14 @@ class _BaseDeep(keras.Model):
             self._gradient_step_impl = self._torch_gradient_step
 
     _serialize_objects = ['_model']
+    _serialize_attributes = ['_n_samples', '_n_features', '_n_outputs']
 
     def get_config(self):
         config = super().get_config()
         for i in self._serialize_objects:
             config[i] = keras.saving.serialize_keras_object(getattr(self, i))
+        for i in self._serialize_attributes:
+            config[i] = getattr(self, i, None)
         return config
 
     @classmethod
@@ -40,9 +43,12 @@ class _BaseDeep(keras.Model):
         for i in cls._serialize_objects:
             model_config = config.pop(i)
             s[i] = keras.saving.deserialize_keras_object(model_config)
+        attributes = {i: config.pop(i, None) for i in cls._serialize_attributes}
         obj = cls(**config)
         for i in cls._serialize_objects:
              setattr(obj, i, s[i])
+        for i, value in attributes.items():
+            setattr(obj, i, value)
         return obj
 
     @staticmethod
@@ -60,6 +66,12 @@ class _BaseDeep(keras.Model):
 
     def _call(self, X):
         return self._model(X)
+
+    def get_weights(self):
+        return self._model.get_weights()
+
+    def set_weights(self, weights):
+        self._model.set_weights(weights)
 
     @staticmethod
     def get_2layer_model(n_features, n_outputs, activation='softmax'):

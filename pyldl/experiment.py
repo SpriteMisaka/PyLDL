@@ -5,9 +5,36 @@ from pyldl.metrics import DEFAULT_METRICS
 def _resolve_fit_args(algorithm, fit_args):
     kwargs = {}
     for base in reversed(algorithm.__mro__):
-        if base.__name__ in fit_args:
-            kwargs.update(fit_args[base.__name__])
+        for targets, values in fit_args.items():
+            if base.__name__ in ((targets,) if isinstance(targets, str) else targets):
+                kwargs.update(values)
     return kwargs
+
+
+def _resolve_extra_args(target, extra_args):
+    import inspect
+
+    parameters = inspect.signature(target).parameters
+    return {
+        name: value for name, value in extra_args.items()
+        if name in parameters
+        and parameters[name].kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        )
+    }
+
+
+def _resolve_metrics(metrics, extra_args):
+    from functools import partial
+    import pyldl.metrics as metric_module
+
+    resolved = []
+    for metric in metrics:
+        function = getattr(metric_module, metric) if isinstance(metric, str) else metric
+        kwargs = _resolve_extra_args(function, extra_args)
+        resolved.append(partial(function, **kwargs) if kwargs else metric)
+    return resolved
 
 
 def _preprocessor_str(preprocessor):
@@ -52,6 +79,22 @@ def _preprocessing_test(preprocessor, X):
     return X
 
 
+def _copy_preprocessor(preprocessor):
+    import copy
+
+    if preprocessor is None:
+        return None
+    if isinstance(preprocessor, list):
+        return [_copy_preprocessor(p) for p in preprocessor]
+    from sklearn.base import TransformerMixin, clone
+    if isinstance(preprocessor, TransformerMixin):
+        try:
+            return clone(preprocessor)
+        except (AttributeError, RuntimeError, TypeError):
+            return copy.deepcopy(preprocessor)
+    return copy.deepcopy(preprocessor)
+
+
 def _postprocessing(postprocessor, D):
     if callable(postprocessor):
         D = postprocessor(D)
@@ -69,6 +112,9 @@ def _postprocessor_str(postprocessor):
     if callable(postprocessor):
         name = getattr(postprocessor, "__name__", postprocessor.__class__.__name__)
         return f"_{name}"
+    from pyldl.algorithms._daldl import DALDL
+    if isinstance(postprocessor, DALDL):
+        return "_DALDL"
 
 
 def _wrap_predict(model, postprocessor):
@@ -83,14 +129,120 @@ def _wrap_predict(model, postprocessor):
     return model
 
 
+def _fit_with_extra_args(model, X, D, fit_args, extra_args):
+    original_score = model.score
+    instance_score = model.__dict__.get("score")
+    has_instance_score = "score" in model.__dict__
+    validation_name = "_calculate_validation_scores"
+    original_validation = getattr(model, validation_name, None)
+    instance_validation = model.__dict__.get(validation_name)
+    has_instance_validation = validation_name in model.__dict__
+
+    def score_with_extra_args(X, D, metrics=None, return_dict=False):
+        if metrics is None:
+            return original_score(X, D, metrics=metrics, return_dict=return_dict)
+        resolved = _resolve_metrics(metrics, extra_args)
+        values = original_score(X, D, metrics=resolved, return_dict=False)
+        return dict(zip(metrics, values)) if return_dict else values
+    model.score = score_with_extra_args
+
+    if original_validation is not None:
+        def validation_with_extra_args(*args, **kwargs):
+            metrics = model._metrics
+            resolved = _resolve_metrics(metrics, extra_args)
+            model._metrics = resolved
+            try:
+                scores = original_validation(*args, **kwargs)
+                if not scores:
+                    return scores
+            finally:
+                model._metrics = metrics
+            return {metric: scores[bound] for metric, bound in zip(metrics, resolved)}
+        model._calculate_validation_scores = validation_with_extra_args
+
+    try:
+        return model.fit(X, D, **fit_args)
+    finally:
+        if has_instance_score:
+            model.score = instance_score
+        else:
+            del model.score
+        if original_validation is not None:
+            if has_instance_validation:
+                model._calculate_validation_scores = instance_validation
+            else:
+                del model._calculate_validation_scores
+
+
+def _run_fold(
+    X, D, train_index, test_index, repeat, fold,
+    algorithm, alg_init_args, alg_fit_args, preprocessor, postprocessor,
+    post_fit_args, metrics, extra_args, model_path, base_model_path,
+    load_models, save_models
+):
+    from pathlib import Path
+
+    X_train, D_train = _preprocessing(preprocessor, X[train_index], D[train_index])
+    X_test = _preprocessing_test(preprocessor, X[test_index])
+    loader = algorithm
+    if postprocessor is not None and not callable(postprocessor) and not isinstance(postprocessor, list):
+        from pyldl.algorithms._daldl import DALDL
+        if isinstance(postprocessor, DALDL):
+            loader = type(postprocessor)
+
+    model_exists = model_path is not None and any(
+        Path(f"{model_path}{suffix}").exists()
+        for suffix in (".pkl", ".keras")
+    )
+    if load_models and model_exists:
+        model = loader.load(model_path)
+        if loader is not algorithm:
+            postprocessor = None
+    else:
+        base_model_exists = base_model_path is not None and any(
+            Path(f"{base_model_path}{suffix}").exists()
+            for suffix in (".pkl", ".keras")
+        )
+        if load_models and base_model_exists:
+            model = algorithm.load(base_model_path)
+        else:
+            model = algorithm(**{
+                **_resolve_extra_args(algorithm, extra_args),
+                **alg_init_args,
+            })
+            _fit_with_extra_args(model, X_train, D_train, alg_fit_args, extra_args)
+            if save_models and loader is not algorithm:
+                model.dump(base_model_path)
+        if loader is not algorithm:
+            import copy
+            postprocessor = copy.deepcopy(postprocessor)
+            for name, value in _resolve_extra_args(type(postprocessor), extra_args).items():
+                setattr(postprocessor, name, value)
+            postprocessor.init_model = model
+            model = _fit_with_extra_args(
+                postprocessor, X_train, D_train, post_fit_args, extra_args
+            )
+            postprocessor = None
+        if save_models:
+            model.dump(model_path)
+    model = _wrap_predict(model, postprocessor)
+    scores = model.score(X_test, D[test_index], metrics=metrics)
+    return repeat, fold, scores
+
+
 def run(
-    algorithms, datasets, metrics=None,
+    algorithms, datasets, metrics=None, *,
     n_folds=10, n_repeats=10, preprocessors=None, postprocessors=None,
-    init_args=None, fit_args=None, random_state=0
+    init_args=None, fit_args=None, random_state=0, extra_args=None,
+    save_models=False, load_models=False, n_jobs=1
 ):
     import pandas as pd
+    from joblib import Parallel, delayed
     from tqdm import tqdm
     from sklearn.model_selection import KFold
+    if n_jobs == 0 or n_jobs < -1:
+        raise ValueError("n_jobs must be a positive integer or -1.")
+    n_jobs = int(n_jobs)
     if metrics is None:
         metrics = DEFAULT_METRICS
     if preprocessors is None:
@@ -101,6 +253,9 @@ def run(
         init_args = {}
     if fit_args is None:
         fit_args = {}
+    if extra_args is None:
+        extra_args = {}
+    score_metrics = _resolve_metrics(metrics, extra_args)
 
     for preprocessor in preprocessors:
         for postprocessor in postprocessors:
@@ -113,58 +268,102 @@ def run(
                 for algorithm in algorithms:
                     alg_fit_args = _resolve_fit_args(algorithm, fit_args)
                     for alg_init_args in init_args.get(algorithm.__name__, [{}]):
-                        df = pd.DataFrame(columns=["repeat", "fold"] + metrics)
-
+                        post_fit_args = {}
+                        if postprocessor is not None and not callable(postprocessor) and not isinstance(postprocessor, list):
+                            from pyldl.algorithms._daldl import DALDL
+                            if isinstance(postprocessor, DALDL):
+                                post_fit_args = _resolve_fit_args(type(postprocessor), fit_args)
                         if len(alg_init_args) > 0:
                             init_str = "_".join([f"{k}={v}" for k, v in alg_init_args.items()])
                             init_str = f"_{init_str}"
                         else:
                             init_str = ""
 
+                        base_setup = f"{algorithm.__name__}{pre_str}{init_str}"
                         setup = f"{algorithm.__name__}{pre_str}{post_str}{init_str}"
                         tqdm.write(f"Running {setup} on {dataset}")
 
-                        outer_pbar = tqdm(total=n_repeats*n_folds, position=0)
-                        inner_pbar = tqdm(total=n_folds, leave=False, position=1, bar_format="{desc}")
-                        for i in range(1, n_repeats+1):
-                            j = 0
-                            kfold = KFold(n_splits=n_folds, shuffle=True, random_state=random_state+i)
-                            for train_index, test_index in kfold.split(X):
-                                j += 1
-
-                                X_train, D_train = _preprocessing(
-                                    preprocessor,
-                                    X[train_index],
-                                    D[train_index]
+                        def tasks():
+                            for i in range(1, n_repeats + 1):
+                                kfold = KFold(
+                                    n_splits=n_folds,
+                                    shuffle=True,
+                                    random_state=random_state + i
                                 )
+                                for j, (train_index, test_index) in enumerate(kfold.split(X), 1):
+                                    task_preprocessor = (
+                                        _copy_preprocessor(preprocessor)
+                                        if n_jobs != 1 else preprocessor
+                                    )
+                                    yield delayed(_run_fold)(
+                                        X,
+                                        D,
+                                        train_index,
+                                        test_index,
+                                        i,
+                                        j,
+                                        algorithm,
+                                        alg_init_args,
+                                        alg_fit_args,
+                                        task_preprocessor,
+                                        postprocessor,
+                                        post_fit_args,
+                                        score_metrics,
+                                        extra_args,
+                                        f"models/{algorithm.__name__}/{dataset}/{setup}_repeat={i}_fold={j}"
+                                        if save_models or load_models else None,
+                                        f"models/{algorithm.__name__}/{dataset}/{base_setup}_repeat={i}_fold={j}"
+                                        if save_models or load_models else None,
+                                        load_models,
+                                        save_models,
+                                    )
 
-                                model = algorithm(**alg_init_args)
-                                model.fit(X_train, D_train, **alg_fit_args)
+                        total = n_repeats * n_folds
+                        results = []
+                        score_sums = [0.] * len(metrics)
+                        outer_pbar = tqdm(total=total, position=0)
+                        inner_pbar = tqdm(
+                            total=n_folds,
+                            leave=False,
+                            position=1,
+                            bar_format="{desc}",
+                        )
+                        try:
+                            with Parallel(
+                                n_jobs=n_jobs,
+                                backend="loky",
+                                return_as="generator",
+                            ) as parallel:
+                                for repeat, fold, scores in parallel(tasks()):
+                                    result = repeat, fold, scores
+                                    results.append(result)
+                                    score_sums = [
+                                        total + score
+                                        for total, score in zip(score_sums, scores)
+                                    ]
+                                    outer_pbar.update(1)
+                                    inner_pbar.set_description_str(
+                                        f"[repeat {repeat}/{n_repeats}, fold {fold}/{n_folds}] "
+                                        + " | ".join(
+                                            f"{metric}: {total / len(results):.4f}"
+                                            for metric, total in zip(metrics, score_sums)
+                                        )
+                                        + " "
+                                    )
+                        finally:
+                            outer_pbar.close()
+                            inner_pbar.close()
 
-                                X_test = _preprocessing_test(
-                                    preprocessor,
-                                    X[test_index]
-                                )
-
-                                model = _wrap_predict(model, postprocessor)
-                                scores = model.score(X_test, D[test_index], metrics=metrics)
-                                df.loc[len(df.index)] = (i, j) + scores
-
-                                means = df[metrics].mean()
-                                stds = df[metrics].std()
-                                outer_pbar.update(1)
-                                inner_pbar.set_description_str(
-                                    f"[repeat {i}/{n_repeats}, fold {j}/{n_folds}] " +
-                                    " | ".join(f"{m}: {v:.4f}" for m, v in means.items()) +
-                                    " "
-                                )
-
+                        results.sort(key=lambda result: (result[0], result[1]))
+                        rows = [
+                            [repeat, fold] + list(scores)
+                            for repeat, fold, scores in results
+                        ]
+                        df = pd.DataFrame(rows, columns=["repeat", "fold"] + metrics)
+                        means = df[metrics].mean()
+                        stds = df[metrics].std()
                         df.loc[len(df.index)] = [""] * len(df.columns)
                         df.loc[len(df.index)] = ["", "mean"] + means.tolist()
                         df.loc[len(df.index)] = ["", "std"] + stds.tolist()
-                        
                         df.to_csv(f"{setup}_{dataset}.csv", index=False)
-
-                        outer_pbar.close()
-                        inner_pbar.close()
                         tqdm.write("(Done!)")
