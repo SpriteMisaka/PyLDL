@@ -4,17 +4,25 @@ from numba import jit
 
 from scipy.optimize import minimize
 from scipy.special import softmax
+from scipy.spatial.distance import cdist
 
 from sklearn.cluster import KMeans
 
 from pyldl.algorithms.base import BaseADMM, BaseLDL
-from pyldl.algorithms.utils import svt, solvel21, pairwise_euclidean
+from pyldl.algorithms.utils import svt, solvel21
+
+
+@jit(nopython=True)
+def _get_log_D_pred(X, W):
+    XW = X @ W
+    for i in range(XW.shape[0]):
+        XW[i] -= np.max(XW[i])
+    return XW - np.log(np.sum(np.exp(XW), axis=1)).reshape(-1, 1)
 
 
 @jit(nopython=True)
 def _get_D_pred(X, W):
-    exp_XW = np.exp(X @ W)
-    return exp_XW / np.sum(exp_XW, axis=1).reshape(-1, 1)
+    return np.exp(_get_log_D_pred(X, W))
 
 
 @jit(nopython=True)
@@ -25,17 +33,19 @@ def _get_D_pred_DSE(D, S, E, X, W):
 
 @jit(nopython=True)
 def _update_W_numba(X, D, W, S, E, V, alpha, rho):
+    log_D_pred = _get_log_D_pred(X, W)
     D_pred, DSE = _get_D_pred_DSE(D, S, E, X, W)
-    DD2 = D_pred - D_pred ** 2
-    kl = np.sum(D * (np.log(D) - np.log(D_pred)))
+    G = -(V + rho * DSE) @ S.T
+    D_flat = D.reshape(-1, )
+    mask = D_flat > 0
+    kl = np.sum(D_flat[mask] * (np.log(D_flat[mask]) - log_D_pred.reshape(-1, )[mask]))
     inn = np.sum(V * DSE)
     fro1 = np.linalg.norm(W) ** 2
     fro2 = rho * np.linalg.norm(DSE) ** 2 / 2.
     loss = kl + inn + alpha * fro1 + fro2
     grad = X.T @ (D_pred - D)
     grad += 2 * alpha * W
-    grad -= X.T @ (DD2 * V) @ S.T
-    grad -= rho * X.T @ (DD2 * DSE) @ S.T
+    grad += X.T @ (D_pred * (G - np.sum(D_pred * G, axis=1).reshape(-1, 1)))
     return loss, grad.reshape(-1, )
 
 
@@ -52,7 +62,7 @@ def _update_S_numba(X, D, W, S, E, Z, V, V2, P, sumP, n_clusters, delta, rho):
     for i in range(n_clusters):
         pairwise -= np.sum(S * P[i])
     loss = inn + fro + delta * pairwise
-    grad = - V.T @ D_pred + V2.T
+    grad = - D_pred.T @ V + V2
     grad += rho * (S - Z - D_pred.T @ DSE)
     grad -= sumP
     return loss, grad.reshape(-1, )
@@ -80,19 +90,21 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         self.delta = delta
 
     def _update_W(self):
-        """Please note that Eq. (9) in paper :cite:`2019:ren2` should be corrected to:
+        r"""The gradient of Eq. (7) in paper :cite:`2019:ren2`, correcting Eq. (9), is:
 
         .. math::
 
-            \\begin{aligned}
-            \\nabla_\\boldsymbol{W} = & \\boldsymbol{X}^{\\top} \\left(\\hat{\\boldsymbol{D}} - \\boldsymbol{D}\\right) + 2 \\lambda_1 \\boldsymbol{W} -
-            \\boldsymbol{X}^{\\top} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
-            \\boldsymbol{\\Gamma}_1\\right) \\boldsymbol{S}^{\\top} \\\\
-            - & \\rho \\boldsymbol{X}^{\\top} \\left(\\left(\\hat{\\boldsymbol{D}} - \\hat{\\boldsymbol{D}}^2\\right) \\odot
-            \\left(\\boldsymbol{D} - \\hat{\\boldsymbol{D}}\\boldsymbol{S} - \\boldsymbol{E}\\right)\\right) \\boldsymbol{S}^{\\top}\\text{,}
-            \\end{aligned}
+            \begin{aligned}
+            \hat{\boldsymbol{D}} &= \operatorname{softmax}(\boldsymbol{X}\boldsymbol{W}), \\
+            \boldsymbol{R} &= \boldsymbol{D} - \hat{\boldsymbol{D}}\boldsymbol{S} - \boldsymbol{E}, \\
+            \boldsymbol{G} &= -(\boldsymbol{\Gamma}_1 + \rho\boldsymbol{R})\boldsymbol{S}^{\top}, \\
+            \nabla_{\boldsymbol{W}} &= \boldsymbol{X}^{\top}[
+            \hat{\boldsymbol{D}} - \boldsymbol{D} + \hat{\boldsymbol{D}}\odot(
+            \boldsymbol{G} - ((\hat{\boldsymbol{D}}\odot\boldsymbol{G})\boldsymbol{1})
+            \boldsymbol{1}^{\top})] + 2\lambda_1\boldsymbol{W}.
+            \end{aligned}
 
-        where :math:`\\odot` denotes element-wise multiplication.
+        Here :math:`\odot` denotes element-wise multiplication.
         """
 
         def _obj_func(w):
@@ -106,6 +118,21 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         self._update_E()
 
     def _update_S(self):
+        r"""The gradient of Eq. (8) in paper :cite:`2019:ren2`, correcting Eq. (10), is:
+
+        .. math::
+
+            \begin{aligned}
+            \boldsymbol{R} &= \boldsymbol{D} - \hat{\boldsymbol{D}}\boldsymbol{S} - \boldsymbol{E}, \\
+            \nabla_{\boldsymbol{S}} &= -\hat{\boldsymbol{D}}^{\top}\boldsymbol{\Gamma}_1
+            + \boldsymbol{\Gamma}_2
+            + \rho(\boldsymbol{S} - \boldsymbol{Z}
+            - \hat{\boldsymbol{D}}^{\top}\boldsymbol{R})
+            - \frac{\lambda_4}{2}\sum_v\boldsymbol{P}_v.
+            \end{aligned}
+
+        Here :math:`(\boldsymbol{P}_v)_{mn} = \|\boldsymbol{D}^{v}_{\cdot m} - \boldsymbol{D}^{v}_{\cdot n}\|_2^2`.
+        """
 
         def _obj_func(s):
             self._S = s.reshape(self._n_outputs, self._n_outputs)
@@ -117,11 +144,11 @@ class LDL_LCLR(BaseADMM, BaseLDL):
         self._S = optimize_result.x.reshape(self._n_outputs, self._n_outputs)
 
     def _update_E(self):
-        _, DSE = _get_D_pred_DSE(self._D, self._S, self._E, self._X, self._W)
-        self._E = solvel21(DSE, self.beta / self._rho)
+        D_pred = _get_D_pred(self._X, self._W)
+        self._E = solvel21(self._D - D_pred @ self._S + self._V / self._rho, self.beta / self._rho)
 
     def _update_Z(self):
-        self._Z = svt(self._S - self._Z, self.gamma / self._rho)
+        self._Z = svt(self._S + self._V2 / self._rho, self.gamma / self._rho)
 
     def _update_V(self):
         self._V, self._V2 = _update_V_numba(self._X, self._D, self._W, self._S, self._E,
@@ -150,10 +177,11 @@ class LDL_LCLR(BaseADMM, BaseLDL):
     def _before_train(self):
         c = KMeans(n_clusters=self.n_clusters).fit_predict(self._D)
         self._P = []
-        self._sumP = 0.
+        self._sumP = np.zeros((self._n_outputs, self._n_outputs))
         for i in range(self.n_clusters):
-            temp = pairwise_euclidean(self._D[c == i].T)
-            self._sumP += self.delta * np.sum(temp)
+            D_cluster = self._D[c == i].T
+            temp = cdist(D_cluster, D_cluster, metric='sqeuclidean')
+            self._sumP += self.delta * temp
             self._P.append(temp)
         self._S = np.eye(self._n_outputs)
         self._E = np.zeros((self._n_samples, self._n_outputs))

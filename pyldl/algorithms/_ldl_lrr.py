@@ -18,16 +18,11 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
         self.beta = beta
 
     @staticmethod
-    def ranking_loss(D_pred, P, W):
+    def ranking_loss(D_pred, P, W, sigma=1e2):
         logsig = lambda x: -ops.logaddexp(0., -x)
-        P_hat = D_pred[:, :, None] - D_pred[:, None, :]
-        l = ((1 - P) * logsig(1 - P_hat) + P * logsig(P_hat)) * W
+        P_hat = sigma * (D_pred[:, :, None] - D_pred[:, None, :])
+        l = ((1 - P) * logsig(-P_hat) + P * logsig(P_hat)) * W
         return -ops.sum(l)
-
-    @staticmethod
-    def preprocessing(D):
-        diff = D[:, :, None] - D[:, None, :]
-        return ops.where(diff > .5, 1., 0.), ops.square(diff)
 
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
@@ -37,4 +32,6 @@ class LDL_LRR(BaseBFGS, BaseDeepLDL):
         return kld + self.alpha * rnk + self.beta * self._l2_reg(theta)
 
     def _before_train(self):
-        self._P, self._W = LDL_LRR.preprocessing(self._D)
+        diff = self._D[:, :, None] - self._D[:, None, :]
+        self._P = ops.where(diff > 0., 1., ops.where(diff < 0., 0., .5))
+        self._W = ops.square(diff)

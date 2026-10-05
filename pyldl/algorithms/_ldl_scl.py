@@ -35,7 +35,7 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
         self.beta = beta
 
     def _get_default_model(self):
-        return self.get_2layer_model(self._n_features, self._n_outputs)
+        return self.get_2layer_model(self._n_features, self._n_outputs, activation='linear')
 
     def _before_train(self):
         self._P = ops.convert_to_tensor(
@@ -50,6 +50,10 @@ class LDL_SCL(BaseAdam, BaseDeepLDL):
             name='W', shape=(self.n_clusters, self._n_outputs),
             initializer=keras.initializers.RandomNormal(), trainable=True
         )
+
+    def train_step(self, *args, **kwargs):
+        super().train_step(*args, **kwargs)
+        self._C.assign(ops.maximum(self._C, EPS))
 
     @staticmethod
     def scl_loss(D_pred, P, C):

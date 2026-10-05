@@ -22,5 +22,7 @@ class LDLLC(BaseBFGS, BaseDeepLDL):
         thetaT = ops.transpose(theta)
         D_pred = keras.activations.softmax(self._X @ theta)
         kld = ops.sum(keras.losses.kl_divergence(self._D, D_pred))
-        lc = ops.sum(non_diagonal(ops.sign(ops.corrcoef(thetaT)) * pairwise_euclidean(thetaT))) / 2.
+        centered = thetaT - ops.mean(thetaT, axis=1, keepdims=True)
+        signs = ops.sign(centered @ ops.transpose(centered))
+        lc = ops.sum(non_diagonal(signs * pairwise_euclidean(thetaT))) / 2.
         return kld + self.alpha * lc + self.beta * self._l2_reg(theta)
