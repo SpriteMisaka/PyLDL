@@ -298,6 +298,15 @@ def sort_loss(D, D_pred):
     return res
 
 
+def kl_divergence_with_grad(D: np.ndarray, D_pred: np.ndarray):
+    D, inside = np.clip(D, EPS, 1.), (D_pred > EPS) & (D_pred < 1.)
+    return kl_divergence(D, D_pred), np.where(inside, -D / np.clip(D_pred, EPS, 1.), 0.)
+
+
+def mean_squared_error_with_grad(D: np.ndarray, D_pred: np.ndarray):
+    return np.mean((D_pred - D) ** 2), 2. * (D_pred - D) / D_pred.shape[1]
+
+
 def soft_thresholding(A: np.ndarray, tau: float) -> np.ndarray:
     r"""Soft thresholding operation.
     It is defined as :math:`\text{soft}(\boldsymbol{A}, \tau) = \text{sgn}(\boldsymbol{A}) \odot \max\lbrace \lvert \boldsymbol{A} \rvert - \tau, 0 \rbrace`,

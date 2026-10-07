@@ -336,7 +336,6 @@ class BaseIter(Base):
 
     def fit(self, X, Y, max_iterations=100, *, convergence_criterion=1e-7,
             validation_split=0., callbacks=None, metrics=None, verbose=0, **kwargs):
-        import keras
         (X, Y), (X_val, Y_val) = self._split_validation_data(validation_split, X, Y)
         super().fit(X, Y, **kwargs)
         self._max_iterations = max_iterations
@@ -346,10 +345,12 @@ class BaseIter(Base):
         self.stop_training = False
         self._before_train()
 
-        callback_list = keras.callbacks.CallbackList(
-            callbacks, model=self, epochs=self._max_iterations, verbose=verbose
-        )
-        callback_list.on_train_begin()
+        if callbacks:
+            import keras
+            callback_list = keras.callbacks.CallbackList(
+                callbacks, model=self, epochs=self._max_iterations, verbose=verbose
+            )
+            callback_list.on_train_begin()
         for iteration in range(self._max_iterations):
             self._current_iteration = iteration + 1
             loss, converged = self._run_iteration()
@@ -357,10 +358,12 @@ class BaseIter(Base):
             if X_val is not None and self._metrics:
                 scores = self.score(X_val, Y_val, metrics=self._metrics, return_dict=True)
             logs = {'loss': float(loss), **scores}
-            callback_list.on_epoch_end(iteration, logs)
+            if callbacks:
+                callback_list.on_epoch_end(iteration, logs)
             if converged or self.stop_training:
                 break
-        callback_list.on_train_end()
+        if callbacks:
+            callback_list.on_train_end()
         return self
 
 

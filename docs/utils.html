@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Utils &amp; Metrics &#8212; PyLDL 0.1.1 documentation</title>
+    <title>Utils &amp; Metrics &#8212; PyLDL 0.1.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
-    <script src="_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="_static/documentation_options.js?v=92734c54"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -225,11 +225,27 @@
 </dd></dl>
 
 </section>
+<section id="kl-divergence-with-grad">
+<h2><cite>kl_divergence_with_grad</cite><a class="headerlink" href="#kl-divergence-with-grad" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.kl_divergence_with_grad">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">kl_divergence_with_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.kl_divergence_with_grad" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="locass-proj">
 <h2><cite>locass_proj</cite><a class="headerlink" href="#locass-proj" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyldl.algorithms.utils.locass_proj">
 <span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">locass_proj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.locass_proj" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="mean-squared-error-with-grad">
+<h2><cite>mean_squared_error_with_grad</cite><a class="headerlink" href="#mean-squared-error-with-grad" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyldl.algorithms.utils.mean_squared_error_with_grad">
+<span class="sig-prename descclassname"><span class="pre">pyldl.algorithms.utils.</span></span><span class="sig-name descname"><span class="pre">mean_squared_error_with_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SpriteMisaka/PyLDL/tree/main/pyldl/algorithms/utils.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyldl.algorithms.utils.mean_squared_error_with_grad" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -1173,7 +1189,9 @@ This setting can refer to:</p>
 <li class="toctree-l2"><a class="reference internal" href="#inv-digamma"><cite>inv_digamma</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kernel"><cite>kernel</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#kl-divergence-downarrow"><cite>kl_divergence</cite><span class="math notranslate nohighlight">\(\downarrow\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kl-divergence-with-grad"><cite>kl_divergence_with_grad</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#locass-proj"><cite>locass_proj</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mean-squared-error-with-grad"><cite>mean_squared_error_with_grad</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#non-diagonal"><cite>non_diagonal</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#normalize"><cite>normalize</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pairwise-cosine"><cite>pairwise_cosine</cite></a></li>

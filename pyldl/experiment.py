@@ -1,5 +1,26 @@
+import sys
+
 from pyldl.utils import load_dataset
 from pyldl.metrics import DEFAULT_METRICS
+
+
+_DVS_PRESETS = {
+    **dict.fromkeys(["SJAFFE", "RAF_ML"], ([1., 0., 1., 0., 0., 0.], [0., 1., 0., 1., 1., 1.])),
+    "emotion6": ([0., 0., 1., 0., 0., 1., 0.], [1., 1., 0., 1., 1., 0., 0.]),
+    "SBU_3DFE": ([1., 0., 0., 0., 0., 1.], [0., 1., 1., 1., 1., 0.]),
+    **dict.fromkeys(["Twitter", "Flickr"], ([0., 1., 0., 1., 0., 1., 0., 0.], [1., 0., 0., 0., 1., 0., 1., 1.])),
+    "Music": ([1., 0., 1., 0., 1., 1., 1., .5, .5], [0., 1., 0., 1., 0., 0., 0., .5, .5]),
+    "Painting": ([1., 0., 0., 1., 0., 1., 0., 0.], [0., 1., 0., 0., 1., 0., 1., 1.]),
+    **dict.fromkeys(["M2B", "fbp5500", "SCUT_FBP", "Movie"], ([0., .25, .5, .75, 1.], [1., .75, .5, .25, 0.])),
+}
+
+
+def _is(target, module, name):
+    module = sys.modules.get(f"pyldl.algorithms.{module}")
+    if module is None:
+        return False
+    cls = getattr(module, name)
+    return issubclass(target, cls) if isinstance(target, type) else isinstance(target, cls)
 
 
 def _resolve_fit_args(algorithm, fit_args):
@@ -23,6 +44,24 @@ def _resolve_extra_args(target, extra_args):
             inspect.Parameter.KEYWORD_ONLY,
         )
     }
+
+
+def _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor):
+    import numpy as np
+
+    resolved = dict(extra_args)
+    for name in ("pos", "neg"):
+        if isinstance(resolved.get(name), dict):
+            if dataset in resolved[name]:
+                resolved[name] = resolved[name][dataset]
+            else:
+                del resolved[name]
+    if dataset in _DVS_PRESETS and (
+        _is(algorithm, "_ldl_dvs", "LDL_DVS") or _is(postprocessor, "_divo", "DivO")
+    ):
+        for name, value in zip(("pos", "neg"), _DVS_PRESETS[dataset]):
+            resolved.setdefault(name, np.array(value, dtype=np.float32))
+    return resolved
 
 
 def _resolve_metrics(metrics, extra_args):
@@ -112,9 +151,9 @@ def _postprocessor_str(postprocessor):
     if callable(postprocessor):
         name = getattr(postprocessor, "__name__", postprocessor.__class__.__name__)
         return f"_{name}"
-    from pyldl.algorithms._daldl import DALDL
-    if isinstance(postprocessor, DALDL):
-        return "_DALDL"
+    from pyldl.algorithms._divo import DivO
+    if isinstance(postprocessor, DivO):
+        return "_DivO"
 
 
 def _wrap_predict(model, postprocessor):
@@ -186,8 +225,8 @@ def _run_fold(
     X_test = _preprocessing_test(preprocessor, X[test_index])
     loader = algorithm
     if postprocessor is not None and not callable(postprocessor) and not isinstance(postprocessor, list):
-        from pyldl.algorithms._daldl import DALDL
-        if isinstance(postprocessor, DALDL):
+        from pyldl.algorithms._divo import DivO
+        if isinstance(postprocessor, DivO):
             loader = type(postprocessor)
 
     model_exists = model_path is not None and any(
@@ -255,7 +294,6 @@ def run(
         fit_args = {}
     if extra_args is None:
         extra_args = {}
-    score_metrics = _resolve_metrics(metrics, extra_args)
 
     for preprocessor in preprocessors:
         for postprocessor in postprocessors:
@@ -267,11 +305,13 @@ def run(
 
                 for algorithm in algorithms:
                     alg_fit_args = _resolve_fit_args(algorithm, fit_args)
+                    alg_extra_args = _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor)
+                    score_metrics = _resolve_metrics(metrics, alg_extra_args)
                     for alg_init_args in init_args.get(algorithm.__name__, [{}]):
                         post_fit_args = {}
                         if postprocessor is not None and not callable(postprocessor) and not isinstance(postprocessor, list):
-                            from pyldl.algorithms._daldl import DALDL
-                            if isinstance(postprocessor, DALDL):
+                            from pyldl.algorithms._divo import DivO
+                            if isinstance(postprocessor, DivO):
                                 post_fit_args = _resolve_fit_args(type(postprocessor), fit_args)
                         if len(alg_init_args) > 0:
                             init_str = "_".join([f"{k}={v}" for k, v in alg_init_args.items()])
@@ -309,7 +349,7 @@ def run(
                                         postprocessor,
                                         post_fit_args,
                                         score_metrics,
-                                        extra_args,
+                                        alg_extra_args,
                                         f"models/{algorithm.__name__}/{dataset}/{setup}_repeat={i}_fold={j}"
                                         if save_models or load_models else None,
                                         f"models/{algorithm.__name__}/{dataset}/{base_setup}_repeat={i}_fold={j}"
