@@ -22,15 +22,16 @@ class LDL4C(BaseBFGS, BaseDeepLDLClassifier):
     def _loss(self, params_1d):
         theta = self._params2model(params_1d)[0]
         D_pred = keras.activations.softmax(self._X @ theta)
-        top2 = ops.take_along_axis(D_pred, self._top2, axis=1)
+        highest = ops.sum(D_pred * self._L, axis=1)
+        rest = ops.max(ops.where(self._L > 0, -1., D_pred), axis=1)
         margin = ops.sum(
-            ops.maximum(0., 1. - (top2[:, 0] - top2[:, 1]) / self._rho)
+            ops.maximum(0., 1. - (highest - rest) / self._rho)
         )
         mae = keras.losses.mean_absolute_error(self._D, D_pred)
         return ops.sum(self._entropy * mae) + self._alpha * margin + self._beta * self._l2_reg(theta)
 
     def _before_train(self):
-        _, self._top2 = ops.top_k(self._D, k=2)
+        self._L = ops.one_hot(ops.argmax(self._D, axis=1), self._n_outputs)
         self._entropy = ops.cast(
             -ops.sum(self._D * ops.log(self._D + EPS), axis=1),
             dtype="float32")
@@ -121,7 +122,7 @@ class LDLM(BaseGD, BaseDeepLDLClassifier):
         self._rest = temp[:, 1:]
 
         rest = ops.take_along_axis(self._D, self._rest, axis=1)
-        temp, _ = ops.top_k(rest, k=2)
+        temp, _ = ops.top_k(ops.pad(rest, [[0, 0], [0, 1]]), k=2)
         self._second_margin = temp[:, 0] - temp[:, 1]
 
         self._L = ops.one_hot(ops.reshape(self._highest, (-1,)), self._n_outputs)

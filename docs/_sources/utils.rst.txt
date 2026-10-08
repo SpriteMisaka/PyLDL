@@ -13,7 +13,6 @@ Utils & Metrics
 
    {% for func_name in all_alg_utils %}
    {% if func_name.startswith('_') %}
-   {% elif func_name == 'sort_loss' %}
    {% else %}
    {{ display_func_name(func_name) }}
    .. autofunction:: pyldl.algorithms.utils.{{ func_name }}

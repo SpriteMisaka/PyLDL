@@ -4,6 +4,8 @@ from functools import wraps, singledispatch
 
 import numpy as np
 
+from scipy.spatial.distance import cdist
+
 
 EPS = np.finfo(np.float64).eps
 
@@ -285,19 +287,6 @@ def kl_divergence(D, D_pred):
     return np.sum(D * (np.log(D) - np.log(D_pred)), 1)
 
 
-@_reduction
-@_1d
-def sort_loss(D, D_pred):
-    i = np.argsort(-D)
-    h = D_pred[np.arange(D_pred.shape[0])[:, np.newaxis], i]
-    res = 0.
-    for j in range(D.shape[1] - 1):
-        for k in range(j + 1, D.shape[1]):
-            res += np.maximum(h[:, k] - h[:, j], 0.) / np.log2(j + 2)
-    res /= np.sum([1. / np.log2(j + 2) for j in range(D.shape[1] - 1)])
-    return res
-
-
 def kl_divergence_with_grad(D: np.ndarray, D_pred: np.ndarray):
     D, inside = np.clip(D, EPS, 1.), (D_pred > EPS) & (D_pred < 1.)
     return kl_divergence(D, D_pred), np.where(inside, -D / np.clip(D_pred, EPS, 1.), 0.)
@@ -559,7 +548,7 @@ def pairwise_euclidean(X, Y=None):
 
     @_pairwise.register(np.ndarray)
     def _(X: np.ndarray, Y: np.ndarray):
-        return np.sqrt(np.sum((X[:, np.newaxis] - Y[np.newaxis]) ** 2, axis=2) + EPS)
+        return cdist(X, Y)
 
     Y = X if Y is None else Y
     return _pairwise(X, Y)
@@ -589,10 +578,7 @@ def pairwise_cosine(X, Y=None, mode: str = 'similarity'):
 
     @_pairwise.register(np.ndarray)
     def _(X: np.ndarray, Y: np.ndarray):
-        X_norm = X / np.linalg.norm(X, axis=1, keepdims=True)
-        Y_norm = Y / np.linalg.norm(Y, axis=1, keepdims=True)
-        similarity = np.dot(X_norm, np.transpose(Y_norm))
-        return similarity
+        return 1 - cdist(X, Y, 'cosine')
 
     Y = X if Y is None else Y
     similarity = _pairwise(X, Y)
@@ -614,7 +600,6 @@ def pairwise_pearsonr(X, Y=None):
     @singledispatch
     def _pairwise(X, Y):
         import keras.ops as ops
-        Y = X if Y is None else Y
         X_centered = X - ops.mean(X, axis=1, keepdims=True)
         Y_centered = Y - ops.mean(Y, axis=1, keepdims=True)
         cov = ops.matmul(X_centered, ops.transpose(Y_centered))
@@ -623,9 +608,10 @@ def pairwise_pearsonr(X, Y=None):
         return cov / ops.matmul(X_std, ops.transpose(Y_std))
 
     @_pairwise.register(np.ndarray)
-    def _(X: np.ndarray, Y: Optional[np.ndarray]):
-        return np.corrcoef(X) if Y is None else np.corrcoef(X, Y)[:X.shape[0], X.shape[0]:]
+    def _(X: np.ndarray, Y: np.ndarray):
+        return 1 - cdist(X, Y, 'correlation')
 
+    Y = X if Y is None else Y
     return _pairwise(X, Y)
 
 

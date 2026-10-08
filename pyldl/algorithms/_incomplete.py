@@ -56,7 +56,7 @@ class WInLDL(BaseADMM, BaseIncomLDL):
 
     def _update_Q(self):
         a = 1 + self._current_iteration / self._max_iterations
-        self._Q2 = np.power(a, np.tile(self._avg, (self._D.shape[0], 1))) * (1 - self._mask)
+        self._Q2 = np.power(a, np.tile(1 - self._avg, (self._D.shape[0], 1))) * (1 - self._mask)
         self._Q = self._Q1 + self._Q2
 
     def _before_train(self):

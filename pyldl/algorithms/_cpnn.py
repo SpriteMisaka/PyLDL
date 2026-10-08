@@ -40,6 +40,7 @@ class CPNN(BaseGD, BaseDeepLDL):
             one_hot = ops.repeat(one_hot, self._v, axis=0)
             v = ops.reshape(ops.tile([1 / (i + 1) for i in range(self._v)], [n]), (-1, 1))
             self._D += self._D * one_hot * v
+            self._n_samples = n * self._v
 
     def _make_inputs(self, X):
         temp = ops.reshape(ops.tile([i + 1 for i in range(self._n_outputs)], [X.shape[0]]), (-1, 1))

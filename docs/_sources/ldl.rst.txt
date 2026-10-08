@@ -38,8 +38,6 @@ For small datasets, algorithms based on :class:`BaseBFGS <pyldl.algorithms.base.
 .. jinja:: ldl_ctx
 
    {% for class_name in all_ldl_algs %}
-   {% if class_name == 'AdaBoostLDL' %}
-   {% else %}
 
    {% if class_name == 'RKNN_LDL' %}
    R\ :math:`k`\NN-LDL
@@ -83,7 +81,6 @@ For small datasets, algorithms based on :class:`BaseBFGS <pyldl.algorithms.base.
       :members:
       :private-members:
 
-   {% endif %}
    {% endfor %}
 
    {% for func_name in all_ldl_loss %}

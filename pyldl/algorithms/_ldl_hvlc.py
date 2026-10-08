@@ -50,7 +50,7 @@ class LDL_HVLC(BaseAdam, BaseDeepLDL):
         )
         self._knn = NearestNeighbors(n_neighbors=self.k+1).fit(self._to_numpy(self._X))
         self._C = self._construct_C(self._X, self_include=False)
-        self._p = ops.convert_to_tensor([pairwise_pearsonr(self._C[i], self._D[i]) for i in range(self._n_samples)], dtype="float32")
+        self._p = ops.reshape(ops.convert_to_tensor([pairwise_pearsonr(self._C[i], self._D[i]) for i in range(self._n_samples)], dtype="float32"), (-1,))
         self._P = ops.convert_to_tensor(pairwise_pearsonr(ops.transpose(self._D)), dtype="float32")
 
     def train_step(self, _, *args, **kwargs):

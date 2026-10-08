@@ -1,4 +1,5 @@
 import copy
+import heapq
 
 import numpy as np
 
@@ -6,7 +7,6 @@ from scipy.special import expit, softmax
 from sklearn.cluster import KMeans
 
 from pyldl.algorithms.base import BaseEnsemble, BaseLDL
-from pyldl.algorithms.utils import sort_loss
 
 from pyldl.algorithms._tree import _Node, best_split
 from pyldl.algorithms._rbm import train_rbm
@@ -173,14 +173,105 @@ class LDLogitBoost(BaseEnsemble):
     """:class:`LDLogitBoost` is proposed in paper :cite:`2016:xing`.
     """
 
-    def __init__(self, estimator=None, n_estimators=100, **kwargs):
+    class VectorTree(BaseLDL):
+        """:class:`VectorTree` is proposed in paper :cite:`2016:xing`.
+        """
+
+        def __init__(self, n_leaves=2, min_to_split=6, **kwargs):
+            super().__init__(**kwargs)
+            self.n_leaves = n_leaves
+            self.min_to_split = min_to_split
+
+        def fit(self, X, D, F=None):
+            super().fit(X, D)
+            self._P = softmax(np.zeros_like(self._D) if F is None else F, axis=1)
+            self._G = self._P - self._D
+            self._order = np.argsort(self._X, axis=0, kind='stable').T
+            self._tree, heap, n_leaves = [], [], 1
+            self._node(np.arange(self._n_samples), heap)
+            while n_leaves < self.n_leaves and heap:
+                _, k, feature, value, left, right = heapq.heappop(heap)
+                self._tree[k][:4] = feature, value, self._node(left, heap), self._node(right, heap)
+                n_leaves += 1
+            for node in self._tree:
+                if node[0] < 0:
+                    node[4] = self._leaf(node[4])
+            del self._P, self._G, self._order
+            return self
+
+        def predict(self, X):
+            return softmax(self._predict_F(X), axis=1)
+
+        def _predict_F(self, X):
+            F = np.zeros((X.shape[0], self._n_outputs))
+            stack = [(0, np.arange(X.shape[0]))]
+            while stack:
+                k, rows = stack.pop()
+                feature, value, left, right, a = self._tree[k]
+                if feature < 0:
+                    F[rows] = a
+                else:
+                    mask = X[rows, feature] < value
+                    stack += [(left, rows[mask]), (right, rows[~mask])]
+            return F
+
+        def _pair(self, idx):
+            g, P = np.sum(self._G[idx], axis=0), self._P[idx]
+            r = np.argmax(-g)
+            h = np.sum(P * (1 - P), axis=0)
+            h = h[r] + h + 2 * np.sum(P[:, [r]] * P, axis=0)
+            gain = (g[r] - g) ** 2 / np.where(h == 0, 1, h)
+            gain[r] = -1
+            return r, np.argmax(gain)
+
+        def _uv(self, idx):
+            r, s = self._pair(idx)
+            P = self._P
+            u = self._G[:, s] - self._G[:, r]
+            v = P[:, r] * (1 - P[:, r]) + P[:, s] * (1 - P[:, s]) + 2 * P[:, r] * P[:, s]
+            return r, s, u, v
+
+        @staticmethod
+        def _gain(u, v):
+            return u ** 2 / (2 * np.where(v == 0, 1, v))
+
+        def _node(self, idx, heap):
+            k = len(self._tree)
+            self._tree.append([-1, 0., 0, 0, idx])
+            if len(idx) < self.min_to_split:
+                return k
+            _, _, u, v = self._uv(idx)
+            mask = np.zeros(self._n_samples, dtype=bool)
+            mask[idx] = True
+            S = self._order[mask[self._order]].reshape(self._order.shape[0], -1)
+            x = np.take_along_axis(self._X.T, S, axis=1)
+            U, V = np.cumsum(u[S], axis=1), np.cumsum(v[S], axis=1)
+            UL, VL = U[:, :-1], V[:, :-1]
+            gain = self._gain(UL, VL) + self._gain(U[:, -1:] - UL, V[:, -1:] - VL)
+            gain = np.where(x[:, :-1] < x[:, 1:], gain, -np.inf)
+            if not np.isfinite(gain).any():
+                return k
+            feature, i = np.unravel_index(np.argmax(gain), gain.shape)
+            expected = gain[feature, i] - self._gain(U[0, -1], V[0, -1])
+            heapq.heappush(heap, (-expected, k, feature, (x[feature, i] + x[feature, i + 1]) / 2, S[feature, :i + 1], S[feature, i + 1:]))
+            return k
+
+        def _leaf(self, idx):
+            r, s, u, v = self._uv(idx)
+            gamma = np.sum(u[idx]) / (np.sum(v[idx]) or 1.)
+            a = np.zeros(self._n_outputs)
+            a[r], a[s] = gamma, -gamma
+            return a
+
+    def __init__(self, estimator=None, n_estimators=100, mode=None, **kwargs):
         from sklearn.tree import DecisionTreeRegressor
         if estimator is None:
-            estimator = DecisionTreeRegressor()
+            estimator = self.VectorTree(n_leaves=20) if mode == 'AOSO' else DecisionTreeRegressor()
         super().__init__(estimator, n_estimators, **kwargs)
+        self._mode = mode
 
     def _calculate_Fj(self, f):
-        return self._learning_rate * ((self._n_outputs - 1) / self._n_outputs) * (f - np.mean(f))
+        return self._learning_rate * ((self._n_outputs - 1) / self._n_outputs) * (f - np.mean(f, axis=1, keepdims=True))
 
     def fit(self, X, D, learning_rate=0.05):
         super().fit(X, D)
@@ -188,58 +279,30 @@ class LDLogitBoost(BaseEnsemble):
         self._learning_rate = learning_rate
         self._F = np.zeros((self._n_samples, self._n_outputs), dtype=np.float32)
         for i in range(self._n_estimators):
+            if self._mode == 'AOSO':
+                model = copy.deepcopy(self._estimator).fit(self._X, self._D, self._F)
+                self._F += self._learning_rate * model._predict_F(self._X)
+                self._estimators.append(model)
+                continue
             P = softmax(self._F, axis=1)
             H = P * (1 - P)
             Z = (self._D - P) / H
+            f = np.zeros((self._n_samples, self._n_outputs))
+            self._estimators.append([])
             for j in range(self._n_outputs):
                 model = copy.deepcopy(self._estimator)
                 model.fit(self._X, Z[:, j], sample_weight=H[:, j])
-                f = model.predict(self._X)
-                self._estimators.append([])
-                self._estimators[i].append(copy.deepcopy(model))
-                self._F[:, j] += self._calculate_Fj(f)
+                f[:, j] = model.predict(self._X)
+                self._estimators[i].append(model)
+            self._F += self._calculate_Fj(f)
         return self
 
     def predict(self, X):
         F = np.zeros((X.shape[0], self._n_outputs), dtype=np.float32)   
         for i in range(self._n_estimators):
-            for j in range(self._n_outputs):
-                f = self._estimators[i][j].predict(X)
-                F[:, j] += self._calculate_Fj(f)
+            if self._mode == 'AOSO':
+                F += self._learning_rate * self._estimators[i]._predict_F(X)
+                continue
+            f = np.stack([self._estimators[i][j].predict(X) for j in range(self._n_outputs)], axis=1)
+            F += self._calculate_Fj(f)
         return softmax(F, axis=1)
-
-
-class AdaBoostLDL(BaseEnsemble):
-
-    def __init__(self, estimator=None, n_estimators=10, alpha=1., **kwargs):
-        from ._specialized_algorithms import SA_BFGS
-        if estimator is None:
-            estimator = SA_BFGS()
-        super().__init__(estimator, n_estimators, **kwargs)
-        self._alpha = alpha
-
-    def fit(self, X, D, loss=sort_loss):
-        super().fit(X, D)
-        p = np.ones((self._n_samples,)) / self._n_samples
-        self._loss = np.zeros((self._n_estimators, self._n_samples))
-        self._estimators = []
-        for i in range(self._n_estimators):
-            select = np.random.choice(self._n_samples, size=self._n_samples, p=p)
-            X_train, D_train = self._X[select], self._D[select]
-
-            model = copy.deepcopy(self._estimator)
-            model.fit(X_train, D_train)
-            self._estimators.append(copy.deepcopy(model))
-
-            D_pred = model.predict(self._X)
-            self._loss[i] = loss(D, D_pred, reduction=None)
-            p += self._alpha * (self._loss[i] / np.sum(self._loss))
-            p /= np.sum(p)
-
-    def predict(self, X):
-        w = np.sum(self._loss, axis=1)
-        w /= np.sum(w)
-        D = np.zeros((X.shape[0], self._n_outputs))
-        for i in range(self._n_estimators):
-            D += w[i] * self._estimators[i].predict(X)
-        return D

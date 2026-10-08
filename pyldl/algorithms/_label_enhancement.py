@@ -15,7 +15,7 @@ import keras
 import keras.ops as ops
 
 from pyldl.algorithms.base import BaseLE, BaseDeepLE, BaseGD, BaseAdam, BaseBFGS
-from pyldl.algorithms.utils import pairwise_cosine
+from pyldl.algorithms.utils import pairwise_cosine, pairwise_euclidean, kernel
 
 
 class FCM(BaseLE):
@@ -151,13 +151,13 @@ class GLLE(BaseBFGS, BaseDeepLE):
         lap = ops.trace(ops.transpose(D) @ self._G @ D)
         return mse + self._alpha * lap + self._beta * self._E_loss(D)
 
-    @staticmethod
-    def _construct_P(X):
-        gamma = 1. / (2. * np.mean(pdist(X)) ** 2)
-        return ops.convert_to_tensor(rbf_kernel(X, gamma=gamma), dtype="float32")
+    def _construct_P(self, X):
+        return ops.convert_to_tensor(kernel(X, self._to_numpy(self._X), gamma=self._gamma), dtype="float32")
 
     def _before_train(self):
-        self._P = self._construct_P(self._to_numpy(self._X))
+        X = self._to_numpy(self._X)
+        self._gamma = 1. / (2. * (np.sum(pairwise_euclidean(X)) / (X.shape[0] * (X.shape[0] - 1))) ** 2)
+        self._P = self._construct_P(X)
 
         self._nn = NearestNeighbors(n_neighbors=self._n_outputs+1)
         self._nn.fit(self._to_numpy(self._X))
@@ -187,7 +187,7 @@ class GLLE(BaseBFGS, BaseDeepLE):
         return self.get_2layer_model(self._P.shape[1], self._n_outputs, activation=None)
 
     def transform(self, X=None, L=None):
-        P = self._P if X is None else self._construct_P(X)
+        P = self._P if X is None else self._construct_P(self._to_numpy(X))
         return self._to_numpy(keras.activations.softmax(self._call(P)))
 
 
@@ -227,7 +227,7 @@ class LEVI(BaseAdam, BaseDeepLE):
         mean, var, samples, X_hat, L_hat = self._call(X, L)
         kl = ops.mean(.5 * (ops.square(mean) + ops.square(var) - 1. - ops.log(ops.square(var))), axis=1)
         rec_X = keras.losses.mean_squared_error(X, X_hat)
-        rec_L = keras.losses.binary_crossentropy(L, L_hat)
+        rec_L = keras.losses.binary_crossentropy(L, L_hat, from_logits=True)
 
         return ops.sum((L - samples)**2) + self._alpha * ops.sum(kl + rec_X + rec_L)
 
@@ -315,7 +315,7 @@ class ConLE(BaseGD, BaseDeepLE):
     @staticmethod
     def _con(X, Y, tau):
         C = ops.exp(pairwise_cosine(X, Y) / tau)
-        CX = ops.exp((pairwise_cosine(X, X) - ops.eye(X.shape[0])) / tau)
+        CX = ops.exp(pairwise_cosine(X, X) / tau) * (1 - ops.eye(X.shape[0]))
         numerator = ops.diagonal(C)
         denominator = ops.sum(CX, axis=1) + ops.sum(C, axis=1) - numerator
         return ops.mean(-ops.log(numerator / denominator))
