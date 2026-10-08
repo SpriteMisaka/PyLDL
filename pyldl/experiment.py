@@ -46,7 +46,7 @@ def _resolve_extra_args(target, extra_args):
     }
 
 
-def _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor):
+def _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor, metrics):
     import numpy as np
 
     resolved = dict(extra_args)
@@ -58,6 +58,7 @@ def _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor):
                 del resolved[name]
     if dataset in _DVS_PRESETS and (
         _is(algorithm, "_ldl_dvs", "LDL_DVS") or _is(postprocessor, "_divo", "DivO")
+        or any(getattr(metric, "__name__", metric) == "divisiveness_error" for metric in metrics)
     ):
         for name, value in zip(("pos", "neg"), _DVS_PRESETS[dataset]):
             resolved.setdefault(name, np.array(value, dtype=np.float32))
@@ -305,7 +306,7 @@ def run(
 
                 for algorithm in algorithms:
                     alg_fit_args = _resolve_fit_args(algorithm, fit_args)
-                    alg_extra_args = _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor)
+                    alg_extra_args = _resolve_dataset_extra_args(extra_args, dataset, algorithm, postprocessor, metrics)
                     score_metrics = _resolve_metrics(metrics, alg_extra_args)
                     for alg_init_args in init_args.get(algorithm.__name__, [{}]):
                         post_fit_args = {}
